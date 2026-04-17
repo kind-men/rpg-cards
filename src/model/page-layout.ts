@@ -1,8 +1,11 @@
+export type CardFormat = 'poker' | 'bridge' | 'tarot';
+
 export default interface PageLayout {
   paperSize: {
     width: number;
     height: number;
   };
+  cardFormat: CardFormat;
   cardSize: {
     width: number;
     height: number;

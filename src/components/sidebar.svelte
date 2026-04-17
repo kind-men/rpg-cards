@@ -12,7 +12,8 @@
   } from 'sveltestrap';
   import { generateExportObject, parseCards } from '../lib/card-json-parser';
   import type Card from '../model/card';
-  import { currentCard, deck, pageLayout } from '../stores';
+  import type { CardFormat } from '../model/page-layout';
+  import { CARD_SIZE_PRESETS, currentCard, deck, pageLayout } from '../stores';
   import { settings } from '../stores/settings';
   import Deck from './deck.svelte';
   import Hint from './hint.svelte';
@@ -80,6 +81,24 @@
 
   const handleEditJson = () => {
     toggleJsonEditor();
+  };
+
+  const cardFormatOptions: { value: CardFormat; label: string }[] = [
+    { value: 'poker', label: 'Poker' },
+    { value: 'bridge', label: 'Bridge' },
+    { value: 'tarot', label: 'Tarot' }
+  ];
+
+  const handleCardFormatChange = (cardFormat: CardFormat) => {
+    pageLayout.update((layout) => ({
+      ...layout,
+      cardFormat,
+      cardSize: { ...CARD_SIZE_PRESETS[cardFormat] }
+    }));
+  };
+
+  const handleCardFormatSelectChange = (event: Event) => {
+    handleCardFormatChange((event.currentTarget as HTMLSelectElement).value as CardFormat);
   };
 </script>
 
@@ -169,6 +188,21 @@
             />
             <InputGroupText>mm</InputGroupText>
           </InputGroup>
+        </FormGroup>
+        <FormGroup>
+          <span>
+            <Label for="card-size-format">Card size</Label>
+          </span>
+          <Input
+            id="card-size-format"
+            type="select"
+            value={$pageLayout.cardFormat}
+            on:change={handleCardFormatSelectChange}
+          >
+            {#each cardFormatOptions as option}
+              <option value={option.value}>{option.label}</option>
+            {/each}
+          </Input>
         </FormGroup>
         <FormGroup>
           <span>

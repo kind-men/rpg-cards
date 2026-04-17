@@ -37,4 +37,67 @@
     font-style: italic;
     src: url('/fonts/draconis-font/DraconisItalic.ttf') format('truetype');
   }
+
+  :global(.accordion-item) {
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(18, 38, 63, 0.12);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: #f6f4ef;
+    --bs-accordion-btn-bg: #f6f4ef;
+    --bs-accordion-active-bg: #f6f4ef;
+    --bs-accordion-btn-color: #223047;
+    --bs-accordion-active-color: #223047;
+    --bs-accordion-border-color: rgba(18, 38, 63, 0.12);
+    --bs-accordion-btn-focus-box-shadow: none;
+    --bs-accordion-btn-icon: none;
+    --bs-accordion-btn-active-icon: none;
+  }
+
+  :global(.accordion-item:last-child) {
+    margin-bottom: 0;
+  }
+
+  :global(.accordion-button) {
+    padding: 0.55rem 0.875rem;
+    background: #f6f4ef !important;
+    color: #223047 !important;
+    font-size: 0.95rem;
+    font-weight: 600;
+    box-shadow: none;
+  }
+
+  :global(.accordion-button:not(.collapsed)) {
+    background: #f6f4ef !important;
+    color: #223047 !important;
+    box-shadow: none;
+  }
+
+  :global(.accordion-button:focus) {
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  :global(.accordion-button::after) {
+    width: auto;
+    height: auto;
+    margin-left: auto;
+    background-image: none !important;
+    content: '+';
+    color: #5e6b81;
+    font-size: 1.15rem;
+    font-weight: 500;
+    line-height: 1;
+    transform: none;
+  }
+
+  :global(.accordion-button:not(.collapsed)::after) {
+    background-image: none !important;
+    content: '-';
+    transform: none;
+  }
+
+  :global(.accordion-body) {
+    background: #f6f4ef;
+  }
 </style>

@@ -5,11 +5,13 @@
     Button,
     Form,
     FormGroup,
+    Icon,
     Input,
     InputGroup,
     InputGroupText,
     Label
   } from 'sveltestrap';
+  import { createEventDispatcher } from 'svelte';
   import { generateExportObject, parseCards } from '../lib/card-json-parser';
   import type Card from '../model/card';
   import type { CardFormat } from '../model/page-layout';
@@ -28,6 +30,7 @@
 
   let toggleJsonEditor: () => void;
   let toggleJsonImportModal: () => void;
+  const dispatch = createEventDispatcher<{ info: void }>();
 
   const addCardsToDeck = (cards: Card[]) => {
     const i = deck.addCards(...cards);
@@ -122,7 +125,7 @@
   };
 </script>
 
-<div>
+<div class="sidebar-shell">
   <Accordion stayOpen>
     <AccordionItem active header="General">
       <div class="button-grid">
@@ -297,11 +300,36 @@
       <Deck />
     </AccordionItem>
   </Accordion>
+  <footer class="sidebar-footer">
+    <a
+      class="sidebar-footer-link"
+      href="https://github.com/mathiasandresen/rpg-cards"
+      target="_blank"
+      rel="noreferrer"
+      aria-label="Open GitHub repository"
+    >
+      <Icon name="github" />
+    </a>
+    <button
+      class="sidebar-footer-link"
+      type="button"
+      aria-label="Open info dialog"
+      on:click={() => dispatch('info')}
+    >
+      <Icon name="info-circle-fill" />
+    </button>
+  </footer>
   <JsonEditorModal bind:toggle={toggleJsonEditor} />
   <JsonImportModal bind:toggle={toggleJsonImportModal} on:import={handleImportFromJSON} />
 </div>
 
 <style lang="scss">
+  .sidebar-shell {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
   .hidden {
     display: none !important;
   }
@@ -336,5 +364,41 @@
     /* height: 1.5em; */
     display: flex;
     align-items: center;
+  }
+
+  .sidebar-footer {
+    position: sticky;
+    bottom: -1.5rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    background: linear-gradient(to top, #ffffff 72%, rgba(255, 255, 255, 0));
+  }
+
+  .sidebar-footer-link {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: #5e6b81;
+    text-decoration: none;
+    transition: background-color 120ms ease, color 120ms ease;
+
+    &:hover {
+      background: rgba(18, 38, 63, 0.06);
+      color: #223047;
+    }
+
+    :global(svg) {
+      width: 0.9rem;
+      height: 0.9rem;
+    }
   }
 </style>

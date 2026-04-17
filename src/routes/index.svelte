@@ -3,15 +3,9 @@
   import {
     Accordion,
     AccordionItem,
-    Icon,
-    Image,
     Modal,
-    ModalBody,
-    Nav,
-    NavItem,
-    NavLink
+    ModalBody
   } from 'sveltestrap';
-  import { Navbar, NavbarBrand } from 'sveltestrap';
   import Sidebar from '$components/sidebar.svelte';
   import CardEditor from '$components/card-editor.svelte';
   import CurrentCard from '$components/card/current-card.svelte';
@@ -22,33 +16,18 @@
   const toggleInfoModal = () => (infoModalOpen = !infoModalOpen);
 </script>
 
-<Navbar id="navbar" color="light" light class="shadow-sm">
-  <NavbarBrand href="/">
-    <div class="navbar-logo">
-      <Image src="/logo-128.png" height="32" />
-      RPG Card Generator
-    </div>
-  </NavbarBrand>
+<div class="workspace">
+  <div class="canvas-layer">
+    <CurrentCard />
+  </div>
 
-  <Nav navbar>
-    <div class="nav-icons">
-      <NavItem>
-        <NavLink href="https://github.com/mathiasandresen/rpg-cards">
-          <Icon name="github" class="navbar-icon" />
-        </NavLink>
-      </NavItem>
-      <NavItem>
-        <NavLink on:click={toggleInfoModal}>
-          <Icon name="info-circle-fill" class="navbar-icon" />
-        </NavLink>
-      </NavItem>
-    </div>
-  </Nav>
-</Navbar>
-<div class="grid">
-  <Sidebar />
-  <CardEditor />
-  <CurrentCard />
+  <aside class="floating-panel floating-panel-left shadow">
+    <Sidebar on:info={toggleInfoModal} />
+  </aside>
+
+  <aside class="floating-panel floating-panel-right shadow">
+    <CardEditor />
+  </aside>
 </div>
 <Modal header="Info" class="info-modal" isOpen={infoModalOpen} toggle={toggleInfoModal}>
   <ModalBody class="p-0">
@@ -64,42 +43,59 @@
 </Modal>
 
 <style lang="scss">
-  .grid {
-    display: grid;
-    gap: 2em;
-    padding: 0 1em;
-    margin-top: 1em;
+  $panel-width: min(24rem, 32vw);
 
-    @media (min-width: 992px) {
-      grid-template-columns: 0.5fr 1fr;
+  .workspace {
+    position: relative;
+    min-height: 100vh;
+  }
+
+  .canvas-layer {
+    position: fixed;
+    inset: 0 $panel-width 0 $panel-width;
+  }
+
+  .floating-panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 10;
+    width: $panel-width;
+    padding: 1rem 1rem 1.5rem;
+    overflow-y: auto;
+    background: #ffffff;
+  }
+
+  .floating-panel-left {
+    left: 0;
+    border-right: 1px solid rgba(18, 38, 63, 0.08);
+  }
+
+  .floating-panel-right {
+    right: 0;
+    border-left: 1px solid rgba(18, 38, 63, 0.08);
+  }
+
+  @media (max-width: 1100px) {
+    .workspace {
+      min-height: auto;
+      padding: 1rem;
+      display: grid;
+      gap: 1rem;
     }
 
-    @media (min-width: 1400px) {
-      grid-template-columns: 400px 1fr 0.5fr;
+    .canvas-layer,
+    .floating-panel {
+      position: static;
+      inset: auto;
+      width: auto;
+      min-height: 0;
     }
-  }
 
-  :global(#navbar) {
-    padding-left: 1em;
-    padding-right: 1em;
-  }
-
-  .nav-icons {
-    display: flex;
-    flex-direction: row;
-    gap: 1.5em;
-  }
-
-  .navbar-logo {
-    display: flex;
-    justify-content: center;
-    gap: 0.5em;
-    color: var(--bs-primary);
-    font-weight: 500;
-  }
-  :global(.navbar-icon) {
-    font-size: 1.5em;
-    color: var(--bs-primary);
+    .floating-panel {
+      overflow: visible;
+      border: 1px solid rgba(18, 38, 63, 0.08);
+    }
   }
 
   .info-modal-text {
@@ -116,5 +112,15 @@
 
   :global(.modal) {
     overflow-y: scroll;
+  }
+
+  :global(body) {
+    overflow: hidden;
+  }
+
+  @media (max-width: 1100px) {
+    :global(body) {
+      overflow: auto;
+    }
   }
 </style>

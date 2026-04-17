@@ -2,10 +2,10 @@
   "name": "rpg-cards",
   "version": "0.0.1",
   "scripts": {
-    "dev": "svelte-kit dev",
+    "dev": "svelte-kit dev --port 3001",
     "build": "npm run update-icons && svelte-kit build",
     "package": "svelte-kit package",
-    "preview": "svelte-kit preview",
+    "preview": "svelte-kit preview --port 3001",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
@@ -27,8 +27,8 @@
     "node-sass": "^7.0.1",
     "prettier": "^2.5.1",
     "prettier-plugin-svelte": "^2.6.0",
-    "simple-svelte-autocomplete": "^2.2.4",
-    "svelte": "^3.46.6",
+    "simple-svelte-autocomplete": "2.2.4",
+    "svelte": "3.46.6",
     "svelte-check": "^2.4.6",
     "svelte-preprocess": "^4.10.4",
     "ts-node": "^10.5.0",
@@ -63,5 +63,10 @@
     "svelte-dnd-action": "^0.9.15",
     "sveltestrap": "^5.9.0",
     "yauzl": "^2.10.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@sveltejs/vite-plugin-svelte": "1.0.0-next.32"
+    }
   }
 }

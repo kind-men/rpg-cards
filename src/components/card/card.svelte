@@ -91,6 +91,21 @@
         padding: 0 0.5em;
         margin-bottom: 0.2em;
         line-height: 1em;
+        font-weight: bold;
+      }
+
+      :global(li) {
+        font-weight: bold;
+      }
+
+      :global(strong),
+      :global(b) {
+        font-weight: bolder;
+        color: var(--card-color);
+      }
+
+      :global(ul) {
+        margin-bottom: 0;
       }
 
       > :global(h2) {

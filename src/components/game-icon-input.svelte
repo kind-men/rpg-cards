@@ -77,9 +77,10 @@
 
   :global(.input-container) {
     height: 100%;
-    :global(*) {
-      border-radius: 0;
-    }
+  }
+
+  :global(.input-container *) {
+    border-radius: 0;
   }
 
   .autocomplete-result-item {

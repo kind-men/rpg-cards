@@ -30,7 +30,7 @@
   };
 </script>
 
-<InputGroup>
+<InputGroup class="game-icon-input-group">
   <InputGroupText class="game-icon-input-icon-wrapper">
     {#if (text === null && isMultiEditing) || (text === '' && isMultiEditing)}
       <GameIcon name={'stack'} color="black" size="1.5em" />
@@ -69,18 +69,30 @@
 </InputGroup>
 
 <style lang="scss">
+  :global(.game-icon-input-group) {
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+
   :global(.autocomplete) {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
     height: 38px !important;
-    // height: auto !important;
   }
 
   :global(.input-container) {
+    width: 100%;
+    min-width: 0;
     height: 100%;
   }
 
   :global(.input-container *) {
     border-radius: 0;
+  }
+
+  :global(.autocomplete-input) {
+    width: 100%;
+    min-width: 0;
   }
 
   .autocomplete-result-item {

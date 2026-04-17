@@ -12,6 +12,8 @@
 <slot />
 
 <style lang="scss">
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
   @font-face {
     font-family: 'Draconis';
     font-style: normal;
@@ -36,6 +38,11 @@
     font-family: 'Draconis';
     font-style: italic;
     src: url('/fonts/draconis-font/DraconisItalic.ttf') format('truetype');
+  }
+
+  :global(html),
+  :global(body) {
+    font-family: 'Inter', sans-serif;
   }
 
   :global(.accordion-item) {

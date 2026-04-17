@@ -2,8 +2,6 @@
   import { DEFAULT_LAYOUT } from '$lib/defaults';
   import extend from 'just-extend';
   import {
-    Accordion,
-    AccordionItem,
     Form,
     FormGroup,
     Input,
@@ -81,98 +79,100 @@
 </script>
 
 <div>
-  <h4>Editor</h4>
-
   {#if card}
     <Form>
-      <!-- Name -->
-      <FormGroup row>
-        <Label class="col-sm-3 col-form-label" for="name">Name</Label>
-        <div class="col">
-          <Input
-            type="text"
-            name="name"
-            id="name"
-            bind:value={card.title}
-            placeholder={isMultiEditing && card.title === null ? '*' : 'Name'}
-          />
-        </div>
-      </FormGroup>
-      <!-- Count -->
-      <FormGroup row>
-        <Label class="col-sm-3 col-form-label" for="count">Count</Label>
-        <div class="col">
-          <Input
-            type="number"
-            name="count"
-            id="count"
-            bind:value={card.count}
-            placeholder={isMultiEditing && card.count === null ? '*' : 'Count'}
-          />
-        </div>
-      </FormGroup>
-      <!-- Icon back -->
-      <FormGroup row>
-        <Label class="col-sm-3 col-form-label" for="icon_back">Icon (Back)</Label>
-        <div class="col">
-          <IconInput
-            bind:isMultiEditing
-            bind:icon={card.icon_back}
-            id="icon_back"
-            name="icon_back"
-            placeholder={isMultiEditing && card.icon_back === null ? '*' : 'Icon back'}
-          />
-        </div>
-      </FormGroup>
-      <!-- Text back -->
-      <FormGroup row>
-        <Label class="col-sm-3 col-form-label" for="text_back">Text (Back)</Label>
-        <div class="col">
-          <Input
-            type="text"
-            name="text_back"
-            id="text_back"
-            bind:value={card.text_back}
-            placeholder={isMultiEditing && card.text_back === null
-              ? '*'
-              : 'Text to show on back, such as spell lvl'}
-          />
-        </div>
-      </FormGroup>
-      <!-- Color -->
-      <FormGroup row>
-        <Label class="col-sm-3 col-form-label" for="color-text" disabled>Color</Label>
-        <div class="col">
-          <InputGroup>
-            <InputGroupText>
-              <input
-                class="color-input rounded"
-                type="color"
-                name="color"
-                id="color-box"
-                bind:value={card.color}
-                on:change={() => recentColors.add(card.color)}
+      <section class="editor-section">
+        <h3 class="editor-section-title">Card</h3>
+        <div class="editor-section-body">
+          <!-- Name -->
+          <FormGroup row>
+            <Label class="col-sm-3 col-form-label" for="name">Name</Label>
+            <div class="col">
+              <Input
+                type="text"
+                name="name"
+                id="name"
+                bind:value={card.title}
+                placeholder={isMultiEditing && card.title === null ? '*' : 'Name'}
               />
-            </InputGroupText>
-            <Input
-              type="text"
-              name="color"
-              id="color-text"
-              bind:value={card.color}
-              placeholder="Color"
-              on:change={() => recentColors.add(card.color)}
-            />
-            <InputGroupText>
-              <ColorSelecter bind:value={card.color} />
-            </InputGroupText>
-          </InputGroup>
+            </div>
+          </FormGroup>
+          <!-- Count -->
+          <FormGroup row>
+            <Label class="col-sm-3 col-form-label" for="count">Count</Label>
+            <div class="col">
+              <Input
+                type="number"
+                name="count"
+                id="count"
+                bind:value={card.count}
+                placeholder={isMultiEditing && card.count === null ? '*' : 'Count'}
+              />
+            </div>
+          </FormGroup>
+          <!-- Icon back -->
+          <FormGroup row>
+            <Label class="col-sm-3 col-form-label" for="icon_back">Icon (Back)</Label>
+            <div class="col">
+              <IconInput
+                bind:isMultiEditing
+                bind:icon={card.icon_back}
+                id="icon_back"
+                name="icon_back"
+                placeholder={isMultiEditing && card.icon_back === null ? '*' : 'Icon back'}
+              />
+            </div>
+          </FormGroup>
+          <!-- Text back -->
+          <FormGroup row>
+            <Label class="col-sm-3 col-form-label" for="text_back">Text (Back)</Label>
+            <div class="col">
+              <Input
+                type="text"
+                name="text_back"
+                id="text_back"
+                bind:value={card.text_back}
+                placeholder={isMultiEditing && card.text_back === null
+                  ? '*'
+                  : 'Text to show on back, such as spell lvl'}
+              />
+            </div>
+          </FormGroup>
+          <!-- Color -->
+          <FormGroup row>
+            <Label class="col-sm-3 col-form-label" for="color-text" disabled>Color</Label>
+            <div class="col">
+              <InputGroup>
+                <InputGroupText>
+                  <input
+                    class="color-input rounded"
+                    type="color"
+                    name="color"
+                    id="color-box"
+                    bind:value={card.color}
+                    on:change={() => recentColors.add(card.color)}
+                  />
+                </InputGroupText>
+                <Input
+                  type="text"
+                  name="color"
+                  id="color-text"
+                  bind:value={card.color}
+                  placeholder="Color"
+                  on:change={() => recentColors.add(card.color)}
+                />
+                <InputGroupText>
+                  <ColorSelecter bind:value={card.color} />
+                </InputGroupText>
+              </InputGroup>
+            </div>
+          </FormGroup>
         </div>
-      </FormGroup>
+      </section>
 
-      <FormGroup row>
-        <div class="form-accordion">
-          <Accordion stayOpen>
-            <AccordionItem active header="Layout">
+      <section class="editor-section">
+        <h3 class="editor-section-title">Layout</h3>
+        <div class="editor-section-body">
               <!-- Title font size -->
               <FormGroup row>
                 <Label class="col-sm-3 col-form-label" for="title-size">Title size</Label>
@@ -219,41 +219,44 @@
                   </div>
                 </FormGroup>
               {/if}
-            </AccordionItem>
-          </Accordion>
         </div>
-      </FormGroup>
+      </section>
 
       <!-- Contents -->
-      <FormGroup row>
-        <Label class="col-sm-3 col-form-label" for="content-editor-type">Contents</Label>
-        <div class="col">
-          <Input
-            type="select"
-            id="content-editor-type"
-            name="content-editor-type"
-            bind:value={contentEditorMode}
-          >
-            <option value="textfield">Textfield mode</option>
-            <option value="individual">Individual mode</option>
-          </Input>
-        </div>
-      </FormGroup>
-      {#if !isMultiEditing && card.contents}
-        <FormGroup row>
-          {#if contentEditorMode === 'individual'}
-            <CardContentEditor bind:contents={card.contents} />
-          {:else}
-            <div>
+      <section class="editor-section">
+        <h3 class="editor-section-title">Contents</h3>
+        <div class="editor-section-body">
+          <FormGroup row>
+            <Label class="col-sm-3 col-form-label" for="content-editor-type">Mode</Label>
+            <div class="col">
               <Input
-                type="textarea"
-                class="content-editor-textarea"
-                bind:value={textFieldContent}
-              />
+                type="select"
+                id="content-editor-type"
+                name="content-editor-type"
+                bind:value={contentEditorMode}
+              >
+                <option value="textfield">Textfield mode</option>
+                <option value="individual">Individual mode</option>
+              </Input>
             </div>
+          </FormGroup>
+          {#if !isMultiEditing && card.contents}
+            <FormGroup row>
+              {#if contentEditorMode === 'individual'}
+                <CardContentEditor bind:contents={card.contents} />
+              {:else}
+                <div>
+                  <Input
+                    type="textarea"
+                    class="content-editor-textarea"
+                    bind:value={textFieldContent}
+                  />
+                </div>
+              {/if}
+            </FormGroup>
           {/if}
-        </FormGroup>
-      {/if}
+        </div>
+      </section>
     </Form>
   {:else}
     <div class="empty-editor">No card is selected!</div>
@@ -261,11 +264,69 @@
 </div>
 
 <style lang="scss">
-  .form-accordion {
-    :global(.accordion-body) {
-      padding-bottom: 0;
-    }
+  :global(form) {
+    font-size: 0.92rem;
   }
+
+  .editor-section {
+    padding: 0.85rem 0 1rem;
+    border-bottom: 1px solid rgba(18, 38, 63, 0.08);
+  }
+
+  .editor-section:first-child {
+    padding-top: 0;
+  }
+
+  .editor-section:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .editor-section-title {
+    margin: 0 0 0.85rem;
+    color: #223047;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  .editor-section-body {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  :global(.form-group) {
+    margin-bottom: 0.35rem;
+  }
+
+  :global(.col-form-label) {
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+    font-size: 0.78rem;
+    line-height: 1.2;
+  }
+
+  :global(.form-control),
+  :global(.input-group-text),
+  :global(.form-select) {
+    font-size: 0.86rem;
+  }
+
+  :global(.form-control),
+  :global(.input-group-text) {
+    padding-top: 0.35rem;
+    padding-bottom: 0.35rem;
+  }
+
+  :global(.row) {
+    --bs-gutter-y: 0.15rem;
+  }
+
+  .editor-section-body :global(.row.mb-3) {
+    margin-bottom: 0.2rem !important;
+  }
+
   .color-input {
     width: 1.5rem;
     height: 1.5rem;

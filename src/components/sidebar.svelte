@@ -87,6 +87,8 @@
     { value: 'poker', label: 'Poker' },
     { value: 'bridge', label: 'Bridge' },
     { value: 'tarot', label: 'Tarot' },
+    { value: 'square-1', label: 'Square (1 inches)' },
+    { value: 'square-2', label: 'Square (2 inches)' },
     { value: 'custom', label: 'Custom' }
   ];
 

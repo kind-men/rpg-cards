@@ -18,6 +18,14 @@ export const CARD_SIZE_PRESETS: Record<CardFormat, { width: number; height: numb
     width: 70,
     height: 120
   },
+  'square-1': {
+    width: 25.4,
+    height: 25.4
+  },
+  'square-2': {
+    width: 50.8,
+    height: 50.8
+  },
   custom: {
     width: 63.5,
     height: 88.9

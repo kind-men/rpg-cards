@@ -1,4 +1,10 @@
-export type CardFormat = 'poker' | 'bridge' | 'tarot' | 'custom';
+export type CardFormat =
+  | 'poker'
+  | 'bridge'
+  | 'tarot'
+  | 'square-1'
+  | 'square-2'
+  | 'custom';
 
 export default interface PageLayout {
   paperSize: {

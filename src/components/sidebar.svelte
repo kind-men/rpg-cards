@@ -86,19 +86,37 @@
   const cardFormatOptions: { value: CardFormat; label: string }[] = [
     { value: 'poker', label: 'Poker' },
     { value: 'bridge', label: 'Bridge' },
-    { value: 'tarot', label: 'Tarot' }
+    { value: 'tarot', label: 'Tarot' },
+    { value: 'custom', label: 'Custom' }
   ];
 
   const handleCardFormatChange = (cardFormat: CardFormat) => {
     pageLayout.update((layout) => ({
       ...layout,
       cardFormat,
-      cardSize: { ...CARD_SIZE_PRESETS[cardFormat] }
+      cardSize:
+        cardFormat === 'custom' ? layout.cardSize : { ...CARD_SIZE_PRESETS[cardFormat] }
     }));
   };
 
   const handleCardFormatSelectChange = (event: Event) => {
     handleCardFormatChange((event.currentTarget as HTMLSelectElement).value as CardFormat);
+  };
+
+  const handleCustomCardSizeChange = (
+    dimension: 'width' | 'height',
+    event: Event
+  ) => {
+    const value = Number((event.currentTarget as HTMLInputElement).value);
+
+    pageLayout.update((layout) => ({
+      ...layout,
+      cardFormat: 'custom',
+      cardSize: {
+        ...layout.cardSize,
+        [dimension]: value
+      }
+    }));
   };
 </script>
 
@@ -204,6 +222,31 @@
             {/each}
           </Input>
         </FormGroup>
+        {#if $pageLayout.cardFormat === 'custom'}
+          <FormGroup>
+            <span>
+              <Label for="custom-card-size">Custom</Label>
+            </span>
+            <InputGroup id="custom-card-size">
+              <Input
+                id="custom-card-size-width"
+                placeholder="Width"
+                type="number"
+                value={$pageLayout.cardSize.width}
+                on:input={(event) => handleCustomCardSizeChange('width', event)}
+              />
+              <InputGroupText>mm</InputGroupText>
+              <Input
+                id="custom-card-size-height"
+                placeholder="Height"
+                type="number"
+                value={$pageLayout.cardSize.height}
+                on:input={(event) => handleCustomCardSizeChange('height', event)}
+              />
+              <InputGroupText>mm</InputGroupText>
+            </InputGroup>
+          </FormGroup>
+        {/if}
         <FormGroup>
           <span>
             <Label for="page-adjust">Print adjust</Label>

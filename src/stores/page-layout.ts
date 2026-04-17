@@ -17,6 +17,10 @@ export const CARD_SIZE_PRESETS: Record<CardFormat, { width: number; height: numb
   tarot: {
     width: 70,
     height: 120
+  },
+  custom: {
+    width: 63.5,
+    height: 88.9
   }
 };
 
@@ -55,6 +59,13 @@ const inferCardFormat = (cardSize?: { width?: number; height?: number }): CardFo
 
 const normalizePageLayout = (layout: Partial<PageLayout> | null | undefined): PageLayout => {
   const cardFormat = layout?.cardFormat ?? inferCardFormat(layout?.cardSize);
+  const cardSize =
+    cardFormat === 'custom'
+      ? {
+          width: layout?.cardSize?.width ?? defaultPageLayout.cardSize.width,
+          height: layout?.cardSize?.height ?? defaultPageLayout.cardSize.height
+        }
+      : CARD_SIZE_PRESETS[cardFormat];
 
   return {
     ...defaultPageLayout,
@@ -64,7 +75,7 @@ const normalizePageLayout = (layout: Partial<PageLayout> | null | undefined): Pa
       ...layout?.paperSize
     },
     cardFormat,
-    cardSize: CARD_SIZE_PRESETS[cardFormat],
+    cardSize,
     adjust: {
       ...defaultPageLayout.adjust,
       ...layout?.adjust

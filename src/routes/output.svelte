@@ -69,6 +69,11 @@
 <style lang="scss">
   $paper-padding: 0.5cm;
 
+  :global(html),
+  :global(body) {
+    overflow: auto;
+  }
+
   .wrapper {
     display: flex;
     flex-direction: column;

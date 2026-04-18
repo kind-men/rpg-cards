@@ -63,11 +63,11 @@
     flex-direction: column;
     // gap: 0.2rem;
     height: 100%;
-
+    min-height: 0;
 
     border-radius: 0.1cm;
     background-color: white;
-    overflow: show;
+    overflow: hidden;
 
     font-family: 'Overpass', Arial, sans-serif;
 
@@ -90,6 +90,8 @@
       display: flex;
       flex-direction: column;
       flex: 1;
+      min-height: 0;
+      overflow: hidden;
 
       :global(p) {
         padding: 0 0.5em;

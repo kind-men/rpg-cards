@@ -2,8 +2,9 @@
   import { DEFAULT_LAYOUT } from '$lib/defaults';
   import extend from 'just-extend';
   import {
+    Button,
     Form,
-    FormGroup,
+    Icon,
     Input,
     InputGroup,
     InputGroupText,
@@ -85,88 +86,78 @@
         <h3 class="editor-section-title">Card</h3>
         <div class="editor-section-body">
           <!-- Name -->
-          <FormGroup row>
-            <Label class="col-sm-3 col-form-label" for="name">Name</Label>
-            <div class="col">
-              <Input
-                type="text"
-                name="name"
-                id="name"
-                bind:value={card.title}
-                placeholder={isMultiEditing && card.title === null ? '*' : 'Name'}
-              />
-            </div>
-          </FormGroup>
+          <div class="editor-field">
+            <Label class="col-form-label" for="name">Name</Label>
+            <Input
+              type="text"
+              name="name"
+              id="name"
+              bind:value={card.title}
+              placeholder={isMultiEditing && card.title === null ? '*' : 'Name'}
+            />
+          </div>
           <!-- Count -->
-          <FormGroup row>
-            <Label class="col-sm-3 col-form-label" for="count">Count</Label>
-            <div class="col">
-              <Input
-                type="number"
-                name="count"
-                id="count"
-                bind:value={card.count}
-                placeholder={isMultiEditing && card.count === null ? '*' : 'Count'}
-              />
-            </div>
-          </FormGroup>
+          <div class="editor-field">
+            <Label class="col-form-label" for="count">Count</Label>
+            <Input
+              type="number"
+              name="count"
+              id="count"
+              bind:value={card.count}
+              placeholder={isMultiEditing && card.count === null ? '*' : 'Count'}
+            />
+          </div>
           <!-- Icon back -->
-          <FormGroup row>
-            <Label class="col-sm-3 col-form-label" for="icon_back">Icon (Back)</Label>
-            <div class="col">
-              <IconInput
-                bind:isMultiEditing
-                bind:icon={card.icon_back}
-                id="icon_back"
-                name="icon_back"
-                placeholder={isMultiEditing && card.icon_back === null ? '*' : 'Icon back'}
-              />
-            </div>
-          </FormGroup>
+          <div class="editor-field">
+            <Label class="col-form-label" for="icon_back">Icon (Back)</Label>
+            <IconInput
+              bind:isMultiEditing
+              bind:icon={card.icon_back}
+              id="icon_back"
+              name="icon_back"
+              placeholder={isMultiEditing && card.icon_back === null ? '*' : 'Icon back'}
+            />
+          </div>
           <!-- Text back -->
-          <FormGroup row>
-            <Label class="col-sm-3 col-form-label" for="text_back">Text (Back)</Label>
-            <div class="col">
-              <Input
-                type="text"
-                name="text_back"
-                id="text_back"
-                bind:value={card.text_back}
-                placeholder={isMultiEditing && card.text_back === null
-                  ? '*'
-                  : 'Text to show on back, such as spell lvl'}
-              />
-            </div>
-          </FormGroup>
+          <div class="editor-field">
+            <Label class="col-form-label" for="text_back">Text (Back)</Label>
+            <Input
+              type="text"
+              name="text_back"
+              id="text_back"
+              bind:value={card.text_back}
+              placeholder={isMultiEditing && card.text_back === null
+                ? '*'
+                : 'Text to show on back, such as spell lvl'}
+            />
+          </div>
           <!-- Color -->
-          <FormGroup row>
-            <Label class="col-sm-3 col-form-label" for="color-text" disabled>Color</Label>
-            <div class="col">
-              <InputGroup>
-                <InputGroupText>
-                  <input
-                    class="color-input rounded"
-                    type="color"
-                    name="color"
-                    id="color-box"
-                    bind:value={card.color}
-                    on:change={() => recentColors.add(card.color)}
-                  />
-                </InputGroupText>
-                <Input
-                  type="text"
+          <div class="editor-field">
+            <Label class="col-form-label" for="color-text" disabled>Color</Label>
+            <InputGroup>
+              <InputGroupText>
+                <input
+                  class="color-input rounded"
+                  type="color"
                   name="color"
-                  id="color-text"
+                  id="color-box"
                   bind:value={card.color}
-                  placeholder="Color"
                   on:change={() => recentColors.add(card.color)}
                 />
-                <InputGroupText>
-                  <ColorSelecter bind:value={card.color} />
-                </InputGroupText>
-              </InputGroup>
-            </div>
-          </FormGroup>
+              </InputGroupText>
+              <Input
+                type="text"
+                name="color"
+                id="color-text"
+                bind:value={card.color}
+                placeholder="Color"
+                on:change={() => recentColors.add(card.color)}
+              />
+              <InputGroupText>
+                <ColorSelecter bind:value={card.color} />
+              </InputGroupText>
+            </InputGroup>
+          </div>
         </div>
       </section>
 
@@ -174,39 +165,35 @@
         <h3 class="editor-section-title">Layout</h3>
         <div class="editor-section-body">
               <!-- Title font size -->
-              <FormGroup row>
-                <Label class="col-sm-3 col-form-label" for="title-size">Title size</Label>
-                <div class="col">
-                  <Input
-                    type="text"
-                    name="title-size"
-                    id="title-size"
-                    bind:value={card.layout.title_font_size}
-                    placeholder={isMultiEditing && card.layout.title_font_size === null
-                      ? '*'
-                      : DEFAULT_LAYOUT.TITLE_FONT_SIZE}
-                  />
-                </div>
-              </FormGroup>
+              <div class="editor-field">
+                <Label class="col-form-label" for="title-size">Title size</Label>
+                <Input
+                  type="text"
+                  name="title-size"
+                  id="title-size"
+                  bind:value={card.layout.title_font_size}
+                  placeholder={isMultiEditing && card.layout.title_font_size === null
+                    ? '*'
+                    : DEFAULT_LAYOUT.TITLE_FONT_SIZE}
+                />
+              </div>
               <!-- Text font size -->
-              <FormGroup row>
-                <Label class="col-sm-3 col-form-label" for="text-font-size">Text font size</Label>
-                <div class="col">
-                  <Input
-                    type="text"
-                    name="text-font-size"
-                    id="text-font-size"
-                    bind:value={card.layout.text_font_size}
-                    placeholder={isMultiEditing && card.layout.text_font_size === null
-                      ? '*'
-                      : DEFAULT_LAYOUT.TEXT_FONT_SIZE}
-                  />
-                </div>
-              </FormGroup>
+              <div class="editor-field">
+                <Label class="col-form-label" for="text-font-size">Text font size</Label>
+                <Input
+                  type="text"
+                  name="text-font-size"
+                  id="text-font-size"
+                  bind:value={card.layout.text_font_size}
+                  placeholder={isMultiEditing && card.layout.text_font_size === null
+                    ? '*'
+                    : DEFAULT_LAYOUT.TEXT_FONT_SIZE}
+                />
+              </div>
               <!-- Custom CSS -->
               {#if !isMultiEditing}
-                <FormGroup row>
-                  <Label class="col-sm-3 col-form-label" for="custom-css">
+                <div class="editor-field">
+                  <Label class="col-form-label" for="custom-css">
                     Custom CSS
                     <Hint id="custom-css-hint">
                       <u>Experimental</u> Here you can inject custom CSS (may require
@@ -214,34 +201,32 @@
                       on some properties)
                     </Hint>
                   </Label>
-                  <div class="col">
-                    <CssEditor id="custom-css" bind:css={card.layout.custom_css} />
-                  </div>
-                </FormGroup>
+                  <CssEditor id="custom-css" bind:css={card.layout.custom_css} />
+                </div>
               {/if}
         </div>
       </section>
 
       <!-- Contents -->
       <section class="editor-section">
-        <h3 class="editor-section-title">Contents</h3>
+        <div class="editor-section-header">
+          <h3 class="editor-section-title">Contents</h3>
+          <Button
+            type="button"
+            color="link"
+            class="editor-mode-toggle"
+            aria-label="Toggle textfield mode"
+            aria-pressed={contentEditorMode === 'textfield'}
+            on:click={() =>
+              (contentEditorMode =
+                contentEditorMode === 'textfield' ? 'individual' : 'textfield')}
+          >
+            <Icon name="code-slash" />
+          </Button>
+        </div>
         <div class="editor-section-body">
-          <FormGroup row>
-            <Label class="col-sm-3 col-form-label" for="content-editor-type">Mode</Label>
-            <div class="col">
-              <Input
-                type="select"
-                id="content-editor-type"
-                name="content-editor-type"
-                bind:value={contentEditorMode}
-              >
-                <option value="textfield">Textfield mode</option>
-                <option value="individual">Individual mode</option>
-              </Input>
-            </div>
-          </FormGroup>
           {#if !isMultiEditing && card.contents}
-            <FormGroup row>
+            <div class="editor-field">
               {#if contentEditorMode === 'individual'}
                 <CardContentEditor bind:contents={card.contents} />
               {:else}
@@ -253,7 +238,7 @@
                   />
                 </div>
               {/if}
-            </FormGroup>
+            </div>
           {/if}
         </div>
       </section>
@@ -264,8 +249,8 @@
 </div>
 
 <style lang="scss">
-  :global(form) {
-    font-size: 0.92rem;
+  :global(.floating-panel-right form) {
+    font-size: 0.7rem;
   }
 
   .editor-section {
@@ -283,7 +268,7 @@
   }
 
   .editor-section-title {
-    margin: 0 0 0.85rem;
+    margin: 0;
     color: #223047;
     font-size: 0.7rem;
     font-weight: 700;
@@ -291,40 +276,75 @@
     text-transform: none;
   }
 
+  .editor-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+  }
+
   .editor-section-body {
     display: grid;
     gap: 0.35rem;
   }
 
-  :global(.form-group) {
-    margin-bottom: 0.35rem;
+  .editor-field {
+    display: grid;
+    gap: 0.25rem;
   }
 
-  :global(.col-form-label) {
-    padding-top: 0.2rem;
-    padding-bottom: 0.2rem;
-    font-size: 0.78rem;
+  :global(.floating-panel-right .col-form-label) {
+    padding: 0;
+    font-size: 0.7rem;
     line-height: 1.2;
   }
 
-  :global(.form-control),
-  :global(.input-group-text),
-  :global(.form-select) {
-    font-size: 0.86rem;
+  :global(.floating-panel-right .form-control),
+  :global(.floating-panel-right .input-group-text),
+  :global(.floating-panel-right .form-select) {
+    font-size: 0.7rem;
+    border-radius: 0.1875rem;
   }
 
-  :global(.form-control),
-  :global(.input-group-text) {
-    padding-top: 0.35rem;
-    padding-bottom: 0.35rem;
+  :global(.floating-panel-right input),
+  :global(.floating-panel-right textarea),
+  :global(.floating-panel-right select) {
+    font-size: 0.7rem;
   }
 
-  :global(.row) {
-    --bs-gutter-y: 0.15rem;
+  :global(.floating-panel-right .form-control),
+  :global(.floating-panel-right .input-group-text),
+  :global(.floating-panel-right .form-select) {
+    padding-left: 0.375rem;
+    padding-right: 0.375rem;
+    padding-top: 0.175rem;
+    padding-bottom: 0.175rem;
   }
 
-  .editor-section-body :global(.row.mb-3) {
-    margin-bottom: 0.2rem !important;
+  :global(.floating-panel-right .editor-mode-toggle) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    padding: 0.125rem 0.25rem;
+    font-size: 0.8rem;
+    color: #5f6d80;
+    text-decoration: none;
+    border: 1px solid rgba(18, 38, 63, 0.12);
+    border-radius: 0.1875rem;
+    background: #f6f4ef;
+  }
+
+  :global(.floating-panel-right .editor-mode-toggle:hover) {
+    color: #223047;
+    background: #efebe2;
+  }
+
+  :global(.floating-panel-right .editor-mode-toggle[aria-pressed='true']) {
+    color: #223047;
+    border-color: rgba(18, 38, 63, 0.2);
+    background: #e7e1d2;
   }
 
   .color-input {

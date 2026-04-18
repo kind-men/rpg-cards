@@ -42,10 +42,10 @@
   }
 
   .title-wrapper {
-    height: 17px;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex: 0;
   }
 
   .rpg-card-wrapper {
@@ -64,14 +64,18 @@
     // gap: 0.2rem;
     height: 100%;
 
-    font-size: 10px;
 
     border-radius: 0.1cm;
     background-color: white;
     overflow: show;
 
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial,
-      sans-serif;
+    font-family: 'Overpass', Arial, sans-serif;
+
+    font-size: 10px;
+    letter-spacing: -.03em;
+    line-height: 16.4px;
+    letter-spacing: -4%;
+    font-size: 14px;
 
     h1 {
       font-size: var(--card-title-size);

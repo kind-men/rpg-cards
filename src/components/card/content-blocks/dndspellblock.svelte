@@ -40,6 +40,8 @@
   .block {
     background-color: white;
     padding-bottom: 0.15em;
+    font-size: var(--card-text-size);
+
 
     p,
     h2 {

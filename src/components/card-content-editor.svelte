@@ -70,7 +70,10 @@
   .input-wrapper {
     display: flex;
     margin-bottom: 0.25em;
-    gap: 0.5em;
-    align-items: center;
+    gap: 0.25rem;
+    align-items: flex-start;
+  }
+  :global.add-new-selector {
+    margin-top: 1rem;
   }
 </style>

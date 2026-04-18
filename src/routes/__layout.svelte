@@ -13,6 +13,7 @@
 
 <style lang="scss">
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Overpass:wght@400;500;600;700&display=swap');
 
   @font-face {
     font-family: 'Draconis';

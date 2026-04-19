@@ -31,6 +31,14 @@ export function parseCards(
       card.layout = {};
     }
 
+    if (!card.cardback_mode) {
+      card.cardback_mode = 'icon';
+    }
+
+    if (!Array.isArray(card.cardback_images)) {
+      card.cardback_images = [];
+    }
+
     if (shouldConvertSubtitlePlusRuleToSection) {
       card.contents = convertSubtitlePlusRuleToSection(card.contents);
     }

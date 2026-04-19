@@ -13,6 +13,7 @@
   import { createMultiCard, removeEmpty } from '../lib/card-builder';
   import { getContentAsString, parseCardContents } from '../lib/card-json-parser';
   import type Card from '../model/card';
+  import type { CardBackMode } from '../model/card';
   import { currentCard, deck, multiSelect, recentColors } from '../stores';
   import CardContentEditor from './card-content-editor.svelte';
   import ColorSelecter from './color-selecter.svelte';
@@ -24,6 +25,22 @@
   let contentEditorMode: 'individual' | 'textfield' = 'individual';
   let textFieldContent = getContentAsString(card?.contents);
   $: isMultiEditing = $multiSelect.size > 1;
+  $: cardbackMode = card?.cardback_mode ?? 'icon';
+  $: cardbackImages = card?.cardback_images ?? [];
+
+  const ensureCardbackState = (target: Partial<Card>) => {
+    if (!target || target.cardback_mode === null) {
+      return;
+    }
+
+    if (!target.cardback_mode) {
+      target.cardback_mode = 'icon';
+    }
+
+    if (!Array.isArray(target.cardback_images)) {
+      target.cardback_images = [];
+    }
+  };
 
   const updateDeck = () => {
     if (isMultiEditing) {
@@ -54,6 +71,7 @@
     }
 
     card = $deck[$currentCard];
+    ensureCardbackState(card);
     textFieldContent = getContentAsString(card?.contents);
   };
 
@@ -75,8 +93,47 @@
       return;
     }
     card = $deck[$currentCard];
+    ensureCardbackState(card);
   };
   $: $multiSelect, isMultiEditing !== undefined && handleMultiEditingChanging();
+
+  const handleCardbackModeChange = (event: Event) => {
+    const mode = (event.currentTarget as HTMLSelectElement).value as CardBackMode;
+    card.cardback_mode = mode;
+    card.cardback_images = card.cardback_images ?? [];
+  };
+
+  const handleAddCardbackImage = () => {
+    card.cardback_images = [...(card.cardback_images ?? []), ''];
+  };
+
+  const handleRemoveCardbackImage = (index: number) => {
+    const nextImages = [...(card.cardback_images ?? [])];
+    nextImages.splice(index, 1);
+    card.cardback_images = nextImages;
+  };
+
+  const handleCardbackImageFileChange = async (index: number, event: Event) => {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const dataUri = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+
+    const nextImages = [...(card.cardback_images ?? [])];
+    nextImages[index] = dataUri;
+    card.cardback_images = nextImages;
+
+    input.value = '';
+  };
 </script>
 
 <div>
@@ -107,6 +164,72 @@
               placeholder={isMultiEditing && card.count === null ? '*' : 'Count'}
             />
           </div>
+        </div>
+      </section>
+
+      <section class="editor-section">
+        <h3 class="editor-section-title">Cardback</h3>
+        <div class="editor-section-body">
+          <div class="editor-field">
+            <Label class="col-form-label" for="cardback-mode">Style</Label>
+            <Input
+              id="cardback-mode"
+              type="select"
+              value={cardbackMode}
+              on:change={handleCardbackModeChange}
+            >
+              <option value="icon">Icon + color</option>
+              <option value="images">Background images</option>
+            </Input>
+          </div>
+          {#if cardbackMode === 'images'}
+            <div class="editor-field">
+              <div class="editor-field-inline">
+                <Label class="col-form-label" for="cardback-images">Images</Label>
+                <Button
+                  type="button"
+                  color="link"
+                  class="editor-inline-button"
+                  on:click={handleAddCardbackImage}
+                >
+                  Add
+                </Button>
+              </div>
+
+              <div class="cardback-image-list" id="cardback-images">
+                {#if cardbackImages.length === 0}
+                  <div class="cardback-image-empty">No images added yet.</div>
+                {/if}
+
+                {#each cardbackImages as image, index}
+                  <div class="cardback-image-row">
+                    <div class="cardback-image-preview">
+                      {#if image}
+                        <img src={image} alt={`Cardback image ${index + 1}`} />
+                      {:else}
+                        <span>Empty</span>
+                      {/if}
+                    </div>
+                    <div class="cardback-image-actions">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        on:change={(event) => handleCardbackImageFileChange(index, event)}
+                      />
+                      <Button
+                        type="button"
+                        color="link"
+                        class="editor-inline-button editor-inline-button-danger"
+                        on:click={() => handleRemoveCardbackImage(index)}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          {:else}
           <!-- Icon back -->
           <div class="editor-field">
             <Label class="col-form-label" for="icon_back">Icon (Back)</Label>
@@ -158,6 +281,7 @@
               </InputGroupText>
             </InputGroup>
           </div>
+          {/if}
         </div>
       </section>
 
@@ -294,6 +418,13 @@
     gap: 0.25rem;
   }
 
+  .editor-field-inline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
   :global(.floating-panel-right .col-form-label) {
     padding: 0;
     font-size: 0.7rem;
@@ -322,6 +453,21 @@
     padding-bottom: 0.175rem;
   }
 
+  :global(.floating-panel-right .editor-inline-button) {
+    padding: 0;
+    color: #5f6d80;
+    font-size: 0.7rem;
+    text-decoration: none;
+  }
+
+  :global(.floating-panel-right .editor-inline-button:hover) {
+    color: #223047;
+  }
+
+  :global(.floating-panel-right .editor-inline-button-danger:hover) {
+    color: #9a3c3c;
+  }
+
   :global(.floating-panel-right .editor-mode-toggle) {
     display: inline-flex;
     align-items: center;
@@ -345,6 +491,50 @@
     color: #223047;
     border-color: rgba(18, 38, 63, 0.2);
     background: #e7e1d2;
+  }
+
+  .cardback-image-list {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .cardback-image-empty {
+    padding: 0.45rem 0.55rem;
+    border: 1px dashed rgba(18, 38, 63, 0.12);
+    border-radius: 0.1875rem;
+    color: #7c8799;
+  }
+
+  .cardback-image-row {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.35rem;
+    border: 1px solid rgba(18, 38, 63, 0.08);
+    border-radius: 0.25rem;
+    background: #fbfaf7;
+  }
+
+  .cardback-image-preview {
+    height: 4.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid rgba(18, 38, 63, 0.08);
+    border-radius: 0.1875rem;
+    background: #ffffff;
+    color: #a3acba;
+  }
+
+  .cardback-image-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .cardback-image-actions {
+    display: grid;
+    gap: 0.25rem;
   }
 
   .color-input {

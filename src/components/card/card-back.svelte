@@ -3,6 +3,29 @@
   import { pageLayout } from '../../stores';
   import Icon from '../game-icon.svelte';
   export let card: Card;
+
+  const createLayeredBackground = (images: string[]) => {
+    if (!images?.length) {
+      return '';
+    }
+
+    const orderedImages = [...images].reverse();
+    const urls = orderedImages.map((image) => `url('${image}')`).join(', ');
+    const sizes = orderedImages.map(() => 'contain').join(', ');
+    const positions = orderedImages.map(() => 'center center').join(', ');
+    const repeats = orderedImages.map(() => 'no-repeat').join(', ');
+
+    return [
+      `background-image: ${urls};`,
+      `background-size: ${sizes};`,
+      `background-position: ${positions};`,
+      `background-repeat: ${repeats};`
+    ].join(' ');
+  };
+
+  $: cardbackMode = card?.cardback_mode ?? 'icon';
+  $: cardbackImages = card?.cardback_images ?? [];
+  $: cardbackImageStyle = createLayeredBackground(cardbackImages);
 </script>
 
 <div
@@ -15,21 +38,25 @@
   "
 >
   <div class="rpg-card">
-    <div class="line">
-      <div class="content-top">
-        <div class="content">
-          <p>{card.text_back ?? ''}</p>
+    {#if cardbackMode === 'images'}
+      <div class="image-surface" style={cardbackImageStyle} />
+    {:else}
+      <div class="line">
+        <div class="content-top">
+          <div class="content">
+            <p>{card.text_back ?? ''}</p>
+          </div>
+        </div>
+        <div class="icon-wrapper">
+          <Icon name={card.icon_back} size="5rem" />
+        </div>
+        <div class="content-bottom">
+          <div class="content">
+            <p>{card.text_back ?? ''}</p>
+          </div>
         </div>
       </div>
-      <div class="icon-wrapper">
-        <Icon name={card.icon_back} size="5rem" />
-      </div>
-      <div class="content-bottom">
-        <div class="content">
-          <p>{card.text_back ?? ''}</p>
-        </div>
-      </div>
-    </div>
+    {/if}
   </div>
 </div>
 
@@ -52,8 +79,15 @@
     height: 100%;
     border-radius: $border-radius;
     padding: 0.75em;
-    /* background-color: white; */
     background: radial-gradient(ellipse at center, white 20%, var(--card-color) 120%);
+    overflow: hidden;
+  }
+
+  .image-surface {
+    width: 100%;
+    height: 100%;
+    border-radius: calc(#{$border-radius} - 0.1em);
+    background-color: white;
   }
 
   .icon-wrapper {

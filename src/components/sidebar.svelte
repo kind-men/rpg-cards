@@ -2,7 +2,6 @@
   import {
     Accordion,
     AccordionItem,
-    Button,
     Form,
     FormGroup,
     Icon,
@@ -30,6 +29,7 @@
 
   let toggleJsonEditor: () => void;
   let toggleJsonImportModal: () => void;
+  let generalMenuOpen = false;
   const dispatch = createEventDispatcher<{ info: void }>();
 
   const addCardsToDeck = (cards: Card[]) => {
@@ -75,6 +75,7 @@
   };
 
   const handleImportFromJSONClick = () => {
+    generalMenuOpen = false;
     toggleJsonImportModal();
   };
 
@@ -83,7 +84,36 @@
   };
 
   const handleEditJson = () => {
+    generalMenuOpen = false;
     toggleJsonEditor();
+  };
+
+  const closeGeneralMenu = () => {
+    generalMenuOpen = false;
+  };
+
+  const toggleGeneralMenu = (event: MouseEvent) => {
+    event.stopPropagation();
+    generalMenuOpen = !generalMenuOpen;
+  };
+
+  const handleWindowClick = () => {
+    closeGeneralMenu();
+  };
+
+  const handleImportFileClick = () => {
+    generalMenuOpen = false;
+    importFileSelector.click();
+  };
+
+  const handleImportSampleDeckClick = async () => {
+    generalMenuOpen = false;
+    await handleImportSampleDeck();
+  };
+
+  const handleExportToFileClick = () => {
+    generalMenuOpen = false;
+    handleExportToFile();
   };
 
   const cardFormatOptions: { value: CardFormat; label: string }[] = [
@@ -125,70 +155,92 @@
   };
 </script>
 
+<svelte:window on:click={handleWindowClick} />
+
 <div class="sidebar-shell">
+  <div class="hidden">
+    <input type="file" accept=".json" bind:files={importFiles} bind:this={importFileSelector} />
+    <a href={downloadUrl} download={downloadName} bind:this={hiddenDownloadLink}>
+      Hidden download link
+    </a>
+  </div>
+
+  <div class="sidebar-toolbar">
+    <div class="general-menu-popover" on:click|stopPropagation>
+      <button
+        class="general-menu-trigger"
+        type="button"
+        aria-label="Open general actions menu"
+        aria-expanded={generalMenuOpen}
+        on:click={toggleGeneralMenu}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
+      {#if generalMenuOpen}
+        <div class="general-menu-panel general-menu-panel-top">
+          <div class="general-menu-group">
+            <button class="general-menu-item" type="button" on:click={handleImportFileClick}>
+              Import from file
+            </button>
+            <button
+              class="general-menu-item"
+              type="button"
+              on:click={handleImportSampleDeckClick}
+            >
+              Import sample deck
+            </button>
+            <button class="general-menu-item" type="button" on:click={handleImportFromJSONClick}>
+              Import JSON
+            </button>
+            <button class="general-menu-item" type="button" on:click={handleExportToFileClick}>
+              Export to file
+            </button>
+            <a class="general-menu-item" href="/output" on:click={closeGeneralMenu}>Print</a>
+            <button class="general-menu-item" type="button" on:click={handleEditJson}>
+              Edit JSON
+            </button>
+          </div>
+
+          <div class="general-menu-divider" />
+
+          <div class="general-menu-group">
+            <label class="general-toggle-row" for="convert-first-subtitle">
+              <span class="general-toggle-label">Convert subtitle + rule to sections</span>
+              <div class="general-toggle-controls">
+                <Hint id={'convert-first-subtitle-help'}>
+                  This will convert subtitles followed by a rule into sections.
+                </Hint>
+                <Input
+                  type="checkbox"
+                  id="convert-first-subtitle"
+                  bind:checked={$settings.convertFirstSubtitle}
+                />
+              </div>
+            </label>
+            <label class="general-toggle-row" for="convert-dnd-spell-block">
+              <span class="general-toggle-label">Convert D&amp;D spell blocks</span>
+              <div class="general-toggle-controls">
+                <Hint id={'convert-dnd-spell-block-help'}>
+                  This will convert properties containing Casting Time, Range, Components, and
+                  Duration (in that order) into a block.
+                </Hint>
+                <Input
+                  type="checkbox"
+                  id="convert-dnd-spell-block"
+                  bind:checked={$settings.convertDndSpellblock}
+                />
+              </div>
+            </label>
+          </div>
+        </div>
+      {/if}
+    </div>
+  </div>
+
   <Accordion stayOpen>
-    <AccordionItem active header="General">
-      <div class="button-grid">
-        <div class="hidden">
-          <input
-            type="file"
-            accept=".json"
-            bind:files={importFiles}
-            bind:this={importFileSelector}
-          />
-          <a href={downloadUrl} download={downloadName} bind:this={hiddenDownloadLink}>
-            Hidden download link
-          </a>
-        </div>
-        <div class="sidebar-element">
-          <Button block color="primary" on:click={() => importFileSelector.click()}>
-            Import from file
-          </Button>
-        </div>
-        <div class="sidebar-element">
-          <Button block color="primary" on:click={handleImportSampleDeck}>Import sample deck</Button
-          >
-        </div>
-        <div class="sidebar-element">
-          <Button block color="primary" on:click={() => handleImportFromJSONClick()}
-            >Import JSON</Button
-          >
-        </div>
-        <div class="sidebar-element">
-          <Button block color="primary" on:click={handleExportToFile}>Export to file</Button>
-        </div>
-        <div class="sidebar-element">
-          <Button block color="primary" href="/output">Print</Button>
-        </div>
-        <div class="sidebar-element">
-          <Button block color="primary" on:click={handleEditJson}>Edit JSON</Button>
-        </div>
-        <h2 class="sidebar-header">Options</h2>
-        <div class="sidebar-element low full">
-          <Input
-            type="checkbox"
-            label="Convert subtitle + rule to sections?"
-            id="convert-first-subtitle"
-            bind:checked={$settings.convertFirstSubtitle}
-          />
-          <Hint id={'convert-first-subtitle-help'}>
-            This will convert subtitles followed by a rule into sections.
-          </Hint>
-        </div>
-        <div class="sidebar-element low full">
-          <Input
-            type="checkbox"
-            label="Convert D&D spell blocks?"
-            id="convert-dnd-spell-block"
-            bind:checked={$settings.convertDndSpellblock}
-          />
-          <Hint id={'convert-dnd-spell-block-help'}>
-            This will convert properties containing Casting Time, Range, Components, and Duration
-            (in that order) into a block.
-          </Hint>
-        </div>
-      </div>
-    </AccordionItem>
     <AccordionItem active header="Page">
       <Form>
         <FormGroup>
@@ -334,36 +386,128 @@
     display: none !important;
   }
 
-  .button-grid {
+  .sidebar-toolbar {
+    position: relative;
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .general-menu-popover {
+    position: relative;
+    flex: 0 0 auto;
+  }
+
+  .general-menu-trigger {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.18rem;
+    border: 1px solid rgba(18, 38, 63, 0.1);
+    border-radius: 0.6rem;
+    background: #f6f4ef;
+    color: #223047;
+    transition: background-color 120ms ease, border-color 120ms ease;
+
+    &:hover {
+      background: #efebe2;
+      border-color: rgba(18, 38, 63, 0.16);
+    }
+
+    span {
+      width: 0.8rem;
+      height: 1.5px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+  }
+
+  .general-menu-panel {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    z-index: 20;
+    width: min(18rem, calc(100vw - 4rem));
+    padding: 0.35rem;
+    border: 1px solid rgba(18, 38, 63, 0.1);
+    border-radius: var(--bs-border-radius);
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 18px 40px rgba(18, 38, 63, 0.12);
+    backdrop-filter: blur(10px);
+  }
+
+  .general-menu-panel-top {
+    top: calc(100% + 0.35rem);
+  }
+
+  .general-menu-group {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.25em;
+    gap: 0.15rem;
   }
 
-  .sidebar-element {
+  .general-menu-item {
     width: 100%;
-    min-height: 2.5em;
+    padding: 0.5rem 0.65rem;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    border: 0;
+    border-radius: var(--bs-border-radius);
+    background: transparent;
+    color: #223047;
+    font-size: 0.82rem;
+    text-align: left;
+    text-decoration: none;
 
-    &.full {
-      grid-column: 1 / span 2;
-    }
-
-    &.low {
-      min-height: 1.5em;
+    &:hover {
+      background: #f6f4ef;
     }
   }
 
-  .sidebar-header {
-    font-size: large;
-    margin: 0;
-    grid-column: 1 / span 2;
-    margin-top: 1em;
-    /* height: 1.5em; */
-    display: flex;
+  .general-menu-divider {
+    height: 1px;
+    margin: 0.35rem 0;
+    background: rgba(18, 38, 63, 0.08);
+  }
+
+  .general-toggle-row {
+    padding: 0.5rem 0.65rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
     align-items: center;
+    border-radius: var(--bs-border-radius);
+    cursor: pointer;
+
+    &:hover {
+      background: #f6f4ef;
+    }
+  }
+
+  .general-toggle-label {
+    min-width: 0;
+    color: #223047;
+    font-size: 0.8rem;
+    line-height: 1.35;
+  }
+
+  .general-toggle-controls {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.35rem;
+  }
+  .general-toggle-controls :global(.form-check) {
+    margin: 0;
+    padding: 0;
+    align-content: center;
+  }
+
+  .general-toggle-row :global(.form-check-input) {
+    margin: 0;
+    cursor: pointer;
   }
 
   .sidebar-footer {

@@ -3,6 +3,7 @@
   import { Button, Icon, Input, InputGroup, InputGroupText } from 'sveltestrap';
   import { currentCard, deck, pageLayout } from '../../stores';
   import CardComponent from './card.svelte';
+  import CardBack from './card-back.svelte';
 
   $: card = $deck[$currentCard];
 </script>
@@ -27,15 +28,28 @@
 
   {#if card}
     <div class="current-card">
-      <div
-        class="card-stage"
-        style="
-          width: {$pageLayout.cardSize.width * ($settings.previewZoom / 100)}mm;
-          height: {$pageLayout.cardSize.height * ($settings.previewZoom / 100)}mm;
-        "
-      >
-        <div style="transform: scale({$settings.previewZoom / 100}); transform-origin: top left;">
-          <CardComponent {card} />
+      <div class="card-preview-row">
+        <div
+          class="card-stage"
+          style="
+            width: {$pageLayout.cardSize.width * ($settings.previewZoom / 100)}mm;
+            height: {$pageLayout.cardSize.height * ($settings.previewZoom / 100)}mm;
+          "
+        >
+          <div style="transform: scale({$settings.previewZoom / 100}); transform-origin: top left;">
+            <CardComponent {card} />
+          </div>
+        </div>
+        <div
+          class="card-stage"
+          style="
+            width: {$pageLayout.cardSize.width * ($settings.previewZoom / 100)}mm;
+            height: {$pageLayout.cardSize.height * ($settings.previewZoom / 100)}mm;
+          "
+        >
+          <div style="transform: scale({$settings.previewZoom / 100}); transform-origin: top left;">
+            <CardBack {card} />
+          </div>
         </div>
       </div>
     </div>
@@ -78,6 +92,14 @@
   .card-stage {
     flex: none;
     filter: drop-shadow(0 1.25rem 2.5rem rgba(24, 32, 47, 0.18));
+  }
+
+  .card-preview-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
   }
 
   @media (max-width: 1100px) {

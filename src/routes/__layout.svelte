@@ -43,6 +43,8 @@
 
   :global(html),
   :global(body) {
+    --bs-border-radius: 0.125rem;
+
     font-family: 'Inter', sans-serif;
   }
 

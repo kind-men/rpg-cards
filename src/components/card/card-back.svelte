@@ -1,17 +1,18 @@
 <script lang="ts">
   import type Card from '$model/card';
+  import type { CardBackImage } from '$model/card';
   import { pageLayout } from '../../stores';
   import Icon from '../game-icon.svelte';
   export let card: Card;
 
-  const createLayeredBackground = (images: string[]) => {
+  const createLayeredBackground = (images: CardBackImage[]) => {
     if (!images?.length) {
       return '';
     }
 
     const orderedImages = [...images].reverse();
-    const urls = orderedImages.map((image) => `url('${image}')`).join(', ');
-    const sizes = orderedImages.map(() => 'contain').join(', ');
+    const urls = orderedImages.map((image) => `url('${image.src}')`).join(', ');
+    const sizes = orderedImages.map((image) => image.size || 'contain').join(', ');
     const positions = orderedImages.map(() => 'center center').join(', ');
     const repeats = orderedImages.map(() => 'no-repeat').join(', ');
 
@@ -26,10 +27,12 @@
   $: cardbackMode = card?.cardback_mode ?? 'icon';
   $: cardbackImages = card?.cardback_images ?? [];
   $: cardbackImageStyle = createLayeredBackground(cardbackImages);
+  $: cardbackBorderStyle = card?.cardback_border_style ?? 'normal';
 </script>
 
 <div
   class="rpg-card-wrapper"
+  class:no-cardback-border={cardbackBorderStyle === 'none'}
   style="
     --card-color: {card.color};
     --card-text-size: {card?.layout?.text_font_size ? card?.layout?.text_font_size : '10px'};
@@ -37,9 +40,12 @@
     --card-height: {$pageLayout.cardSize.height}mm;
   "
 >
-  <div class="rpg-card">
+  <div class="rpg-card" class:rpg-card-images={cardbackMode === 'images'}>
     {#if cardbackMode === 'images'}
-      <div class="image-surface" style={cardbackImageStyle} />
+      <div
+        class="image-surface"
+        style={`background-color: ${card.cardback_background_color ?? '#ffffff'}; ${cardbackImageStyle}`}
+      />
     {:else}
       <div class="line">
         <div class="content-top">
@@ -75,12 +81,20 @@
     background-color: var(--card-color);
   }
 
+  .rpg-card-wrapper.no-cardback-border {
+    border-width: 0;
+  }
+
   .rpg-card {
     height: 100%;
     border-radius: $border-radius;
     padding: 0.75em;
     background: radial-gradient(ellipse at center, white 20%, var(--card-color) 120%);
     overflow: hidden;
+  }
+
+  .rpg-card.rpg-card-images {
+    padding: 0;
   }
 
   .image-surface {

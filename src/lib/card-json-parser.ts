@@ -1,5 +1,6 @@
 import type Card from '../model/card';
 import type { CardContent } from '../model/card';
+import type { CardBackImage } from '../model/card';
 import { SPLIT_REGEX } from './constants';
 import { uuid4 } from './uuid';
 import type { CardCollection } from '../model/card-collection';
@@ -35,8 +36,14 @@ export function parseCards(
       card.cardback_mode = 'icon';
     }
 
-    if (!Array.isArray(card.cardback_images)) {
-      card.cardback_images = [];
+    card.cardback_images = normalizeCardbackImages(card.cardback_images);
+
+    if (!card.cardback_background_color) {
+      card.cardback_background_color = '#ffffff';
+    }
+
+    if (!card.cardback_border_style) {
+      card.cardback_border_style = 'normal';
     }
 
     if (shouldConvertSubtitlePlusRuleToSection) {
@@ -49,6 +56,35 @@ export function parseCards(
   });
 
   return cards;
+}
+
+export function normalizeCardbackImages(images: unknown): CardBackImage[] {
+  if (!Array.isArray(images)) {
+    return [];
+  }
+
+  return images
+    .map((image) => {
+      if (typeof image === 'string') {
+        return {
+          src: image,
+          size: 'contain'
+        } as CardBackImage;
+      }
+
+      if (image && typeof image === 'object') {
+        const src = 'src' in image && typeof image.src === 'string' ? image.src : '';
+        const size = 'size' in image && typeof image.size === 'string' ? image.size : 'contain';
+
+        return {
+          src,
+          size
+        } as CardBackImage;
+      }
+
+      return null;
+    })
+    .filter((image): image is CardBackImage => Boolean(image));
 }
 
 function convertSubtitlePlusRuleToSection(contents: CardContent[]): CardContent[] {

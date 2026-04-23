@@ -1,11 +1,37 @@
 <script lang="ts">
+  import { afterUpdate, tick } from 'svelte';
   import { settings } from '../../stores/settings';
-  import { Button, Icon, Input, InputGroup, InputGroupText } from 'sveltestrap';
+  import { Button, Icon, Input, InputGroup, InputGroupText, Tooltip } from 'sveltestrap';
   import { currentCard, deck, pageLayout } from '../../stores';
   import CardComponent from './card.svelte';
   import CardBack from './card-back.svelte';
 
+  let frontStageElement: HTMLDivElement;
+  let hasContentOverflow = false;
+  const overflowWarningId = 'card-overflow-warning';
+
   $: card = $deck[$currentCard];
+
+  const updateOverflowState = async () => {
+    await tick();
+
+    const contentElement = frontStageElement?.querySelector('.card-content') as HTMLElement;
+    if (!contentElement) {
+      hasContentOverflow = false;
+      return;
+    }
+
+    const children = Array.from(contentElement.children) as HTMLElement[];
+    const childOverflow = children.some(
+      (child) => child.offsetTop + child.offsetHeight > contentElement.clientHeight + 1
+    );
+
+    hasContentOverflow = childOverflow;
+  };
+
+  afterUpdate(() => {
+    void updateOverflowState();
+  });
 </script>
 
 <div class="canvas">
@@ -31,6 +57,7 @@
       <div class="card-preview-row">
         <div
           class="card-stage"
+          bind:this={frontStageElement}
           style="
             width: {$pageLayout.cardSize.width * ($settings.previewZoom / 100)}mm;
             height: {$pageLayout.cardSize.height * ($settings.previewZoom / 100)}mm;
@@ -39,6 +66,14 @@
           <div style="transform: scale({$settings.previewZoom / 100}); transform-origin: top left;">
             <CardComponent {card} />
           </div>
+          {#if hasContentOverflow}
+            <div class="card-overflow-warning" id={overflowWarningId}>
+              <Icon name="exclamation-triangle-fill" />
+            </div>
+            <Tooltip target={overflowWarningId} placement="left">
+              Some content is clipped and does not fit on this card.
+            </Tooltip>
+          {/if}
         </div>
         <div
           class="card-stage"
@@ -90,6 +125,7 @@
   }
 
   .card-stage {
+    position: relative;
     flex: none;
     filter: drop-shadow(0 1.25rem 2.5rem rgba(24, 32, 47, 0.18));
   }
@@ -100,6 +136,22 @@
     align-items: center;
     justify-content: center;
     gap: 2rem;
+  }
+
+  .card-overflow-warning {
+    position: absolute;
+    right: 0.45rem;
+    bottom: 0.45rem;
+    z-index: 2;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: rgba(255, 242, 184, 0.96);
+    color: #9a6b00;
+    box-shadow: 0 0.25rem 0.8rem rgba(24, 32, 47, 0.16);
   }
 
   @media (max-width: 1100px) {

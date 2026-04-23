@@ -3,20 +3,28 @@
   import extend from 'just-extend';
   import {
     Button,
+    ButtonGroup,
     Form,
     Icon,
     Input,
-    InputGroup,
-    InputGroupText,
     Label
   } from 'sveltestrap';
   import { createMultiCard, removeEmpty } from '../lib/card-builder';
-  import { getContentAsString, parseCardContents } from '../lib/card-json-parser';
+  import {
+    getContentAsString,
+    normalizeCardbackImages,
+    parseCardContents
+  } from '../lib/card-json-parser';
   import type Card from '../model/card';
-  import type { CardBackMode } from '../model/card';
-  import { currentCard, deck, multiSelect, recentColors } from '../stores';
+  import type {
+    CardBackBorderStyle,
+    CardBackImage,
+    CardBackImageSizePreset,
+    CardBackMode
+  } from '../model/card';
+  import { currentCard, deck, multiSelect } from '../stores';
   import CardContentEditor from './card-content-editor.svelte';
-  import ColorSelecter from './color-selecter.svelte';
+  import ColorInput from './color-input.svelte';
   import CssEditor from './css-editor.svelte';
   import IconInput from './game-icon-input.svelte';
   import Hint from './hint.svelte';
@@ -27,6 +35,27 @@
   $: isMultiEditing = $multiSelect.size > 1;
   $: cardbackMode = card?.cardback_mode ?? 'icon';
   $: cardbackImages = card?.cardback_images ?? [];
+  const cardbackSizeOptions: { value: CardBackImageSizePreset; label: string }[] = [
+    { value: 'cover', label: 'Cover' },
+    { value: 'contain', label: 'Contain' },
+    { value: 'custom', label: 'Custom' }
+  ];
+  const cardbackBorderOptions: { value: CardBackBorderStyle; label: string }[] = [
+    { value: 'none', label: 'None' },
+    { value: 'normal', label: 'Normal' }
+  ];
+
+  const getCardbackImageSizePreset = (image: CardBackImage): CardBackImageSizePreset => {
+    if (image?.size === 'cover') {
+      return 'cover';
+    }
+
+    if (image?.size === 'contain' || !image?.size) {
+      return 'contain';
+    }
+
+    return 'custom';
+  };
 
   const ensureCardbackState = (target: Partial<Card>) => {
     if (!target || target.cardback_mode === null) {
@@ -37,8 +66,14 @@
       target.cardback_mode = 'icon';
     }
 
-    if (!Array.isArray(target.cardback_images)) {
-      target.cardback_images = [];
+    target.cardback_images = normalizeCardbackImages(target.cardback_images);
+
+    if (!target.cardback_background_color) {
+      target.cardback_background_color = '#ffffff';
+    }
+
+    if (!target.cardback_border_style) {
+      target.cardback_border_style = 'normal';
     }
   };
 
@@ -97,14 +132,19 @@
   };
   $: $multiSelect, isMultiEditing !== undefined && handleMultiEditingChanging();
 
-  const handleCardbackModeChange = (event: Event) => {
-    const mode = (event.currentTarget as HTMLSelectElement).value as CardBackMode;
+  const setCardbackMode = (mode: CardBackMode) => {
     card.cardback_mode = mode;
     card.cardback_images = card.cardback_images ?? [];
   };
 
   const handleAddCardbackImage = () => {
-    card.cardback_images = [...(card.cardback_images ?? []), ''];
+    card.cardback_images = [
+      ...(card.cardback_images ?? []),
+      {
+        src: '',
+        size: 'contain'
+      }
+    ];
   };
 
   const handleRemoveCardbackImage = (index: number) => {
@@ -129,10 +169,32 @@
     });
 
     const nextImages = [...(card.cardback_images ?? [])];
-    nextImages[index] = dataUri;
+    nextImages[index] = {
+      ...(nextImages[index] ?? { size: 'contain' }),
+      src: dataUri
+    };
     card.cardback_images = nextImages;
 
     input.value = '';
+  };
+
+  const handleCardbackImageSizePresetChange = (index: number, event: Event) => {
+    const preset = (event.currentTarget as HTMLSelectElement).value as CardBackImageSizePreset;
+    const nextImages = [...(card.cardback_images ?? [])];
+    const nextImage = { ...(nextImages[index] ?? { src: '' }) };
+    nextImage.size = preset === 'custom' ? nextImage.size || 'contain' : preset;
+    nextImages[index] = nextImage;
+    card.cardback_images = nextImages;
+  };
+
+  const handleCardbackImageCustomSizeChange = (index: number, event: Event) => {
+    const value = (event.currentTarget as HTMLInputElement).value;
+    const nextImages = [...(card.cardback_images ?? [])];
+    nextImages[index] = {
+      ...(nextImages[index] ?? { src: '' }),
+      size: value
+    };
+    card.cardback_images = nextImages;
   };
 </script>
 
@@ -164,25 +226,64 @@
               placeholder={isMultiEditing && card.count === null ? '*' : 'Count'}
             />
           </div>
+          <!-- Color -->
+          <div class="editor-field">
+            <Label class="col-form-label" for="color-text" disabled>Color</Label>
+            <ColorInput bind:value={card.color} idPrefix="color" name="color" />
+          </div>
         </div>
       </section>
 
       <section class="editor-section">
-        <h3 class="editor-section-title">Cardback</h3>
-        <div class="editor-section-body">
-          <div class="editor-field">
-            <Label class="col-form-label" for="cardback-mode">Style</Label>
-            <Input
-              id="cardback-mode"
-              type="select"
-              value={cardbackMode}
-              on:change={handleCardbackModeChange}
+        <div class="editor-section-header">
+          <h3 class="editor-section-title">Cardback</h3>
+          <ButtonGroup class="editor-mode-group" aria-label="Cardback style">
+            <Button
+              type="button"
+              color="link"
+              class="editor-mode-toggle"
+              aria-label="Use icon and color cardback"
+              aria-pressed={cardbackMode === 'icon'}
+              on:click={() => setCardbackMode('icon')}
             >
-              <option value="icon">Icon + color</option>
-              <option value="images">Background images</option>
-            </Input>
-          </div>
+              <Icon name="bookmark-star" />
+            </Button>
+            <Button
+              type="button"
+              color="link"
+              class="editor-mode-toggle"
+              aria-label="Use image cardback"
+              aria-pressed={cardbackMode === 'images'}
+              on:click={() => setCardbackMode('images')}
+            >
+              <Icon name="image" />
+            </Button>
+          </ButtonGroup>
+        </div>
+        <div class="editor-section-body">
           {#if cardbackMode === 'images'}
+            <div class="editor-field">
+              <Label class="col-form-label" for="cardback-background-color-text">
+                Background color
+              </Label>
+              <ColorInput
+                bind:value={card.cardback_background_color}
+                idPrefix="cardback-background-color"
+                name="cardback-background-color"
+              />
+            </div>
+            <div class="editor-field">
+              <Label class="col-form-label" for="cardback-border-style">Border</Label>
+              <Input
+                id="cardback-border-style"
+                type="select"
+                bind:value={card.cardback_border_style}
+              >
+                {#each cardbackBorderOptions as option}
+                  <option value={option.value}>{option.label}</option>
+                {/each}
+              </Input>
+            </div>
             <div class="editor-field">
               <div class="editor-field-inline">
                 <Label class="col-form-label" for="cardback-images">Images</Label>
@@ -204,8 +305,8 @@
                 {#each cardbackImages as image, index}
                   <div class="cardback-image-row">
                     <div class="cardback-image-preview">
-                      {#if image}
-                        <img src={image} alt={`Cardback image ${index + 1}`} />
+                      {#if image.src}
+                        <img src={image.src} alt={`Cardback image ${index + 1}`} />
                       {:else}
                         <span>Empty</span>
                       {/if}
@@ -216,6 +317,23 @@
                         accept="image/*"
                         on:change={(event) => handleCardbackImageFileChange(index, event)}
                       />
+                      <Input
+                        type="select"
+                        value={getCardbackImageSizePreset(image)}
+                        on:change={(event) => handleCardbackImageSizePresetChange(index, event)}
+                      >
+                        {#each cardbackSizeOptions as option}
+                          <option value={option.value}>{option.label}</option>
+                        {/each}
+                      </Input>
+                      {#if getCardbackImageSizePreset(image) === 'custom'}
+                        <Input
+                          type="text"
+                          value={image.size}
+                          placeholder="Background size"
+                          on:input={(event) => handleCardbackImageCustomSizeChange(index, event)}
+                        />
+                      {/if}
                       <Button
                         type="button"
                         color="link"
@@ -254,32 +372,17 @@
                 : 'Text to show on back, such as spell lvl'}
             />
           </div>
-          <!-- Color -->
           <div class="editor-field">
-            <Label class="col-form-label" for="color-text" disabled>Color</Label>
-            <InputGroup>
-              <InputGroupText>
-                <input
-                  class="color-input rounded"
-                  type="color"
-                  name="color"
-                  id="color-box"
-                  bind:value={card.color}
-                  on:change={() => recentColors.add(card.color)}
-                />
-              </InputGroupText>
-              <Input
-                type="text"
-                name="color"
-                id="color-text"
-                bind:value={card.color}
-                placeholder="Color"
-                on:change={() => recentColors.add(card.color)}
-              />
-              <InputGroupText>
-                <ColorSelecter bind:value={card.color} />
-              </InputGroupText>
-            </InputGroup>
+            <Label class="col-form-label" for="cardback-border-style">Border</Label>
+            <Input
+              id="cardback-border-style"
+              type="select"
+              bind:value={card.cardback_border_style}
+            >
+              {#each cardbackBorderOptions as option}
+                <option value={option.value}>{option.label}</option>
+              {/each}
+            </Input>
           </div>
           {/if}
         </div>
@@ -374,7 +477,7 @@
 
 <style lang="scss">
   :global(.floating-panel-right form) {
-    font-size: 0.7rem;
+    font-size: var(--editor-form-font-size);
   }
 
   .editor-section {
@@ -394,10 +497,11 @@
   .editor-section-title {
     margin: 0;
     color: #223047;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    font-size: var(--section-title-size);
+    font-weight: var(--section-title-weight);
+    letter-spacing: var(--section-title-spacing);
     text-transform: none;
+    padding: 0 0 .75rem 0;
   }
 
   .editor-section-header {
@@ -427,30 +531,30 @@
 
   :global(.floating-panel-right .col-form-label) {
     padding: 0;
-    font-size: 0.7rem;
-    line-height: 1.2;
+    font-size: var(--editor-form-font-size);
+    line-height: var(--editor-form-label-line-height);
   }
 
   :global(.floating-panel-right .form-control),
   :global(.floating-panel-right .input-group-text),
   :global(.floating-panel-right .form-select) {
-    font-size: 0.7rem;
-    border-radius: 0.1875rem;
+    font-size: var(--editor-form-font-size);
+    border-radius: var(--editor-form-control-radius);
   }
 
   :global(.floating-panel-right input),
   :global(.floating-panel-right textarea),
   :global(.floating-panel-right select) {
-    font-size: 0.7rem;
+    font-size: var(--editor-form-font-size);
   }
 
   :global(.floating-panel-right .form-control),
   :global(.floating-panel-right .input-group-text),
   :global(.floating-panel-right .form-select) {
-    padding-left: 0.375rem;
-    padding-right: 0.375rem;
-    padding-top: 0.175rem;
-    padding-bottom: 0.175rem;
+    padding-left: var(--editor-form-control-padding-x);
+    padding-right: var(--editor-form-control-padding-x);
+    padding-top: var(--editor-form-control-padding-y);
+    padding-bottom: var(--editor-form-control-padding-y);
   }
 
   :global(.floating-panel-right .editor-inline-button) {
@@ -468,11 +572,14 @@
     color: #9a3c3c;
   }
 
+  :global(.floating-panel-right .editor-mode-group) {
+    gap: 0.25rem;
+  }
+
   :global(.floating-panel-right .editor-mode-toggle) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-left: auto;
     padding: 0.125rem 0.25rem;
     font-size: 0.8rem;
     color: #5f6d80;
@@ -507,7 +614,9 @@
 
   .cardback-image-row {
     display: grid;
-    gap: 0.35rem;
+    grid-template-columns: 4.25rem minmax(0, 1fr);
+    align-items: start;
+    gap: 0.5rem;
     padding: 0.35rem;
     border: 1px solid rgba(18, 38, 63, 0.08);
     border-radius: 0.25rem;
@@ -515,6 +624,7 @@
   }
 
   .cardback-image-preview {
+    width: 4.25rem;
     height: 4.25rem;
     display: flex;
     align-items: center;
@@ -535,13 +645,7 @@
   .cardback-image-actions {
     display: grid;
     gap: 0.25rem;
-  }
-
-  .color-input {
-    width: 1.5rem;
-    height: 1.5rem;
-    cursor: pointer;
-    overflow: hidden;
+    min-width: 0;
   }
   :global(.content-editor-textarea) {
     height: 20em;

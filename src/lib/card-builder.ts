@@ -7,6 +7,8 @@ export const createNewCard = (): Card => ({
   color: '#4a6898',
   contents: [],
   count: 1,
+  cardback_background_color: '#ffffff',
+  cardback_border_style: 'normal',
   cardback_images: [],
   cardback_mode: 'icon',
   icon: 'magic-swirl',

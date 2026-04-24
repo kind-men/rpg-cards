@@ -3,49 +3,19 @@
 
   export let side: 'left' | 'right';
   export let width: number;
-  export let minWidth = 260;
-  export let maxWidth = 520;
-  export let mobileBreakpoint = 1100;
-
-  let viewportWidth = 0;
-  let isResizing = false;
-
-  const dispatch = createEventDispatcher<{ resize: { width: number } }>();
-
-  const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+  export let scrollable = false;
+  const dispatch = createEventDispatcher<{ resizestart: { side: 'left' | 'right' } }>();
 
   const startResize = (event: MouseEvent) => {
     event.preventDefault();
-    isResizing = true;
-  };
-
-  const stopResize = () => {
-    isResizing = false;
-  };
-
-  const handleWindowMouseMove = (event: MouseEvent) => {
-    if (!isResizing || viewportWidth <= mobileBreakpoint) {
-      return;
-    }
-
-    const nextWidth =
-      side === 'left'
-        ? clamp(event.clientX, minWidth, maxWidth)
-        : clamp(viewportWidth - event.clientX, minWidth, maxWidth);
-
-    dispatch('resize', { width: nextWidth });
+    dispatch('resizestart', { side });
   };
 </script>
-
-<svelte:window
-  bind:innerWidth={viewportWidth}
-  on:mousemove={handleWindowMouseMove}
-  on:mouseup={stopResize}
-/>
 
 <aside
   class:sidebar-container-left={side === 'left'}
   class:sidebar-container-right={side === 'right'}
+  class:sidebar-container-scrollable={scrollable}
   class="sidebar-container"
   style={`--sidebar-width: ${width}px;`}
 >
@@ -79,8 +49,8 @@
     bottom: 0;
     z-index: 10;
     width: var(--sidebar-width);
-    padding: 1rem;
-    overflow-y: auto;
+    padding: 1rem 1rem .5rem 1rem;
+    overflow: hidden;
     background: #ffffff;
     box-shadow: none;
   }
@@ -96,9 +66,19 @@
   }
 
   .sidebar-container-content {
-    min-height: 100%;
+    height: 100%;
+    min-height: 0;
     display: flex;
     flex-direction: column;
+  }
+
+  .sidebar-container-scrollable {
+    overflow-y: auto;
+  }
+
+  .sidebar-container-scrollable .sidebar-container-content {
+    height: auto;
+    min-height: 100%;
   }
 
   .sidebar-resize-handle {
@@ -140,7 +120,7 @@
   }
 
   .sidebar-container-content :global(.sidebar-section) {
-    padding: 0.85rem 0 1rem;
+    padding: 0 0 1rem;
     border-bottom: 1px solid rgba(18, 38, 63, 0.08);
   }
 

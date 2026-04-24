@@ -43,11 +43,12 @@
 
   :global(html),
   :global(body) {
+    --bs-font-sans-serif: "Inter", sans-serif;
     --bs-border-radius: 0.125rem;
-    --section-title-size: 0.8rem;
+    --section-title-size: 0.9rem;
     --section-title-weight: 550;
     --section-title-spacing: 0.04em;
-    --editor-form-font-size: 0.7rem;
+    --editor-form-font-size: 0.8rem;
     --editor-form-label-line-height: 1.2;
     --editor-form-control-radius: 0.1875rem;
     --editor-form-control-padding-x: 0.375rem;

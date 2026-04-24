@@ -15,7 +15,9 @@ export const createNewCard = (): Card => ({
   icon_back: 'magic-swirl',
   tags: [],
   title: 'New Card',
-  layout: {}
+  layout: {
+    show_title: true
+  }
 });
 
 export function createNewCardContent(type: CardContentTypeV2): CardContent {

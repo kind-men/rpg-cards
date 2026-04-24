@@ -36,6 +36,8 @@
   $: isMultiEditing = $multiSelect.size > 1;
   $: cardbackMode = card?.cardback_mode ?? 'icon';
   $: cardbackImages = card?.cardback_images ?? [];
+  $: hasTitleContent = card?.contents?.some((content) => content.type === 'cardtitle') ?? false;
+  $: isTitleVisible = hasTitleContent || card?.layout?.show_title !== false;
   const cardbackSizeOptions: { value: CardBackImageSizePreset; label: string }[] = [
     { value: 'cover', label: 'Cover' },
     { value: 'contain', label: 'Contain' },
@@ -197,6 +199,14 @@
     };
     card.cardback_images = nextImages;
   };
+
+  const toggleTitleVisibility = () => {
+    if (hasTitleContent) {
+      return;
+    }
+
+    card.layout.show_title = card.layout.show_title === false;
+  };
 </script>
 
 <div class="card-editor-content">
@@ -206,13 +216,56 @@
           <!-- Name -->
           <div class="sidebar-field">
             <Label class="col-form-label" for="name">Name</Label>
-            <Input
-              type="text"
-              name="name"
-              id="name"
-              bind:value={card.title}
-              placeholder={isMultiEditing && card.title === null ? '*' : 'Name'}
-            />
+            <div class="name-field-row">
+              <Input
+                type="text"
+                name="name"
+                id="name"
+                bind:value={card.title}
+                placeholder={isMultiEditing && card.title === null ? '*' : 'Name'}
+              />
+              <Button
+                type="button"
+                color="link"
+                class="editor-icon-button"
+                aria-label={hasTitleContent
+                  ? 'Title visibility is controlled by a title content block'
+                  : isTitleVisible
+                    ? 'Hide title on card'
+                    : 'Show title on card'}
+                aria-pressed={isTitleVisible}
+                disabled={hasTitleContent}
+                on:click={toggleTitleVisibility}
+              >
+                <Icon name={isTitleVisible ? 'eye' : 'eye-slash'} />
+              </Button>
+            </div>
+          </div>
+          <div class="layout-size-fields">
+            <div class="sidebar-field">
+              <Label class="col-form-label" for="title-size">Title size</Label>
+              <Input
+                type="text"
+                name="title-size"
+                id="title-size"
+                bind:value={card.layout.title_font_size}
+                placeholder={isMultiEditing && card.layout.title_font_size === null
+                  ? '*'
+                  : DEFAULT_LAYOUT.TITLE_FONT_SIZE}
+              />
+            </div>
+            <div class="sidebar-field">
+              <Label class="col-form-label" for="text-font-size">Text font size</Label>
+              <Input
+                type="text"
+                name="text-font-size"
+                id="text-font-size"
+                bind:value={card.layout.text_font_size}
+                placeholder={isMultiEditing && card.layout.text_font_size === null
+                  ? '*'
+                  : DEFAULT_LAYOUT.TEXT_FONT_SIZE}
+              />
+            </div>
           </div>
           <!-- Color -->
           <div class="sidebar-field">
@@ -374,49 +427,6 @@
           {/if}
       </SidebarSection>
 
-      <SidebarSection title="Layout">
-              <!-- Title font size -->
-              <div class="sidebar-field">
-                <Label class="col-form-label" for="title-size">Title size</Label>
-                <Input
-                  type="text"
-                  name="title-size"
-                  id="title-size"
-                  bind:value={card.layout.title_font_size}
-                  placeholder={isMultiEditing && card.layout.title_font_size === null
-                    ? '*'
-                    : DEFAULT_LAYOUT.TITLE_FONT_SIZE}
-                />
-              </div>
-              <!-- Text font size -->
-              <div class="sidebar-field">
-                <Label class="col-form-label" for="text-font-size">Text font size</Label>
-                <Input
-                  type="text"
-                  name="text-font-size"
-                  id="text-font-size"
-                  bind:value={card.layout.text_font_size}
-                  placeholder={isMultiEditing && card.layout.text_font_size === null
-                    ? '*'
-                    : DEFAULT_LAYOUT.TEXT_FONT_SIZE}
-                />
-              </div>
-              <!-- Custom CSS -->
-              {#if !isMultiEditing}
-                <div class="sidebar-field">
-                  <Label class="col-form-label" for="custom-css">
-                    Custom CSS
-                    <Hint id="custom-css-hint">
-                      <u>Experimental</u> Here you can inject custom CSS (may require
-                      <code>!important</code>
-                      on some properties)
-                    </Hint>
-                  </Label>
-                  <CssEditor id="custom-css" bind:css={card.layout.custom_css} />
-                </div>
-              {/if}
-      </SidebarSection>
-
       <!-- Contents -->
       <SidebarSection>
         <svelte:fragment slot="header">
@@ -449,6 +459,23 @@
               {/if}
             </div>
           {/if}
+      </SidebarSection>
+
+      <SidebarSection title="Layout">
+              <!-- Custom CSS -->
+              {#if !isMultiEditing}
+                <div class="sidebar-field">
+                  <Label class="col-form-label" for="custom-css">
+                    Custom CSS
+                    <Hint id="custom-css-hint">
+                      <u>Experimental</u> Here you can inject custom CSS (may require
+                      <code>!important</code>
+                      on some properties)
+                    </Hint>
+                  </Label>
+                  <CssEditor id="custom-css" bind:css={card.layout.custom_css} />
+                </div>
+              {/if}
       </SidebarSection>
     </Form>
   {:else}
@@ -490,6 +517,13 @@
   .card-editor-content :global(.editor-icon-button:hover) {
     background: rgba(18, 38, 63, 0.06);
     color: #223047;
+  }
+
+  .card-editor-content :global(.editor-icon-button:disabled) {
+    opacity: 0.45;
+    cursor: default;
+    background: transparent;
+    color: #6a7688;
   }
 
   .card-editor-content :global(.editor-mode-toggle) {
@@ -568,6 +602,26 @@
     gap: 0.25rem;
     min-width: 0;
   }
+
+  .layout-size-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .name-field-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  @media (max-width: 520px) {
+    .layout-size-fields {
+      grid-template-columns: 1fr;
+    }
+  }
+
   :global(.content-editor-textarea) {
     height: 20em;
   }

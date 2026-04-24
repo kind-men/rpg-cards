@@ -330,7 +330,10 @@
     min-height: 0;
     display: flex;
     flex-direction: column;
+    flex: 1 1 auto;
     gap: 0.1rem;
+    overflow-y: auto;
+    padding-right: 0.2rem;
   }
 
   .deck-settings {

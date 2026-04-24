@@ -21,6 +21,7 @@
 
   const dispatch = createEventDispatcher();
   const CONTENT_TYPE_ICONS = {
+    cardtitle: 'queen-crown',
     text: 'scroll-unfurled',
     subtitle: 'bookmarklet',
     rule: 'split-cross',

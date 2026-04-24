@@ -33,6 +33,7 @@ export interface CardContent {
 }
 
 export interface CardLayout {
+  show_title?: boolean;
   base_font_size?: string;
   text_font_size?: string;
   title_font_size?: string;

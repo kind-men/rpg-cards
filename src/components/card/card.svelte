@@ -6,6 +6,9 @@
   import CardContent from './card-content.svelte';
 
   export let card: Card;
+
+  $: hasTitleContent = card.contents?.some((content) => content.type === 'cardtitle') ?? false;
+  $: showTitle = card.layout?.show_title !== false && !hasTitleContent;
 </script>
 
 <div
@@ -19,12 +22,14 @@
   "
 >
   <div class="rpg-card">
-    <div class="title-wrapper">
-      <h1>{card.title}</h1>
-    </div>
+    {#if showTitle}
+      <div class="title-wrapper">
+        <h1>{card.title}</h1>
+      </div>
+    {/if}
     <div class="card-content">
       {#each card.contents as content}
-        <CardContent {content} />
+        <CardContent {content} {card} />
       {/each}
     </div>
   </div>

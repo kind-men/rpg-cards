@@ -303,9 +303,11 @@
 
 <style lang="scss">
   .sidebar-content {
-    min-height: 100%;
+    height: 100%;
+    min-height: 0;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
   .hidden {
@@ -348,6 +350,7 @@
     display: block;
     object-fit: contain;
     pointer-events: none;
+    opacity: 0.8;
   }
 
   .general-menu-chevron {
@@ -454,8 +457,8 @@
     position: sticky;
     bottom: -1.5rem;
     margin-top: auto;
-    padding-top: 1rem;
-    padding-bottom: 0.5rem;
+    padding-top: .5rem;
+    padding-bottom: 0;
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;

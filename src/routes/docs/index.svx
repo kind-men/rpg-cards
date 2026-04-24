@@ -2,87 +2,199 @@
   import ContentTypeTable from "$components/docs/content-type-table.svelte";
 </script>
 
-# Documentation
-This is the documentation for RPG Cards Generator.
-Click [here](/) to see the generator in action.
+<section class="docs-hero">
+  <img class="docs-logo" src="/logo_512.png" alt="RPG Cards logo" />
+  <h1 class="docs-hero-title">RPG Cards Generator</h1>
+  <p class="docs-hero-copy">
+    Build, organize, and print polished RPG cards from one workspace. This guide covers the
+    current editor, import and export formats, and the card data the app understands today.
+  </p>
+  <div class="docs-hero-actions">
+    <a class="docs-button" href="/">Open the editor</a>
+    <a class="docs-button docs-button-secondary" href="#export-data">Jump to JSON format</a>
+  </div>
+</section>
 
-## Export JSON data {#export-data}
-Export objects are json files containing a few fields:
-* `version` (string): Defining the version of the export object
-  * Possible values `"1"`
-* `cards` (array): The list of cards
-  * see [Card JSON data](#card-data)
+<section class="docs-section">
+  <h2>Overview</h2>
+  <p>The app is built around three areas:</p>
+  <ul>
+    <li>The left sidebar for deck management, import and export, print settings, and card size presets.</li>
+    <li>The center canvas for previewing the currently selected card.</li>
+    <li>The right sidebar for editing the selected card, including cardback options, layout, and contents.</li>
+  </ul>
+  <p>
+    On larger screens, both sidebars can be resized by dragging their outer edges. On smaller
+    screens, the layout stacks vertically.
+  </p>
+</section>
 
-Example:
+<section class="docs-section">
+  <h2>Working with cards</h2>
+  <p>In the deck panel you can:</p>
+  <ul>
+    <li>add cards</li>
+    <li>select a card to edit it</li>
+    <li>select multiple cards for batch editing</li>
+    <li>duplicate cards</li>
+    <li>delete cards</li>
+    <li>choose a card size preset or use a custom size</li>
+  </ul>
+  <p>In the editor panel you can:</p>
+  <ul>
+    <li>edit the card title and color</li>
+    <li>switch the cardback between icon mode and image mode</li>
+    <li>manage one or more cardback images</li>
+    <li>change border and background settings for the back of the card</li>
+    <li>adjust layout settings such as title size, text size, and custom CSS</li>
+    <li>edit card contents either block-by-block or as plain text</li>
+  </ul>
+</section>
 
-```json
-{
+<section class="docs-section">
+  <h2>Import and export</h2>
+  <p>The app can open JSON files from the left sidebar and export the current deck as JSON.</p>
+  <p>Imports currently accept:</p>
+  <ul>
+    <li>the current export format: an object with <code>version</code> and <code>cards</code></li>
+    <li>an array of cards</li>
+    <li>a legacy single-card object</li>
+  </ul>
+  <p>
+    When importing, the optional conversion toggles can transform subtitle-plus-rule pairs into
+    sections and convert D&amp;D spell properties into spell blocks.
+  </p>
+</section>
+
+<section class="docs-section">
+  <h2>Print view</h2>
+  <p>Use the print button in the left sidebar to open <code>/output</code>.</p>
+  <p>The print settings currently control:</p>
+  <ul>
+    <li>paper size</li>
+    <li>print adjustment on the X and Y axes</li>
+    <li>cardback border width</li>
+  </ul>
+  <p>
+    The print layout uses the selected card size from the deck panel and renders both fronts and
+    backs.
+  </p>
+</section>
+
+<section class="docs-section" id="export-data">
+  <h2>Export JSON data</h2>
+  <p>The current export format is a JSON object with these fields:</p>
+  <ul>
+    <li><code>version</code> (string): export format version. Current value: <code>"1"</code></li>
+    <li><code>cards</code> (array): list of cards. See <a href="#card-data">Card JSON data</a>.</li>
+  </ul>
+  <p>Example:</p>
+  <pre><code>{`{
   "version": "1",
   "cards": [...]
-}
-```
+}`}</code></pre>
+</section>
 
-## Card JSON data {#card-data}
-Cards objects have the following fields:
-* `count` (number): Amount of the card to be printed
-* `color` (string): Color of the card
-* `title` (string): Title of the card
-* `icon_back`(string): Name of the icon used on the back of the card
-  * See [Icons](#icons)
-* `layout` (object): Information about the layout of the card such as text size
-* `text_back` (string): Text showed on the back of the card such as the spell level
-* `contents` (array): Array of contents of the card
-  * See [Contents](#contents)
-
-Example: 
-
-```json
-{
+<section class="docs-section" id="card-data">
+  <h2>Card JSON data</h2>
+  <p>Cards can contain the following fields:</p>
+  <ul>
+    <li><code>count</code> (number): amount of this card to print</li>
+    <li><code>color</code> (string): card color</li>
+    <li><code>title</code> (string): card title</li>
+    <li><code>icon</code> (string): front icon</li>
+    <li><code>icon_back</code> (string): icon used on the card back in icon mode. See <a href="#icons">Icons</a>.</li>
+    <li><code>text_back</code> (string, optional): text shown on the back, such as a spell level</li>
+    <li><code>cardback_mode</code> (string, optional): back style. Possible values: <code>"icon"</code>, <code>"images"</code></li>
+    <li><code>cardback_images</code> (array, optional): list of cardback images when image mode is used</li>
+    <li><code>cardback_background_color</code> (string, optional): background color behind cardback images</li>
+    <li><code>cardback_border_style</code> (string, optional): cardback border style. Possible values: <code>"none"</code>, <code>"normal"</code></li>
+    <li><code>tags</code> (array): list of tags</li>
+    <li><code>layout</code> (object): per-card layout settings</li>
+    <li><code>contents</code> (array): list of content blocks. See <a href="#contents">Contents JSON data</a>.</li>
+  </ul>
+  <p>Example:</p>
+  <pre><code>{`{
   "count": 1,
   "color": "#4a6898",
   "title": "Hex",
+  "icon": "sparkles",
   "icon_back": "magic-swirl",
-  "contents": [
-    ...
-  ],
+  "text_back": "1st Level",
+  "cardback_mode": "icon",
+  "cardback_images": [],
+  "cardback_background_color": "#ffffff",
+  "cardback_border_style": "normal",
+  "tags": [],
   "layout": {
-    "text_font_size": ""
+    "title_font_size": "",
+    "text_font_size": "",
+    "custom_css": ""
   },
-  "text_back": ""
-}
-```
+  "contents": [
+    {
+      "type": "text",
+      "content": "Choose one creature you can see within range.",
+      "id": "04ea19f0-2655-44d4-9de5-595c9b554b75"
+    }
+  ]
+}`}</code></pre>
 
-## Contents JSON data {#contents}
-Content objects have the following fields:
-* `id` (string): A unique id used by the drag and drop mechanics
-* `type` (string): The type of the content, used by the renderer
-  * See [the table below](#content-types)
-* `content` (string): The actual content where parameters are divided by a pipe ` | `.
+  <h3>Cardback images</h3>
+  <p>Each cardback image can contain:</p>
+  <ul>
+    <li><code>src</code> (string): image source, typically a data URL after uploading an image in the editor</li>
+    <li><code>size</code> (string, optional): image sizing mode or custom background-size value</li>
+  </ul>
+</section>
 
-### Content types
-<ContentTypeTable />
+<section class="docs-section">
+  <h2>Layout JSON data</h2>
+  <p>The <code>layout</code> object can contain:</p>
+  <ul>
+    <li><code>base_font_size</code> (string, optional)</li>
+    <li><code>text_font_size</code> (string, optional)</li>
+    <li><code>title_font_size</code> (string, optional)</li>
+    <li><code>custom_css</code> (string, optional)</li>
+  </ul>
+</section>
 
-Examples:
+<section class="docs-section" id="contents">
+  <h2>Contents JSON data</h2>
+  <p>Content objects have the following fields:</p>
+  <ul>
+    <li><code>type</code> (string): content type used by the renderer. See <a href="#content-types">the table below</a>.</li>
+    <li><code>content</code> (string): content parameters separated by a pipe <code>|</code></li>
+    <li><code>id</code> (string, optional): unique id used by the editor</li>
+  </ul>
 
-```json
-...
-{
-  "type": "dndspellblock",
-  "content": "1 action | Self (15-foot radius) | V | Instantaneous",
-  "id": "17252d82-2ff1-44f0-9a3b-8e82406a1d90"
-},
-{
-  "type": "rule",
-  "content": "",
-  "id": "23e3310c-6e4f-4d9e-9849-93a9936fba71"
-},
-{
-  "type": "text",
-  "content": "You create a lash of lightning energy that strikes at one creature of your choice that you can see within 15 feet of you. The target must succeed on a Strength saving throw or be pulled up to 10 feet in a straight line toward you and then take 1d8 lightning damage if it is within 5 feet of you.",
-  "id": "04ea19f0-2655-44d4-9de5-595c9b554b75"
-},
-...
-```
+  <h3 id="content-types">Content types</h3>
+  <ContentTypeTable />
 
-## Icons
-Icons available in RPG Card Generator are provided by [Game-icons.net](https://game-icons.net/) - please check them out!
+  <p>Examples:</p>
+  <pre><code>{`[
+  {
+    "type": "dndspellblock",
+    "content": "1 action | Self (15-foot radius) | V | Instantaneous",
+    "id": "17252d82-2ff1-44f0-9a3b-8e82406a1d90"
+  },
+  {
+    "type": "rule",
+    "content": "",
+    "id": "23e3310c-6e4f-4d9e-9849-93a9936fba71"
+  },
+  {
+    "type": "text",
+    "content": "You create a lash of lightning energy that strikes at one creature of your choice.",
+    "id": "04ea19f0-2655-44d4-9de5-595c9b554b75"
+  }
+]`}</code></pre>
+</section>
+
+<section class="docs-section" id="icons">
+  <h2>Icons</h2>
+  <p>
+    Icons available in RPG Cards Generator are provided by
+    <a href="https://game-icons.net/">Game-icons.net</a>.
+  </p>
+</section>

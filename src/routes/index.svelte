@@ -21,6 +21,7 @@
   let viewportWidth = 0;
   let leftPanelWidth = 340;
   let rightPanelWidth = 340;
+  let activeResize: 'left' | 'right' | undefined;
 
   const toggleInfoModal = () => (infoModalOpen = !infoModalOpen);
 
@@ -32,16 +33,29 @@
   const getMaxRightPanelWidth = () =>
     clamp(viewportWidth - leftPanelWidth - minCanvasWidth, minPanelWidth, maxPanelWidth);
 
-  const handleLeftResize = (event: CustomEvent<{ width: number }>) => {
-    leftPanelWidth = clamp(event.detail.width, minPanelWidth, getMaxLeftPanelWidth());
+  const startResize = (event: CustomEvent<{ side: 'left' | 'right' }>) => {
+    activeResize = event.detail.side;
   };
 
-  const handleRightResize = (event: CustomEvent<{ width: number }>) => {
-    rightPanelWidth = clamp(event.detail.width, minPanelWidth, getMaxRightPanelWidth());
+  const stopResize = () => {
+    activeResize = undefined;
+  };
+
+  const handleWindowMouseMove = (event: MouseEvent) => {
+    if (!activeResize || viewportWidth <= 1100) {
+      return;
+    }
+
+    if (activeResize === 'left') {
+      leftPanelWidth = clamp(event.clientX, minPanelWidth, getMaxLeftPanelWidth());
+      return;
+    }
+
+    rightPanelWidth = clamp(viewportWidth - event.clientX, minPanelWidth, getMaxRightPanelWidth());
   };
 </script>
 
-<svelte:window bind:innerWidth={viewportWidth} />
+<svelte:window bind:innerWidth={viewportWidth} on:mousemove={handleWindowMouseMove} on:mouseup={stopResize} />
 
 <div
   class="workspace"
@@ -54,9 +68,7 @@
   <SidebarContainer
     side="left"
     width={leftPanelWidth}
-    minWidth={minPanelWidth}
-    maxWidth={getMaxLeftPanelWidth()}
-    on:resize={handleLeftResize}
+    on:resizestart={startResize}
   >
     <Sidebar on:info={toggleInfoModal} />
   </SidebarContainer>
@@ -64,9 +76,8 @@
   <SidebarContainer
     side="right"
     width={rightPanelWidth}
-    minWidth={minPanelWidth}
-    maxWidth={getMaxRightPanelWidth()}
-    on:resize={handleRightResize}
+    scrollable={true}
+    on:resizestart={startResize}
   >
     <CardEditor />
   </SidebarContainer>

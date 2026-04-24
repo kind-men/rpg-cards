@@ -2,6 +2,7 @@ import 'svelte';
 import type CardContentTypeDescriptor from '$model/card-content-type';
 import Dndspellblock from '$components/card/content-blocks/dndspellblock.svelte';
 import Dndstats from '$components/card/content-blocks/dndstats.svelte';
+import CardTitle from '$components/card/content-blocks/card-title.svelte';
 import Text from '$components/card/content-blocks/text.svelte';
 import Rule from '$components/card/content-blocks/rule.svelte';
 import Section from '$components/card/content-blocks/section.svelte';
@@ -21,6 +22,12 @@ const createCardContentTypes = <
 ) => args;
 
 export const CARD_CONTENT_TYPES = createCardContentTypes(
+  {
+    name: 'cardtitle',
+    description: 'Displays the card title using the card header style.',
+    params: [],
+    renderComponent: CardTitle
+  },
   {
     name: 'text',
     description: 'Simple paragraph',

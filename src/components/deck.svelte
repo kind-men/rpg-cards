@@ -79,19 +79,6 @@
         <button class="deck-toolbar-button" type="button" on:click={handleAddCard}>
           <Icon name="plus-lg" />
         </button>
-        <button
-          class="deck-toolbar-button"
-          type="button"
-          disabled={!cards || cards.length === 0}
-          on:click={() =>
-            confirmThis({
-              func: () => handleClearDeck(),
-              title: 'Clear deck',
-              body: 'Are you sure you want to clear the deck?'
-            })}
-        >
-          <Icon name="trash" />
-        </button>
       </div>
     </div>
 
@@ -115,6 +102,7 @@
             <button
               class="deck-header-action"
               type="button"
+              disabled={$multiSelect.size < 2}
               on:click={() =>
                 confirmThis({
                   func: handleDeleteSelected,
@@ -256,7 +244,9 @@
     color: #223047;
   }
 
-  .deck-toolbar-button:disabled {
+  .deck-toolbar-button:disabled,
+  .deck-header-action:disabled,
+  .deck-row-action:disabled {
     opacity: 0.35;
     cursor: not-allowed;
   }

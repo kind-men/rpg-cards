@@ -1,10 +1,20 @@
 <script lang="ts">
-  import { Button, Icon, Tooltip } from 'sveltestrap';
+  import { Button, Icon, Input, InputGroup, InputGroupText, Label, Tooltip } from 'sveltestrap';
   import type Card from '../model/card';
+  import type { CardFormat } from '../model/page-layout';
   import { createNewCard } from '../lib/card-builder';
-  import { currentCard, deck, multiSelect } from '../stores';
+  import { CARD_SIZE_PRESETS, currentCard, deck, multiSelect, pageLayout } from '../stores';
   import ConfirmationDialog from './confirmation-dialog.svelte';
   import { uuid4 } from '$lib/uuid';
+
+  const cardFormatOptions: { value: CardFormat; label: string }[] = [
+    { value: 'poker', label: 'Poker' },
+    { value: 'bridge', label: 'Bridge' },
+    { value: 'tarot', label: 'Tarot' },
+    { value: 'square-1', label: 'Square (1 inches)' },
+    { value: 'square-2', label: 'Square (2 inches)' },
+    { value: 'custom', label: 'Custom' }
+  ];
 
   let cards: Card[];
   $: {
@@ -69,6 +79,32 @@
     deck.addCards(newCard);
     currentCard.set($deck.length - 1);
   };
+
+  const handleCardFormatChange = (cardFormat: CardFormat) => {
+    pageLayout.update((layout) => ({
+      ...layout,
+      cardFormat,
+      cardSize:
+        cardFormat === 'custom' ? layout.cardSize : { ...CARD_SIZE_PRESETS[cardFormat] }
+    }));
+  };
+
+  const handleCardFormatSelectChange = (event: Event) => {
+    handleCardFormatChange((event.currentTarget as HTMLSelectElement).value as CardFormat);
+  };
+
+  const handleCustomCardSizeChange = (dimension: 'width' | 'height', event: Event) => {
+    const value = Number((event.currentTarget as HTMLInputElement).value);
+
+    pageLayout.update((layout) => ({
+      ...layout,
+      cardFormat: 'custom',
+      cardSize: {
+        ...layout.cardSize,
+        [dimension]: value
+      }
+    }));
+  };
 </script>
 
 <ConfirmationDialog let:confirm={confirmThis} danger>
@@ -80,6 +116,45 @@
           <Icon name="plus-lg" />
         </button>
       </div>
+    </div>
+
+    <div class="deck-settings">
+      <div class="deck-settings-field">
+        <Label class="col-form-label" for="card-size-format">Card size</Label>
+        <Input
+          id="card-size-format"
+          type="select"
+          value={$pageLayout.cardFormat}
+          on:change={handleCardFormatSelectChange}
+        >
+          {#each cardFormatOptions as option}
+            <option value={option.value}>{option.label}</option>
+          {/each}
+        </Input>
+      </div>
+      {#if $pageLayout.cardFormat === 'custom'}
+        <div class="deck-settings-field">
+          <Label class="col-form-label" for="custom-card-size">Custom</Label>
+          <InputGroup id="custom-card-size">
+            <Input
+              id="custom-card-size-width"
+              placeholder="Width"
+              type="number"
+              value={$pageLayout.cardSize.width}
+              on:input={(event) => handleCustomCardSizeChange('width', event)}
+            />
+            <InputGroupText>mm</InputGroupText>
+            <Input
+              id="custom-card-size-height"
+              placeholder="Height"
+              type="number"
+              value={$pageLayout.cardSize.height}
+              on:input={(event) => handleCustomCardSizeChange('height', event)}
+            />
+            <InputGroupText>mm</InputGroupText>
+          </InputGroup>
+        </div>
+      {/if}
     </div>
 
     <div class="deck-list" role="list">
@@ -256,6 +331,42 @@
     display: flex;
     flex-direction: column;
     gap: 0.1rem;
+  }
+
+  .deck-settings {
+    margin-bottom: 0.75rem;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .deck-settings-field {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .deck-settings :global(.col-form-label) {
+    padding: 0;
+    color: #223047;
+    font-size: var(--editor-form-font-size);
+    line-height: var(--editor-form-label-line-height);
+  }
+
+  .deck-settings :global(.form-control),
+  .deck-settings :global(.input-group-text),
+  .deck-settings :global(.form-select),
+  .deck-settings :global(input),
+  .deck-settings :global(select) {
+    font-size: var(--editor-form-font-size);
+  }
+
+  .deck-settings :global(.form-control),
+  .deck-settings :global(.input-group-text),
+  .deck-settings :global(.form-select) {
+    padding-left: var(--editor-form-control-padding-x);
+    padding-right: var(--editor-form-control-padding-x);
+    padding-top: var(--editor-form-control-padding-y);
+    padding-bottom: var(--editor-form-control-padding-y);
+    border-radius: var(--editor-form-control-radius);
   }
 
   .deck-list-header {

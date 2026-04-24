@@ -80,10 +80,10 @@
     h1 {
       font-size: var(--card-title-size);
       text-transform: uppercase;
-      font-weight: normal;
-      font-family: Draconis;
-
-      transform: scaleX(1.4);
+      font-weight: 800;
+      font-family: "Overpass",sans-serif;
+      letter-spacing: -0.025em;
+      padding: .25rem 0;
     }
 
     .card-content {

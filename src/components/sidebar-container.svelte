@@ -79,7 +79,7 @@
     bottom: 0;
     z-index: 10;
     width: var(--sidebar-width);
-    padding: 0.5rem;
+    padding: 1rem;
     overflow-y: auto;
     background: #ffffff;
     box-shadow: none;

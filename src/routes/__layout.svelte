@@ -13,7 +13,7 @@
 
 <style lang="scss">
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-  @import url('https://fonts.googleapis.com/css2?family=Overpass:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Overpass:wght@400;500;600;700;800&display=swap');
 
   @font-face {
     font-family: 'Draconis';
@@ -117,5 +117,9 @@
 
   :global(.accordion-body) {
     background: #f6f4ef;
+  }
+
+  :global(hr) {
+    margin: 0.5rem 0;
   }
 </style>

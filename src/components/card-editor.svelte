@@ -214,17 +214,6 @@
               placeholder={isMultiEditing && card.title === null ? '*' : 'Name'}
             />
           </div>
-          <!-- Count -->
-          <div class="sidebar-field">
-            <Label class="col-form-label" for="count">Count</Label>
-            <Input
-              type="number"
-              name="count"
-              id="count"
-              bind:value={card.count}
-              placeholder={isMultiEditing && card.count === null ? '*' : 'Count'}
-            />
-          </div>
           <!-- Color -->
           <div class="sidebar-field">
             <Label class="col-form-label" for="color-text" disabled>Color</Label>

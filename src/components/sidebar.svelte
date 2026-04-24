@@ -10,8 +10,7 @@
   import { createEventDispatcher } from 'svelte';
   import { generateExportObject, parseCards } from '../lib/card-json-parser';
   import type Card from '../model/card';
-  import type { CardFormat } from '../model/page-layout';
-  import { CARD_SIZE_PRESETS, currentCard, deck, pageLayout } from '../stores';
+  import { currentCard, deck, pageLayout } from '../stores';
   import { settings } from '../stores/settings';
   import Deck from './deck.svelte';
   import Hint from './hint.svelte';
@@ -114,43 +113,6 @@
     handleExportToFile();
   };
 
-  const cardFormatOptions: { value: CardFormat; label: string }[] = [
-    { value: 'poker', label: 'Poker' },
-    { value: 'bridge', label: 'Bridge' },
-    { value: 'tarot', label: 'Tarot' },
-    { value: 'square-1', label: 'Square (1 inches)' },
-    { value: 'square-2', label: 'Square (2 inches)' },
-    { value: 'custom', label: 'Custom' }
-  ];
-
-  const handleCardFormatChange = (cardFormat: CardFormat) => {
-    pageLayout.update((layout) => ({
-      ...layout,
-      cardFormat,
-      cardSize:
-        cardFormat === 'custom' ? layout.cardSize : { ...CARD_SIZE_PRESETS[cardFormat] }
-    }));
-  };
-
-  const handleCardFormatSelectChange = (event: Event) => {
-    handleCardFormatChange((event.currentTarget as HTMLSelectElement).value as CardFormat);
-  };
-
-  const handleCustomCardSizeChange = (
-    dimension: 'width' | 'height',
-    event: Event
-  ) => {
-    const value = Number((event.currentTarget as HTMLInputElement).value);
-
-    pageLayout.update((layout) => ({
-      ...layout,
-      cardFormat: 'custom',
-      cardSize: {
-        ...layout.cardSize,
-        [dimension]: value
-      }
-    }));
-  };
 </script>
 
 <svelte:window on:click={handleWindowClick} />
@@ -168,21 +130,25 @@
       <button
         class="general-menu-trigger"
         type="button"
-        aria-label="Open general actions menu"
+        aria-label="Toggle general actions menu"
         aria-expanded={generalMenuOpen}
         on:click={toggleGeneralMenu}
       >
-        <span />
-        <span />
-        <span />
+        <img class="general-menu-trigger-image" src="/menu-logo.svg" alt="" />
+        <span class:general-menu-chevron-open={generalMenuOpen} class="general-menu-chevron" />
       </button>
 
       {#if generalMenuOpen}
         <div class="general-menu-panel general-menu-panel-top">
           <div class="general-menu-group">
             <button class="general-menu-item" type="button" on:click={handleImportFileClick}>
-              Import from file
+              Open
             </button>
+            <button class="general-menu-item" type="button" on:click={handleExportToFileClick}>
+              Save
+            </button>
+            <div class="general-menu-divider" />
+
             <button
               class="general-menu-item"
               type="button"
@@ -193,10 +159,6 @@
             <button class="general-menu-item" type="button" on:click={handleImportFromJSONClick}>
               Import JSON
             </button>
-            <button class="general-menu-item" type="button" on:click={handleExportToFileClick}>
-              Export to file
-            </button>
-            <a class="general-menu-item" href="/output" on:click={closeGeneralMenu}>Print</a>
             <button class="general-menu-item" type="button" on:click={handleEditJson}>
               Edit JSON
             </button>
@@ -238,7 +200,17 @@
     </div>
   </div>
 
-  <SidebarSection title="Page">
+  <SidebarSection>
+      <svelte:fragment slot="header">
+        <h2 class="sidebar-section-title">Print</h2>
+        <a
+          class="sidebar-section-action"
+          href="/output"
+          aria-label="Open print view"
+        >
+          <Icon name="printer" />
+        </a>
+      </svelte:fragment>
       <Form class="sidebar-form">
         <div class="sidebar-field">
           <Label class="col-form-label" for="paper-size">Paper size</Label>
@@ -259,42 +231,6 @@
             <InputGroupText>mm</InputGroupText>
           </InputGroup>
         </div>
-        <div class="sidebar-field">
-          <Label class="col-form-label" for="card-size-format">Card size</Label>
-          <Input
-            id="card-size-format"
-            type="select"
-            value={$pageLayout.cardFormat}
-            on:change={handleCardFormatSelectChange}
-          >
-            {#each cardFormatOptions as option}
-              <option value={option.value}>{option.label}</option>
-            {/each}
-          </Input>
-        </div>
-        {#if $pageLayout.cardFormat === 'custom'}
-          <div class="sidebar-field">
-            <Label class="col-form-label" for="custom-card-size">Custom</Label>
-            <InputGroup id="custom-card-size">
-              <Input
-                id="custom-card-size-width"
-                placeholder="Width"
-                type="number"
-                value={$pageLayout.cardSize.width}
-                on:input={(event) => handleCustomCardSizeChange('width', event)}
-              />
-              <InputGroupText>mm</InputGroupText>
-              <Input
-                id="custom-card-size-height"
-                placeholder="Height"
-                type="number"
-                value={$pageLayout.cardSize.height}
-                on:input={(event) => handleCustomCardSizeChange('height', event)}
-              />
-              <InputGroupText>mm</InputGroupText>
-            </InputGroup>
-          </div>
-        {/if}
         <div class="sidebar-field">
           <div class="sidebar-field-label">
             <Label class="col-form-label" for="page-adjust">Print adjust</Label>
@@ -388,30 +324,45 @@
   }
 
   .general-menu-trigger {
-    width: 2rem;
-    height: 2rem;
+    padding: 0;
     display: inline-flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 0.18rem;
-    border: 1px solid rgba(18, 38, 63, 0.1);
-    border-radius: 0.6rem;
-    background: #f6f4ef;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
     color: #223047;
-    transition: background-color 120ms ease, border-color 120ms ease;
+    transition: color 120ms ease, opacity 120ms ease;
+    appearance: none;
 
     &:hover {
-      background: #efebe2;
-      border-color: rgba(18, 38, 63, 0.16);
+      color: #111111;
+      opacity: 0.82;
     }
+  }
 
-    span {
-      width: 0.8rem;
-      height: 1.5px;
-      border-radius: 999px;
-      background: currentColor;
-    }
+  .general-menu-trigger-image {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: block;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+  .general-menu-chevron {
+    width: 0.27rem;
+    height: 0.27rem;
+    margin-top: -0.015rem;
+    border-right: 1.125px solid currentColor;
+    border-bottom: 1.125px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 120ms ease;
+    pointer-events: none;
+  }
+
+  .general-menu-chevron-open {
+    transform: rotate(-135deg);
   }
 
   .general-menu-panel {
@@ -523,6 +474,31 @@
     color: #5e6b81;
     text-decoration: none;
     transition: background-color 120ms ease, color 120ms ease;
+
+    &:hover {
+      background: rgba(18, 38, 63, 0.06);
+      color: #223047;
+    }
+
+    :global(svg) {
+      width: 0.9rem;
+      height: 0.9rem;
+    }
+  }
+
+  .sidebar-section-action {
+    width: 1.7rem;
+    height: 1.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 0.35rem;
+    background: transparent;
+    color: #6a7688;
+    text-decoration: none;
+    transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;
 
     &:hover {
       background: rgba(18, 38, 63, 0.06);

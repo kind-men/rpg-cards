@@ -28,6 +28,7 @@
   import CssEditor from './css-editor.svelte';
   import IconInput from './game-icon-input.svelte';
   import Hint from './hint.svelte';
+  import SidebarSection from './sidebar-section.svelte';
 
   let card: Card = $deck[$currentCard];
   let contentEditorMode: 'individual' | 'textfield' = 'individual';
@@ -198,14 +199,12 @@
   };
 </script>
 
-<div>
+<div class="card-editor-content">
   {#if card}
-    <Form>
-      <section class="editor-section">
-        <h3 class="editor-section-title">Card</h3>
-        <div class="editor-section-body">
+    <Form class="sidebar-form">
+      <SidebarSection title="Card">
           <!-- Name -->
-          <div class="editor-field">
+          <div class="sidebar-field">
             <Label class="col-form-label" for="name">Name</Label>
             <Input
               type="text"
@@ -216,7 +215,7 @@
             />
           </div>
           <!-- Count -->
-          <div class="editor-field">
+          <div class="sidebar-field">
             <Label class="col-form-label" for="count">Count</Label>
             <Input
               type="number"
@@ -227,16 +226,15 @@
             />
           </div>
           <!-- Color -->
-          <div class="editor-field">
+          <div class="sidebar-field">
             <Label class="col-form-label" for="color-text" disabled>Color</Label>
             <ColorInput bind:value={card.color} idPrefix="color" name="color" />
           </div>
-        </div>
-      </section>
+      </SidebarSection>
 
-      <section class="editor-section">
-        <div class="editor-section-header">
-          <h3 class="editor-section-title">Cardback</h3>
+      <SidebarSection>
+        <svelte:fragment slot="header">
+          <h2 class="sidebar-section-title">Cardback</h2>
           <ButtonGroup class="editor-mode-group" aria-label="Cardback style">
             <Button
               type="button"
@@ -259,10 +257,9 @@
               <Icon name="image" />
             </Button>
           </ButtonGroup>
-        </div>
-        <div class="editor-section-body">
+        </svelte:fragment>
           {#if cardbackMode === 'images'}
-            <div class="editor-field">
+            <div class="sidebar-field">
               <Label class="col-form-label" for="cardback-background-color-text">
                 Background color
               </Label>
@@ -272,7 +269,7 @@
                 name="cardback-background-color"
               />
             </div>
-            <div class="editor-field">
+            <div class="sidebar-field">
               <Label class="col-form-label" for="cardback-border-style">Border</Label>
               <Input
                 id="cardback-border-style"
@@ -284,8 +281,8 @@
                 {/each}
               </Input>
             </div>
-            <div class="editor-field">
-              <div class="editor-field-inline">
+            <div class="sidebar-field">
+              <div class="sidebar-field-inline">
                 <Label class="col-form-label" for="cardback-images">Images</Label>
                 <Button
                   type="button"
@@ -349,7 +346,7 @@
             </div>
           {:else}
           <!-- Icon back -->
-          <div class="editor-field">
+          <div class="sidebar-field">
             <Label class="col-form-label" for="icon_back">Icon (Back)</Label>
             <IconInput
               bind:isMultiEditing
@@ -360,7 +357,7 @@
             />
           </div>
           <!-- Text back -->
-          <div class="editor-field">
+          <div class="sidebar-field">
             <Label class="col-form-label" for="text_back">Text (Back)</Label>
             <Input
               type="text"
@@ -372,7 +369,7 @@
                 : 'Text to show on back, such as spell lvl'}
             />
           </div>
-          <div class="editor-field">
+          <div class="sidebar-field">
             <Label class="col-form-label" for="cardback-border-style">Border</Label>
             <Input
               id="cardback-border-style"
@@ -385,14 +382,11 @@
             </Input>
           </div>
           {/if}
-        </div>
-      </section>
+      </SidebarSection>
 
-      <section class="editor-section">
-        <h3 class="editor-section-title">Layout</h3>
-        <div class="editor-section-body">
+      <SidebarSection title="Layout">
               <!-- Title font size -->
-              <div class="editor-field">
+              <div class="sidebar-field">
                 <Label class="col-form-label" for="title-size">Title size</Label>
                 <Input
                   type="text"
@@ -405,7 +399,7 @@
                 />
               </div>
               <!-- Text font size -->
-              <div class="editor-field">
+              <div class="sidebar-field">
                 <Label class="col-form-label" for="text-font-size">Text font size</Label>
                 <Input
                   type="text"
@@ -419,7 +413,7 @@
               </div>
               <!-- Custom CSS -->
               {#if !isMultiEditing}
-                <div class="editor-field">
+                <div class="sidebar-field">
                   <Label class="col-form-label" for="custom-css">
                     Custom CSS
                     <Hint id="custom-css-hint">
@@ -431,13 +425,12 @@
                   <CssEditor id="custom-css" bind:css={card.layout.custom_css} />
                 </div>
               {/if}
-        </div>
-      </section>
+      </SidebarSection>
 
       <!-- Contents -->
-      <section class="editor-section">
-        <div class="editor-section-header">
-          <h3 class="editor-section-title">Contents</h3>
+      <SidebarSection>
+        <svelte:fragment slot="header">
+          <h2 class="sidebar-section-title">Contents</h2>
           <Button
             type="button"
             color="link"
@@ -450,10 +443,9 @@
           >
             <Icon name="code-slash" />
           </Button>
-        </div>
-        <div class="editor-section-body">
+        </svelte:fragment>
           {#if !isMultiEditing && card.contents}
-            <div class="editor-field">
+            <div class="sidebar-field">
               {#if contentEditorMode === 'individual'}
                 <CardContentEditor bind:contents={card.contents} />
               {:else}
@@ -467,8 +459,7 @@
               {/if}
             </div>
           {/if}
-        </div>
-      </section>
+      </SidebarSection>
     </Form>
   {:else}
     <div class="empty-editor">No card is selected!</div>
@@ -476,107 +467,22 @@
 </div>
 
 <style lang="scss">
-  :global(.floating-panel-right form) {
-    font-size: var(--editor-form-font-size);
-  }
-
-  .editor-section {
-    padding: 0.85rem 0 1rem;
-    border-bottom: 1px solid rgba(18, 38, 63, 0.08);
-  }
-
-  .editor-section:first-child {
-    padding-top: 0;
-  }
-
-  .editor-section:last-child {
-    padding-bottom: 0;
-    border-bottom: 0;
-  }
-
-  .editor-section-title {
-    margin: 0;
-    color: #223047;
-    font-size: var(--section-title-size);
-    font-weight: var(--section-title-weight);
-    letter-spacing: var(--section-title-spacing);
-    text-transform: none;
-    padding: 0 0 .75rem 0;
-  }
-
-  .editor-section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    margin-bottom: 0.85rem;
-  }
-
-  .editor-section-body {
-    display: grid;
-    gap: 0.35rem;
-  }
-
-  .editor-field {
-    display: grid;
-    gap: 0.25rem;
-  }
-
-  .editor-field-inline {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-  }
-
-  :global(.floating-panel-right .col-form-label) {
-    padding: 0;
-    font-size: var(--editor-form-font-size);
-    line-height: var(--editor-form-label-line-height);
-  }
-
-  :global(.floating-panel-right .form-control),
-  :global(.floating-panel-right .input-group-text),
-  :global(.floating-panel-right .form-select) {
-    font-size: var(--editor-form-font-size);
-    border-radius: var(--editor-form-control-radius);
-  }
-
-  :global(.floating-panel-right input),
-  :global(.floating-panel-right textarea),
-  :global(.floating-panel-right select) {
-    font-size: var(--editor-form-font-size);
-  }
-
-  :global(.floating-panel-right .form-control),
-  :global(.floating-panel-right .input-group-text),
-  :global(.floating-panel-right .form-select) {
-    padding-left: var(--editor-form-control-padding-x);
-    padding-right: var(--editor-form-control-padding-x);
-    padding-top: var(--editor-form-control-padding-y);
-    padding-bottom: var(--editor-form-control-padding-y);
-  }
-
-  :global(.floating-panel-right .editor-inline-button) {
+  .card-editor-content :global(.editor-inline-button) {
     padding: 0;
     color: #5f6d80;
     font-size: 0.7rem;
     text-decoration: none;
   }
 
-  :global(.floating-panel-right .editor-inline-button:hover) {
+  .card-editor-content :global(.editor-inline-button:hover) {
     color: #223047;
   }
 
-  :global(.floating-panel-right .editor-inline-button-danger:hover) {
+  .card-editor-content :global(.editor-inline-button-danger:hover) {
     color: #9a3c3c;
   }
 
-  :global(.floating-panel-right .editor-mode-group) {
-    gap: 0.25rem;
-  }
-
-  :global(.floating-panel-right .editor-mode-toggle) {
+  .card-editor-content :global(.editor-mode-toggle) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -589,12 +495,12 @@
     background: #f6f4ef;
   }
 
-  :global(.floating-panel-right .editor-mode-toggle:hover) {
+  .card-editor-content :global(.editor-mode-toggle:hover) {
     color: #223047;
     background: #efebe2;
   }
 
-  :global(.floating-panel-right .editor-mode-toggle[aria-pressed='true']) {
+  .card-editor-content :global(.editor-mode-toggle[aria-pressed='true']) {
     color: #223047;
     border-color: rgba(18, 38, 63, 0.2);
     background: #e7e1d2;

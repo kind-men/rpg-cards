@@ -17,6 +17,7 @@
   import Hint from './hint.svelte';
   import JsonEditorModal from './json-editor-modal.svelte';
   import JsonImportModal, { ImportEventPayload } from './json-import-modal.svelte';
+  import SidebarSection from './sidebar-section.svelte';
 
   let importFileSelector: HTMLInputElement;
   let importFiles: FileList;
@@ -154,7 +155,7 @@
 
 <svelte:window on:click={handleWindowClick} />
 
-<div class="sidebar-shell">
+<div class="sidebar-content">
   <div class="hidden">
     <input type="file" accept=".json" bind:files={importFiles} bind:this={importFileSelector} />
     <a href={downloadUrl} download={downloadName} bind:this={hiddenDownloadLink}>
@@ -237,13 +238,9 @@
     </div>
   </div>
 
-  <section class="sidebar-panel">
-    <div class="sidebar-panel-header">
-      <h2 class="sidebar-panel-title">Page</h2>
-    </div>
-    <div class="sidebar-panel-body">
-      <Form class="page-form">
-        <div class="page-field">
+  <SidebarSection title="Page">
+      <Form class="sidebar-form">
+        <div class="sidebar-field">
           <Label class="col-form-label" for="paper-size">Paper size</Label>
           <InputGroup id="paper-size">
             <Input
@@ -262,7 +259,7 @@
             <InputGroupText>mm</InputGroupText>
           </InputGroup>
         </div>
-        <div class="page-field">
+        <div class="sidebar-field">
           <Label class="col-form-label" for="card-size-format">Card size</Label>
           <Input
             id="card-size-format"
@@ -276,7 +273,7 @@
           </Input>
         </div>
         {#if $pageLayout.cardFormat === 'custom'}
-          <div class="page-field">
+          <div class="sidebar-field">
             <Label class="col-form-label" for="custom-card-size">Custom</Label>
             <InputGroup id="custom-card-size">
               <Input
@@ -298,8 +295,8 @@
             </InputGroup>
           </div>
         {/if}
-        <div class="page-field">
-          <div class="page-field-label">
+        <div class="sidebar-field">
+          <div class="sidebar-field-label">
             <Label class="col-form-label" for="page-adjust">Print adjust</Label>
             <Hint id="page-adjust-help">
               Use this to adjust the print in order to make up for difference in printers
@@ -322,8 +319,8 @@
             <InputGroupText>mm</InputGroupText>
           </InputGroup>
         </div>
-        <div class="page-field">
-          <div class="page-field-label">
+        <div class="sidebar-field">
+          <div class="sidebar-field-label">
             <Label class="col-form-label" for="card-back-border">Cardback border</Label>
             <Hint id="card-back-border-hint">
               Use this add a colored border around the back of the cards when printing to make up
@@ -341,13 +338,10 @@
           </InputGroup>
         </div>
       </Form>
-    </div>
-  </section>
-  <section class="sidebar-panel sidebar-panel-deck">
-    <div class="sidebar-panel-body">
+  </SidebarSection>
+  <SidebarSection grow={true}>
       <Deck />
-    </div>
-  </section>
+  </SidebarSection>
   <footer class="sidebar-footer">
     <a
       class="sidebar-footer-link"
@@ -372,7 +366,7 @@
 </div>
 
 <style lang="scss">
-  .sidebar-shell {
+  .sidebar-content {
     min-height: 100%;
     display: flex;
     flex-direction: column;
@@ -384,7 +378,6 @@
 
   .sidebar-toolbar {
     position: relative;
-    margin-bottom: 0.75rem;
     display: flex;
     justify-content: flex-start;
   }
@@ -516,80 +509,6 @@
     justify-content: flex-end;
     gap: 0.5rem;
     background: linear-gradient(to top, #ffffff 72%, rgba(255, 255, 255, 0));
-  }
-
-  .sidebar-panel {
-    padding: 0.85rem 0 1rem;
-    border-bottom: 1px solid rgba(18, 38, 63, 0.08);
-  }
-
-  .sidebar-panel-deck {
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-  }
-
-  .sidebar-panel-header {
-    margin-bottom: 0.75rem;
-  }
-
-  .sidebar-panel-title {
-    margin: 0;
-    color: #223047;
-    font-size: var(--section-title-size);
-    font-weight: var(--section-title-weight);
-    letter-spacing: var(--section-title-spacing);
-    text-transform: none;
-  }
-
-  .sidebar-panel-body {
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-  }
-
-  :global(.page-form) {
-    display: grid;
-    gap: 0.6rem;
-    font-size: var(--editor-form-font-size);
-  }
-
-  .page-field {
-    display: grid;
-    gap: 0.25rem;
-  }
-
-  .page-field-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-  }
-
-  :global(.page-form) :global(.col-form-label) {
-    padding: 0;
-    color: #223047;
-    font-size: var(--editor-form-font-size);
-    line-height: var(--editor-form-label-line-height);
-  }
-
-  :global(.page-form) :global(.form-control),
-  :global(.page-form) :global(.input-group-text),
-  :global(.page-form) :global(.form-select),
-  :global(.page-form) :global(input),
-  :global(.page-form) :global(select) {
-    font-size: var(--editor-form-font-size);
-  }
-
-  :global(.page-form) :global(.form-control),
-  :global(.page-form) :global(.input-group-text),
-  :global(.page-form) :global(.form-select) {
-    padding-left: var(--editor-form-control-padding-x);
-    padding-right: var(--editor-form-control-padding-x);
-    padding-top: var(--editor-form-control-padding-y);
-    padding-bottom: var(--editor-form-control-padding-y);
-    border-radius: var(--editor-form-control-radius);
   }
 
   .sidebar-footer-link {

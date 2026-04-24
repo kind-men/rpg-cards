@@ -108,14 +108,24 @@
 
   let colorHex = '#ffffff';
   let alphaPercent = 100;
+  let isSyncingControls = false;
+  let lastCommittedAlphaPercent = alphaPercent;
 
   const syncControlsFromValue = () => {
+    isSyncingControls = true;
     const { r, g, b, a } = parseColor(value);
     colorHex = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
     alphaPercent = Math.round(clamp(a, 0, 1) * 100);
+    lastCommittedAlphaPercent = alphaPercent;
+    isSyncingControls = false;
   };
 
   $: value, syncControlsFromValue();
+  $: if (!isSyncingControls && alphaPercent !== lastCommittedAlphaPercent) {
+    commitColor();
+    recentColors.add(value);
+    lastCommittedAlphaPercent = alphaPercent;
+  }
 
   const commitColor = () => {
     const { r, g, b } = parseHexColor(colorHex) ?? { r: 255, g: 255, b: 255, a: 1 };
@@ -127,56 +137,79 @@
     recentColors.add(value);
   };
 
-  const handleAlphaChange = () => {
-    commitColor();
-    recentColors.add(value);
-  };
-
   const handleColorChange = () => {
     syncControlsFromValue();
     recentColors.add(value);
   };
 </script>
 
-<InputGroup>
-  <InputGroupText>
-    <input
-      class="color-input rounded"
-      type="color"
-      alpha
-      name={name}
-      id={`${idPrefix}-box`}
-      bind:value={colorHex}
-      on:input={handleHexChange}
-      on:change={handleHexChange}
+<div class="color-input-layout">
+  <div class="color-main-row">
+    <InputGroup class="color-text-group">
+      <InputGroupText>
+        <input
+          class="color-input rounded"
+          type="color"
+          alpha
+          name={name}
+          id={`${idPrefix}-box`}
+          bind:value={colorHex}
+          on:input={handleHexChange}
+          on:change={handleHexChange}
+        />
+      </InputGroupText>
+      <Input
+        type="text"
+        {name}
+        id={`${idPrefix}-text`}
+        bind:value
+        {placeholder}
+        on:change={handleColorChange}
+      />
+    </InputGroup>
+
+    <ColorSelecter id={`${idPrefix}-select-button`} bind:value />
+  </div>
+
+  <div class="alpha-row">
+    <Input
+      class="alpha-input"
+      type="range"
+      min="0"
+      max="100"
+      step="1"
+      aria-label="Opacity"
+      style={`--alpha-color: ${colorHex};`}
+      bind:value={alphaPercent}
     />
-  </InputGroupText>
-  <Input
-    type="text"
-    {name}
-    id={`${idPrefix}-text`}
-    bind:value
-    {placeholder}
-    on:change={handleColorChange}
-  />
-  <Input
-    class="alpha-input"
-    type="range"
-    min="0"
-    max="100"
-    step="1"
-    aria-label="Opacity"
-    bind:value={alphaPercent}
-    on:input={handleAlphaChange}
-    on:change={handleAlphaChange}
-  />
-  <InputGroupText class="alpha-value">{alphaPercent}%</InputGroupText>
-  <InputGroupText>
-    <ColorSelecter bind:value />
-  </InputGroupText>
-</InputGroup>
+    <div class="alpha-value">{alphaPercent}%</div>
+  </div>
+</div>
 
 <style lang="scss">
+  .color-input-layout {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .color-main-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.35rem;
+    align-items: center;
+  }
+
+  .color-text-group {
+    min-width: 0;
+  }
+
+  .alpha-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.35rem;
+    align-items: center;
+  }
+
   .color-input {
     width: 1.5rem;
     height: 1.5rem;
@@ -184,14 +217,79 @@
     overflow: hidden;
   }
 
-  :global(.alpha-input.form-control) {
-    max-width: 5.25rem;
-    padding-left: 0.2rem;
-    padding-right: 0.2rem;
+  :global(.alpha-input.form-range) {
+    width: 100%;
+    max-width: none;
+    padding: 0.2rem;
+    border-radius: var(--editor-form-control-radius);
+    border: 1px solid var(--bs-border-color, #ced4da);
+    background-color: #ffffff;
+    background-image:
+      linear-gradient(45deg, rgba(18, 38, 63, 0.08) 25%, transparent 25%),
+      linear-gradient(-45deg, rgba(18, 38, 63, 0.08) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, rgba(18, 38, 63, 0.08) 75%),
+      linear-gradient(-45deg, transparent 75%, rgba(18, 38, 63, 0.08) 75%),
+      linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, var(--alpha-color) 100%);
+    background-position:
+      0 0,
+      0 0.4rem,
+      0.4rem -0.4rem,
+      -0.4rem 0,
+      0 0;
+    background-size:
+      0.8rem 0.8rem,
+      0.8rem 0.8rem,
+      0.8rem 0.8rem,
+      0.8rem 0.8rem,
+      100% 100%;
+    background-repeat: repeat, repeat, repeat, repeat, no-repeat;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
   }
 
   .alpha-value {
     min-width: 3.25rem;
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
+    padding: var(--editor-form-control-padding-y) var(--editor-form-control-padding-x);
+    border: 1px solid var(--bs-border-color, #ced4da);
+    border-radius: var(--editor-form-control-radius);
+    background: #e9ecef;
+    color: #223047;
+  }
+
+  :global(.alpha-input.form-range::-webkit-slider-runnable-track) {
+    height: 100%;
+    background: transparent;
+    border: 0;
+  }
+
+  :global(.alpha-input.form-range::-webkit-slider-thumb) {
+    width: 0.7rem;
+    height: 0.7rem;
+    margin-top: .15rem;
+    border: 2px solid #ffffff;
+    border-radius: 999px;
+    background: transparent;
+    box-shadow: 0 1px 3px rgba(18, 38, 63, 0.18);
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  :global(.alpha-input.form-range::-moz-range-track) {
+    height: 100%;
+    background: transparent;
+    border: 0;
+  }
+
+  :global(.alpha-input.form-range::-moz-range-thumb) {
+    width: 0.9rem;
+    height: 0.9rem;
+    border: 1px solid rgba(18, 38, 63, 0.18);
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(18, 38, 63, 0.18);
   }
 </style>

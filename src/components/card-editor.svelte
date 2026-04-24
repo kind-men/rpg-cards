@@ -281,18 +281,19 @@
                 {/each}
               </Input>
             </div>
-            <div class="sidebar-field">
-              <div class="sidebar-field-inline">
-                <Label class="col-form-label" for="cardback-images">Images</Label>
+            <SidebarSection class="cardback-images-section">
+              <svelte:fragment slot="header">
+                <h3 class="sidebar-section-title">Images</h3>
                 <Button
                   type="button"
                   color="link"
-                  class="editor-inline-button"
+                  class="editor-icon-button"
+                  aria-label="Add cardback image"
                   on:click={handleAddCardbackImage}
                 >
-                  Add
+                  <Icon name="plus-lg" />
                 </Button>
-              </div>
+              </svelte:fragment>
 
               <div class="cardback-image-list" id="cardback-images">
                 {#if cardbackImages.length === 0}
@@ -343,7 +344,7 @@
                   </div>
                 {/each}
               </div>
-            </div>
+            </SidebarSection>
           {:else}
           <!-- Icon back -->
           <div class="sidebar-field">
@@ -482,6 +483,26 @@
     color: #9a3c3c;
   }
 
+  .card-editor-content :global(.editor-icon-button) {
+    width: 1.7rem;
+    height: 1.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 0.35rem;
+    background: transparent;
+    color: #6a7688;
+    text-decoration: none;
+    transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;
+  }
+
+  .card-editor-content :global(.editor-icon-button:hover) {
+    background: rgba(18, 38, 63, 0.06);
+    color: #223047;
+  }
+
   .card-editor-content :global(.editor-mode-toggle) {
     display: inline-flex;
     align-items: center;
@@ -509,6 +530,11 @@
   .cardback-image-list {
     display: grid;
     gap: 0.35rem;
+  }
+
+  :global(.cardback-images-section.sidebar-section) {
+    padding: 0;
+    border-bottom: 0;
   }
 
   .cardback-image-empty {

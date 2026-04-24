@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { uuid4 } from '$lib/uuid';
   import { recentColors } from '../stores';
   import { Icon, Popover, TabContent, TabPane, Tooltip } from 'sveltestrap';
   import colorSets from '../../static/colors.json';
 
   let isOpen = false;
   export let value: string;
+  export let id = `color-select-button-${uuid4()}`;
 
   $: recentsSet = {
     set: 'Recents',
@@ -30,10 +32,16 @@
 
 <svelte:body on:click={handleBodyClick} />
 
-<a id="color-select-button" tabindex="0" on:click|preventDefault|stopPropagation>
+<button
+  {id}
+  class="color-select-button"
+  type="button"
+  aria-label="Open color palette"
+  on:click|preventDefault|stopPropagation
+>
   <Icon name="palette-fill" />
-</a>
-<Popover class="popover" placement="bottom" target="color-select-button" bind:isOpen>
+</button>
+<Popover class="popover" placement="bottom" target={id} bind:isOpen>
   <div class="wrapper" on:click|preventDefault|stopPropagation>
     <TabContent vertical pills>
       {#each [...colorSets, recentsSet] as set, setIndex}
@@ -57,8 +65,24 @@
 </Popover>
 
 <style lang="scss">
-  a {
+  .color-select-button {
+    width: 1.7rem;
+    height: 1.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 0.35rem;
+    background: transparent;
+    color: #6a7688;
+    transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;
     cursor: pointer;
+
+    &:hover {
+      background: rgba(18, 38, 63, 0.06);
+      color: #223047;
+    }
   }
 
   .wrapper {

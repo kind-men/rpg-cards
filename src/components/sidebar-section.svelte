@@ -3,7 +3,7 @@
   export let grow = false;
 </script>
 
-<section class:sidebar-section-grow={grow} class="sidebar-section">
+<section {...$$restProps} class:sidebar-section-grow={grow} class="sidebar-section">
   {#if $$slots.header}
     <div class="sidebar-section-header">
       <slot name="header" />

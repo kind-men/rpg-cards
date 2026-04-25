@@ -35,6 +35,13 @@
     newList.push(createNewCardContent(addType));
     contents = newList;
   };
+
+  $: if (contents?.some((content) => !content.id)) {
+    contents = contents.map((content) => ({
+      ...content,
+      id: content.id ?? uuid4()
+    }));
+  }
 </script>
 
 <div class="content-editor-list">
@@ -85,6 +92,7 @@
   .input-wrapper {
     display: flex;
     align-items: flex-start;
+    width: 100%;
   }
 
   :global.add-new-selector {

@@ -13,7 +13,6 @@
   } from 'sveltestrap';
   import { SPLIT_REGEX } from '../lib/constants';
   import type { CardContent } from '../model/card';
-  import GameIcon from './game-icon.svelte';
   import MarkdownEditor from './markdown-editor.svelte';
 
   export let content: CardContent;
@@ -22,22 +21,6 @@
   let splitContent = content.content?.split(SPLIT_REGEX) ?? typeDescriptor.params.map(() => '');
 
   const dispatch = createEventDispatcher();
-  const CONTENT_TYPE_ICONS = {
-    cardtitle: 'queen-crown',
-    text: 'scroll-unfurled',
-    subtitle: 'bookmarklet',
-    rule: 'split-cross',
-    property: 'quill-ink',
-    description: 'rule-book',
-    section: 'upgrade',
-    boxes: 'empty-chessboard',
-    fill: 'resize',
-    bullet: 'bullet-impacts',
-    picture: 'photo-camera',
-    dndstats: 'crossed-swords',
-    dndspellblock: 'spell-book'
-  } as const;
-  $: typeIconName = CONTENT_TYPE_ICONS[content.type] ?? 'plain-circle';
   $: typeIconTarget = `content-type-icon-${content.id ?? content.type}`;
 
   const updateContent = () => {
@@ -67,9 +50,6 @@
         <Icon name="grip-vertical" />
       </button>
       <div class="editor-content-card-title" id={typeIconTarget}>
-        <span class="content-type-icon-wrapper">
-          <GameIcon name={typeIconName} color="#8b96a8" size="1rem" />
-        </span>
         <span>{typeDescriptor.name}</span>
       </div>
     </div>
@@ -153,7 +133,6 @@
     min-width: 0;
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
     color: #223047;
     font-size: 0.74rem;
     font-weight: 600;
@@ -195,14 +174,6 @@
 
   :global(.editor-content-input-group) {
     margin-bottom: 0;
-  }
-
-  .content-type-icon-wrapper {
-    width: 1.25rem;
-    min-width: 1.25rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
 
   :global(.small-input) {

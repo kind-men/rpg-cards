@@ -72,13 +72,8 @@
     flex-direction: column;
   }
 
-  .sidebar-container-scrollable {
-    overflow-y: auto;
-  }
-
   .sidebar-container-scrollable .sidebar-container-content {
-    height: auto;
-    min-height: 100%;
+    overflow-y: auto;
   }
 
   .sidebar-resize-handle {
@@ -120,7 +115,7 @@
   }
 
   .sidebar-container-content :global(.sidebar-section) {
-    padding: 0 0 1rem;
+    padding: .5rem 0 1rem;
     border-bottom: 1px solid rgba(18, 38, 63, 0.08);
   }
 

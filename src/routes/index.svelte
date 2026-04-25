@@ -76,7 +76,6 @@
   <SidebarContainer
     side="right"
     width={rightPanelWidth}
-    scrollable={true}
     on:resizestart={startResize}
   >
     <CardEditor />

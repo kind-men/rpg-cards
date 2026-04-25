@@ -234,319 +234,323 @@
 
 <div class="card-editor-content">
   {#if card}
-    <Form class={`sidebar-form ${editorPane === 'content' ? 'sidebar-form-content' : ''}`}>
-      <div class="card-editor-header">
-        <div class="sidebar-field">
-          <div class="name-field-row">
-            {#if isEditingName}
-              <Input
-                bind:this={nameInput}
-                type="text"
-                name="name"
-                id="name"
-                bind:value={card.title}
-                placeholder={isMultiEditing && card.title === null ? '*' : 'Name'}
-                on:blur={stopEditingName}
-                on:keydown={(event) => {
-                  if (event.key === 'Enter') {
-                    event.preventDefault();
-                    stopEditingName();
-                  }
-                }}
-              />
-            {:else}
-              <div class="name-display" id="name">
-                {card.title || (isMultiEditing && card.title === null ? '*' : 'Untitled card')}
-              </div>
-            {/if}
+    <Form class="sidebar-form">
+      <div class="card-editor-shell">
+        <div class="card-editor-header-shell">
+          <div class="card-editor-header">
+            <div class="sidebar-field">
+              <div class="name-field-row">
+                {#if isEditingName}
+                  <Input
+                    bind:this={nameInput}
+                    type="text"
+                    name="name"
+                    id="name"
+                    bind:value={card.title}
+                    placeholder={isMultiEditing && card.title === null ? '*' : 'Name'}
+                    on:blur={stopEditingName}
+                    on:keydown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault();
+                        stopEditingName();
+                      }
+                    }}
+                  />
+                {:else}
+                  <div class="name-display" id="name">
+                    {card.title || (isMultiEditing && card.title === null ? '*' : 'Untitled card')}
+                  </div>
+                {/if}
 
+                <Button
+                  type="button"
+                  color="link"
+                  class="editor-icon-button"
+                  aria-label={isEditingName ? 'Finish editing card name' : 'Edit card name'}
+                  on:click={startEditingName}
+                >
+                  <Icon name={isEditingName ? 'check-lg' : 'pencil'} />
+                </Button>
+                <Button
+                  type="button"
+                  color="link"
+                  class="editor-icon-button"
+                  aria-label={hasTitleContent
+                    ? 'Title visibility is controlled by a title content block'
+                    : isTitleVisible
+                      ? 'Hide title on card'
+                      : 'Show title on card'}
+                  aria-pressed={isTitleVisible}
+                  disabled={hasTitleContent}
+                  on:click={toggleTitleVisibility}
+                >
+                  <Icon name={isTitleVisible ? 'eye' : 'eye-slash'} />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div class="editor-pane-switch" role="tablist" aria-label="Card editor mode">
             <Button
               type="button"
               color="link"
-              class="editor-icon-button"
-              aria-label={isEditingName ? 'Finish editing card name' : 'Edit card name'}
-              on:click={startEditingName}
+              class={`editor-pane-toggle ${editorPane === 'content' ? 'editor-pane-toggle-active' : ''}`}
+              role="tab"
+              aria-selected={editorPane === 'content'}
+              on:click={() => (editorPane = 'content')}
             >
-              <Icon name={isEditingName ? 'check-lg' : 'pencil'} />
+              Content
             </Button>
             <Button
               type="button"
               color="link"
-              class="editor-icon-button"
-              aria-label={hasTitleContent
-                ? 'Title visibility is controlled by a title content block'
-                : isTitleVisible
-                  ? 'Hide title on card'
-                  : 'Show title on card'}
-              aria-pressed={isTitleVisible}
-              disabled={hasTitleContent}
-              on:click={toggleTitleVisibility}
+              class={`editor-pane-toggle ${editorPane === 'style' ? 'editor-pane-toggle-active' : ''}`}
+              role="tab"
+              aria-selected={editorPane === 'style'}
+              on:click={() => (editorPane = 'style')}
             >
-              <Icon name={isTitleVisible ? 'eye' : 'eye-slash'} />
+              Style
             </Button>
           </div>
         </div>
 
-      </div>
-
-      <div class="editor-pane-switch" role="tablist" aria-label="Card editor mode">
-        <Button
-          type="button"
-          color="link"
-          class={`editor-pane-toggle ${editorPane === 'content' ? 'editor-pane-toggle-active' : ''}`}
-          role="tab"
-          aria-selected={editorPane === 'content'}
-          on:click={() => (editorPane = 'content')}
-        >
-          Content
-        </Button>
-        <Button
-          type="button"
-          color="link"
-          class={`editor-pane-toggle ${editorPane === 'style' ? 'editor-pane-toggle-active' : ''}`}
-          role="tab"
-          aria-selected={editorPane === 'style'}
-          on:click={() => (editorPane = 'style')}
-        >
-          Style
-        </Button>
-      </div>
-
-      {#if editorPane === 'content'}
-      <!-- Contents -->
-      <SidebarSection grow={contentEditorMode === 'textfield'}>
-        <svelte:fragment slot="header">
-          <h2 class="sidebar-section-title">Contents</h2>
-          <Button
-            type="button"
-            color="link"
-            class="editor-mode-toggle"
-            aria-label="Toggle textfield mode"
-            aria-pressed={contentEditorMode === 'textfield'}
-            on:click={() =>
-              (contentEditorMode =
-                contentEditorMode === 'textfield' ? 'individual' : 'textfield')}
-          >
-            <Icon name="code-slash" />
-          </Button>
-        </svelte:fragment>
-          {#if !isMultiEditing && card.contents}
-            <div class="sidebar-field" class:sidebar-field-grow={contentEditorMode === 'textfield'}>
-              {#if contentEditorMode === 'individual'}
-                <CardContentEditor bind:contents={card.contents} />
-              {:else}
-                <div class="raw-content-editor">
-                  <TextEditor
-                    id="content-editor-raw"
-                    class="content-editor-textarea"
-                    bind:value={textFieldContent}
-                  />
+        <div class="card-editor-sections-scroll">
+          {#if editorPane === 'content'}
+          <SidebarSection grow={contentEditorMode === 'textfield'}>
+            <svelte:fragment slot="header">
+              <h2 class="sidebar-section-title">Contents</h2>
+              <Button
+                type="button"
+                color="link"
+                class="editor-mode-toggle"
+                aria-label="Toggle textfield mode"
+                aria-pressed={contentEditorMode === 'textfield'}
+                on:click={() =>
+                  (contentEditorMode =
+                    contentEditorMode === 'textfield' ? 'individual' : 'textfield')}
+              >
+                <Icon name="code-slash" />
+              </Button>
+            </svelte:fragment>
+              {#if !isMultiEditing && card.contents}
+                <div class="sidebar-field" class:sidebar-field-grow={contentEditorMode === 'textfield'}>
+                  {#if contentEditorMode === 'individual'}
+                    <CardContentEditor bind:contents={card.contents} />
+                  {:else}
+                    <div class="raw-content-editor">
+                      <TextEditor
+                        id="content-editor-raw"
+                        class="content-editor-textarea"
+                        bind:value={textFieldContent}
+                      />
+                    </div>
+                  {/if}
                 </div>
               {/if}
-            </div>
-          {/if}
-      </SidebarSection>
-      {:else}
-        <SidebarSection title="Card Style">
-          <div class="layout-size-fields">
-            <div class="sidebar-field">
-              <Label class="col-form-label" for="title-size">Title size</Label>
-              <Input
-                type="text"
-                name="title-size"
-                id="title-size"
-                bind:value={card.layout.title_font_size}
-                placeholder={isMultiEditing && card.layout.title_font_size === null
-                  ? '*'
-                  : DEFAULT_LAYOUT.TITLE_FONT_SIZE}
-              />
-            </div>
-            <div class="sidebar-field">
-              <Label class="col-form-label" for="text-font-size">Text font size</Label>
-              <Input
-                type="text"
-                name="text-font-size"
-                id="text-font-size"
-                bind:value={card.layout.text_font_size}
-                placeholder={isMultiEditing && card.layout.text_font_size === null
-                  ? '*'
-                  : DEFAULT_LAYOUT.TEXT_FONT_SIZE}
-              />
-            </div>
-          </div>
-          <div class="sidebar-field">
-            <Label class="col-form-label" for="color-text" disabled>Color</Label>
-            <ColorInput bind:value={card.color} idPrefix="color" name="color" />
-          </div>
-        </SidebarSection>
+          </SidebarSection>
+          {:else}
+            <SidebarSection title="Card Style">
+              <div class="layout-size-fields">
+                <div class="sidebar-field">
+                  <Label class="col-form-label" for="title-size">Title size</Label>
+                  <Input
+                    type="text"
+                    name="title-size"
+                    id="title-size"
+                    bind:value={card.layout.title_font_size}
+                    placeholder={isMultiEditing && card.layout.title_font_size === null
+                      ? '*'
+                      : DEFAULT_LAYOUT.TITLE_FONT_SIZE}
+                  />
+                </div>
+                <div class="sidebar-field">
+                  <Label class="col-form-label" for="text-font-size">Text font size</Label>
+                  <Input
+                    type="text"
+                    name="text-font-size"
+                    id="text-font-size"
+                    bind:value={card.layout.text_font_size}
+                    placeholder={isMultiEditing && card.layout.text_font_size === null
+                      ? '*'
+                      : DEFAULT_LAYOUT.TEXT_FONT_SIZE}
+                  />
+                </div>
+              </div>
+              <div class="sidebar-field">
+                <Label class="col-form-label" for="color-text" disabled>Color</Label>
+                <ColorInput bind:value={card.color} idPrefix="color" name="color" />
+              </div>
+            </SidebarSection>
 
-        <SidebarSection>
-          <svelte:fragment slot="header">
-            <h2 class="sidebar-section-title">Cardback</h2>
-            <ButtonGroup class="editor-mode-group" aria-label="Cardback style">
-              <Button
-                type="button"
-                color="link"
-                class="editor-mode-toggle"
-                aria-label="Use icon and color cardback"
-                aria-pressed={cardbackMode === 'icon'}
-                on:click={() => setCardbackMode('icon')}
-              >
-                <Icon name="bookmark-star" />
-              </Button>
-              <Button
-                type="button"
-                color="link"
-                class="editor-mode-toggle"
-                aria-label="Use image cardback"
-                aria-pressed={cardbackMode === 'images'}
-                on:click={() => setCardbackMode('images')}
-              >
-                <Icon name="image" />
-              </Button>
-            </ButtonGroup>
-          </svelte:fragment>
-            {#if cardbackMode === 'images'}
-              <div class="sidebar-field">
-                <Label class="col-form-label" for="cardback-background-color-text">
-                  Background color
-                </Label>
-                <ColorInput
-                  bind:value={card.cardback_background_color}
-                  idPrefix="cardback-background-color"
-                  name="cardback-background-color"
-                />
-              </div>
-              <div class="sidebar-field">
-                <Label class="col-form-label" for="cardback-border-style">Border</Label>
-                <Input
-                  id="cardback-border-style"
-                  type="select"
-                  bind:value={card.cardback_border_style}
-                >
-                  {#each cardbackBorderOptions as option}
-                    <option value={option.value}>{option.label}</option>
-                  {/each}
-                </Input>
-              </div>
-              <SidebarSection class="cardback-images-section">
-                <svelte:fragment slot="header">
-                  <h3 class="sidebar-section-title">Images</h3>
+            <SidebarSection>
+              <svelte:fragment slot="header">
+                <h2 class="sidebar-section-title">Cardback</h2>
+                <ButtonGroup class="editor-mode-group" aria-label="Cardback style">
                   <Button
                     type="button"
                     color="link"
-                    class="editor-icon-button"
-                    aria-label="Add cardback image"
-                    on:click={handleAddCardbackImage}
+                    class="editor-mode-toggle"
+                    aria-label="Use icon and color cardback"
+                    aria-pressed={cardbackMode === 'icon'}
+                    on:click={() => setCardbackMode('icon')}
                   >
-                    <Icon name="plus-lg" />
+                    <Icon name="bookmark-star" />
                   </Button>
-                </svelte:fragment>
-
-                <div class="cardback-image-list" id="cardback-images">
-                  {#if cardbackImages.length === 0}
-                    <div class="cardback-image-empty">No images added yet.</div>
-                  {/if}
-
-                  {#each cardbackImages as image, index}
-                    <div class="cardback-image-row">
-                      <div class="cardback-image-preview">
-                        {#if image.src}
-                          <img src={image.src} alt={`Cardback image ${index + 1}`} />
-                        {:else}
-                          <span>Empty</span>
-                        {/if}
-                      </div>
-                      <div class="cardback-image-actions">
-                        <Input
-                          type="file"
-                          accept="image/*"
-                          on:change={(event) => handleCardbackImageFileChange(index, event)}
-                        />
-                        <Input
-                          type="select"
-                          value={getCardbackImageSizePreset(image)}
-                          on:change={(event) => handleCardbackImageSizePresetChange(index, event)}
-                        >
-                          {#each cardbackSizeOptions as option}
-                            <option value={option.value}>{option.label}</option>
-                          {/each}
-                        </Input>
-                        {#if getCardbackImageSizePreset(image) === 'custom'}
-                          <Input
-                            type="text"
-                            value={image.size}
-                            placeholder="Background size"
-                            on:input={(event) => handleCardbackImageCustomSizeChange(index, event)}
-                          />
-                        {/if}
-                        <Button
-                          type="button"
-                          color="link"
-                          class="editor-inline-button editor-inline-button-danger"
-                          on:click={() => handleRemoveCardbackImage(index)}
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    </div>
-                  {/each}
-                </div>
-              </SidebarSection>
-            {:else}
-            <div class="sidebar-field">
-              <Label class="col-form-label" for="icon_back">Icon (Back)</Label>
-              <IconInput
-                bind:isMultiEditing
-                bind:icon={card.icon_back}
-                id="icon_back"
-                name="icon_back"
-                placeholder={isMultiEditing && card.icon_back === null ? '*' : 'Icon back'}
-              />
-            </div>
-            <div class="sidebar-field">
-              <Label class="col-form-label" for="text_back">Text (Back)</Label>
-              <Input
-                type="text"
-                name="text_back"
-                id="text_back"
-                bind:value={card.text_back}
-                placeholder={isMultiEditing && card.text_back === null
-                  ? '*'
-                  : 'Text to show on back, such as spell lvl'}
-              />
-            </div>
-            <div class="sidebar-field">
-              <Label class="col-form-label" for="cardback-border-style">Border</Label>
-              <Input
-                id="cardback-border-style"
-                type="select"
-                bind:value={card.cardback_border_style}
-              >
-                {#each cardbackBorderOptions as option}
-                  <option value={option.value}>{option.label}</option>
-                {/each}
-              </Input>
-            </div>
-            {/if}
-        </SidebarSection>
-
-        <SidebarSection title="Layout">
-                {#if !isMultiEditing}
+                  <Button
+                    type="button"
+                    color="link"
+                    class="editor-mode-toggle"
+                    aria-label="Use image cardback"
+                    aria-pressed={cardbackMode === 'images'}
+                    on:click={() => setCardbackMode('images')}
+                  >
+                    <Icon name="image" />
+                  </Button>
+                </ButtonGroup>
+              </svelte:fragment>
+                {#if cardbackMode === 'images'}
                   <div class="sidebar-field">
-                    <Label class="col-form-label" for="custom-css">
-                      Custom CSS
-                      <Hint id="custom-css-hint">
-                        <u>Experimental</u> Here you can inject custom CSS (may require
-                        <code>!important</code>
-                        on some properties)
-                      </Hint>
+                    <Label class="col-form-label" for="cardback-background-color-text">
+                      Background color
                     </Label>
-                    <CssEditor id="custom-css" bind:css={card.layout.custom_css} />
+                    <ColorInput
+                      bind:value={card.cardback_background_color}
+                      idPrefix="cardback-background-color"
+                      name="cardback-background-color"
+                    />
                   </div>
+                  <div class="sidebar-field">
+                    <Label class="col-form-label" for="cardback-border-style">Border</Label>
+                    <Input
+                      id="cardback-border-style"
+                      type="select"
+                      bind:value={card.cardback_border_style}
+                    >
+                      {#each cardbackBorderOptions as option}
+                        <option value={option.value}>{option.label}</option>
+                      {/each}
+                    </Input>
+                  </div>
+                  <SidebarSection class="cardback-images-section">
+                    <svelte:fragment slot="header">
+                      <h3 class="sidebar-section-title">Images</h3>
+                      <Button
+                        type="button"
+                        color="link"
+                        class="editor-icon-button"
+                        aria-label="Add cardback image"
+                        on:click={handleAddCardbackImage}
+                      >
+                        <Icon name="plus-lg" />
+                      </Button>
+                    </svelte:fragment>
+
+                    <div class="cardback-image-list" id="cardback-images">
+                      {#if cardbackImages.length === 0}
+                        <div class="cardback-image-empty">No images added yet.</div>
+                      {/if}
+
+                      {#each cardbackImages as image, index}
+                        <div class="cardback-image-row">
+                          <div class="cardback-image-preview">
+                            {#if image.src}
+                              <img src={image.src} alt={`Cardback image ${index + 1}`} />
+                            {:else}
+                              <span>Empty</span>
+                            {/if}
+                          </div>
+                          <div class="cardback-image-actions">
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              on:change={(event) => handleCardbackImageFileChange(index, event)}
+                            />
+                            <Input
+                              type="select"
+                              value={getCardbackImageSizePreset(image)}
+                              on:change={(event) => handleCardbackImageSizePresetChange(index, event)}
+                            >
+                              {#each cardbackSizeOptions as option}
+                                <option value={option.value}>{option.label}</option>
+                              {/each}
+                            </Input>
+                            {#if getCardbackImageSizePreset(image) === 'custom'}
+                              <Input
+                                type="text"
+                                value={image.size}
+                                placeholder="Background size"
+                                on:input={(event) => handleCardbackImageCustomSizeChange(index, event)}
+                              />
+                            {/if}
+                            <Button
+                              type="button"
+                              color="link"
+                              class="editor-inline-button editor-inline-button-danger"
+                              on:click={() => handleRemoveCardbackImage(index)}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        </div>
+                      {/each}
+                    </div>
+                  </SidebarSection>
+                {:else}
+                <div class="sidebar-field">
+                  <Label class="col-form-label" for="icon_back">Icon (Back)</Label>
+                  <IconInput
+                    bind:isMultiEditing
+                    bind:icon={card.icon_back}
+                    id="icon_back"
+                    name="icon_back"
+                    placeholder={isMultiEditing && card.icon_back === null ? '*' : 'Icon back'}
+                  />
+                </div>
+                <div class="sidebar-field">
+                  <Label class="col-form-label" for="text_back">Text (Back)</Label>
+                  <Input
+                    type="text"
+                    name="text_back"
+                    id="text_back"
+                    bind:value={card.text_back}
+                    placeholder={isMultiEditing && card.text_back === null
+                      ? '*'
+                      : 'Text to show on back, such as spell lvl'}
+                  />
+                </div>
+                <div class="sidebar-field">
+                  <Label class="col-form-label" for="cardback-border-style">Border</Label>
+                  <Input
+                    id="cardback-border-style"
+                    type="select"
+                    bind:value={card.cardback_border_style}
+                  >
+                    {#each cardbackBorderOptions as option}
+                      <option value={option.value}>{option.label}</option>
+                    {/each}
+                  </Input>
+                </div>
                 {/if}
-        </SidebarSection>
-      {/if}
+            </SidebarSection>
+
+            <SidebarSection title="Layout">
+                    {#if !isMultiEditing}
+                      <div class="sidebar-field">
+                        <Label class="col-form-label" for="custom-css">
+                          Custom CSS
+                          <Hint id="custom-css-hint">
+                            <u>Experimental</u> Here you can inject custom CSS (may require
+                            <code>!important</code>
+                            on some properties)
+                          </Hint>
+                        </Label>
+                        <CssEditor id="custom-css" bind:css={card.layout.custom_css} />
+                      </div>
+                    {/if}
+            </SidebarSection>
+          {/if}
+        </div>
+      </div>
     </Form>
   {:else}
     <div class="empty-editor">No card is selected!</div>
@@ -555,9 +559,17 @@
 
 <style lang="scss">
   .card-editor-content {
+    height: 100%;
     min-height: 100%;
     display: flex;
     flex-direction: column;
+    min-width: 0;
+  }
+
+  .card-editor-content :global(form.sidebar-form) {
+    height: 100%;
+    min-height: 0;
+    display: block;
   }
 
   .card-editor-content :global(.editor-inline-button) {
@@ -669,6 +681,22 @@
     gap: 0.35rem;
   }
 
+  .card-editor-header-shell {
+    flex: 0 0 auto;
+    margin: 0 0 0.9rem;
+    display: grid;
+    gap: 0.5rem;
+    background: #ffffff;
+  }
+
+  .card-editor-shell {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+  }
+
   :global(.cardback-images-section.sidebar-section) {
     padding: 0;
     border-bottom: 0;
@@ -725,15 +753,20 @@
 
   .card-editor-header {
     display: grid;
-    gap: 0.5rem;
   }
 
   .sidebar-form-content {
     height: 100%;
-    min-height: 100%;
+    min-height: 0;
+  }
+
+  .card-editor-sections-scroll {
+    min-height: 0;
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
+    overflow-y: auto;
+    padding-right: 0.1rem;
   }
 
   .name-field-row {

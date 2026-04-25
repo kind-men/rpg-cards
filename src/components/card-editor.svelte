@@ -35,6 +35,9 @@
   let card: Card = $deck[$currentCard];
   let editorPane: 'content' | 'style' = 'content';
   let contentEditorMode: 'individual' | 'textfield' = 'individual';
+  let setCollapsedVersion = 0;
+  let setCollapsed = true;
+  let hasExpandedContentItems = false;
   let isEditingName = false;
   let textFieldContent = getContentAsString(card?.contents);
   let nameInput: HTMLInputElement;
@@ -118,6 +121,9 @@
     ensureCardbackState(card);
     textFieldContent = getContentAsString(card?.contents);
     isEditingName = false;
+    setCollapsed = true;
+    setCollapsedVersion += 1;
+    hasExpandedContentItems = false;
   };
 
   const updateCardContents = () => {
@@ -230,6 +236,18 @@
   const stopEditingName = () => {
     isEditingName = false;
   };
+
+  const toggleAllContentItems = () => {
+    setCollapsed = hasExpandedContentItems;
+    setCollapsedVersion += 1;
+  };
+
+  const toggleContentEditorMode = () => {
+    contentEditorMode = contentEditorMode === 'textfield' ? 'individual' : 'textfield';
+    setCollapsed = true;
+    setCollapsedVersion += 1;
+    hasExpandedContentItems = false;
+  };
 </script>
 
 <div class="card-editor-content">
@@ -316,26 +334,43 @@
 
         <div class="card-editor-sections-scroll">
           {#if editorPane === 'content'}
-          <SidebarSection grow={contentEditorMode === 'textfield'}>
-            <svelte:fragment slot="header">
-              <h2 class="sidebar-section-title">Contents</h2>
+        <SidebarSection grow={contentEditorMode === 'textfield'}>
+          <svelte:fragment slot="header">
+            <h2 class="sidebar-section-title">Contents</h2>
+            <div class="contents-header-actions">
               <Button
                 type="button"
                 color="link"
-                class="editor-mode-toggle"
+                class="editor-icon-button"
+                aria-label={hasExpandedContentItems
+                  ? 'Collapse all content items'
+                  : 'Expand all content items'}
+                on:click={toggleAllContentItems}
+              >
+                <Icon name={hasExpandedContentItems ? 'arrows-collapse' : 'arrows-expand'} />
+              </Button>
+              <Button
+                type="button"
+                color="link"
+                class={`editor-icon-button ${contentEditorMode === 'textfield' ? 'editor-mode-toggle editor-mode-toggle-active' : ''}`}
                 aria-label="Toggle textfield mode"
                 aria-pressed={contentEditorMode === 'textfield'}
-                on:click={() =>
-                  (contentEditorMode =
-                    contentEditorMode === 'textfield' ? 'individual' : 'textfield')}
+                on:click={toggleContentEditorMode}
               >
                 <Icon name="code-slash" />
               </Button>
-            </svelte:fragment>
+            </div>
+          </svelte:fragment>
               {#if !isMultiEditing && card.contents}
                 <div class="sidebar-field" class:sidebar-field-grow={contentEditorMode === 'textfield'}>
                   {#if contentEditorMode === 'individual'}
-                    <CardContentEditor bind:contents={card.contents} />
+                    <CardContentEditor
+                      bind:contents={card.contents}
+                      {setCollapsedVersion}
+                      {setCollapsed}
+                      on:collapsechange={(event) =>
+                        (hasExpandedContentItems = event.detail.hasExpandedItems)}
+                    />
                   {:else}
                     <div class="raw-content-editor">
                       <TextEditor
@@ -638,6 +673,13 @@
     background: #e7e1d2;
   }
 
+  .card-editor-content :global(.editor-mode-toggle-active) {
+    color: #223047;
+    border-color: rgba(18, 38, 63, 0.2);
+    background: #e7e1d2;
+    box-shadow: inset 0 1px 2px rgba(18, 38, 63, 0.08);
+  }
+
   .editor-pane-switch {
     margin: 0 0 0.9rem;
     padding: 0.25rem;
@@ -753,6 +795,13 @@
 
   .card-editor-header {
     display: grid;
+  }
+
+  .contents-header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: auto;
   }
 
   .sidebar-form-content {

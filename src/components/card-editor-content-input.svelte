@@ -8,20 +8,19 @@
     Icon,
     Input,
     InputGroup,
-    InputGroupText,
-    Tooltip
+    InputGroupText
   } from 'sveltestrap';
   import { SPLIT_REGEX } from '../lib/constants';
   import type { CardContent } from '../model/card';
   import MarkdownEditor from './markdown-editor.svelte';
 
   export let content: CardContent;
+  export let collapsed = true;
   $: typeDescriptor = getContentTypeDescriptor(content.type);
 
   let splitContent = content.content?.split(SPLIT_REGEX) ?? typeDescriptor.params.map(() => '');
 
   const dispatch = createEventDispatcher();
-  $: typeIconTarget = `content-type-icon-${content.id ?? content.type}`;
 
   const updateContent = () => {
     content.content =
@@ -49,9 +48,15 @@
       >
         <Icon name="grip-vertical" />
       </button>
-      <div class="editor-content-card-title" id={typeIconTarget}>
+      <button
+        type="button"
+        class="editor-content-card-title"
+        aria-expanded={!collapsed}
+        on:click={() => dispatch('togglecollapse')}
+      >
+        <Icon name={collapsed ? 'chevron-right' : 'chevron-down'} />
         <span>{typeDescriptor.name}</span>
-      </div>
+      </button>
     </div>
     <ButtonGroup class="editor-content-actions">
       <Button
@@ -77,30 +82,31 @@
     </ButtonGroup>
   </div>
 
-  <div
-    class="editor-content-card-body"
-    class:editor-content-card-body-text={content.type === 'text'}
-  >
-    {#if content.type === 'text'}
-      <MarkdownEditor bind:value={splitContent[0]} height="280px" />
-    {:else}
-      <InputGroup class="editor-content-input-group">
-        {#if typeDescriptor.params.length === 0}
-          <Input disabled />
-        {:else}
-          {#each typeDescriptor.params as param, index}
-            <Input
-              type={param.type ?? 'text'}
-              bind:value={splitContent[index]}
-              placeholder={param.name}
-            />
-          {/each}
-        {/if}
-      </InputGroup>
-    {/if}
-  </div>
+  {#if !collapsed}
+    <div
+      class="editor-content-card-body"
+      class:editor-content-card-body-text={content.type === 'text'}
+    >
+      {#if content.type === 'text'}
+        <MarkdownEditor bind:value={splitContent[0]} height="280px" />
+      {:else}
+        <InputGroup class="editor-content-input-group">
+          {#if typeDescriptor.params.length === 0}
+            <Input disabled />
+          {:else}
+            {#each typeDescriptor.params as param, index}
+              <Input
+                type={param.type ?? 'text'}
+                bind:value={splitContent[index]}
+                placeholder={param.name}
+              />
+            {/each}
+          {/if}
+        </InputGroup>
+      {/if}
+    </div>
+  {/if}
 </div>
-<Tooltip target={typeIconTarget} placement="top">{typeDescriptor.name}</Tooltip>
 
 <style lang="scss">
   .editor-content-card {
@@ -127,17 +133,29 @@
     display: flex;
     align-items: center;
     gap: 0.35rem;
+    flex: 1 1 auto;
   }
 
   .editor-content-card-title {
     min-width: 0;
     display: inline-flex;
     align-items: center;
+    justify-content: flex-start;
+    gap: 0.25rem;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
     color: #223047;
     font-size: 0.74rem;
     font-weight: 600;
     letter-spacing: 0.02em;
     text-transform: capitalize;
+    text-align: left;
+  }
+
+  .editor-content-card-title:hover {
+    color: #111c2d;
   }
 
   .editor-content-drag-handle {

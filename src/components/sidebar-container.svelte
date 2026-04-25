@@ -198,6 +198,7 @@
     color: #223047;
     font-size: var(--editor-form-font-size);
     line-height: var(--editor-form-label-line-height);
+    font-weight: 500;
   }
 
   .sidebar-container-content :global(.form-control),

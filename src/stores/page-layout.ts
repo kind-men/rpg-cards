@@ -2,6 +2,7 @@ import { browser } from '$app/env';
 import { writable } from 'svelte/store';
 import type PageLayout from '../model/page-layout';
 import type { CardFormat } from '../model/page-layout';
+import type { PaperFormat } from '../model/page-layout';
 
 const LOCALSTORAGE_KEY = 'pageLayout';
 
@@ -32,7 +33,35 @@ export const CARD_SIZE_PRESETS: Record<CardFormat, { width: number; height: numb
   }
 };
 
+export const PAPER_SIZE_PRESETS: Record<PaperFormat, { width: number; height: number }> = {
+  a3: {
+    width: 297,
+    height: 420
+  },
+  a4: {
+    width: 210,
+    height: 297
+  },
+  a5: {
+    width: 148,
+    height: 210
+  },
+  letter: {
+    width: 215.9,
+    height: 279.4
+  },
+  legal: {
+    width: 215.9,
+    height: 355.6
+  },
+  custom: {
+    width: 210,
+    height: 297
+  }
+};
+
 const defaultPageLayout: PageLayout = {
+  paperFormat: 'a4',
   paperSize: {
     width: 210,
     height: 297
@@ -65,7 +94,30 @@ const inferCardFormat = (cardSize?: { width?: number; height?: number }): CardFo
   return matchingFormat?.[0] ?? defaultPageLayout.cardFormat;
 };
 
+const inferPaperFormat = (paperSize?: { width?: number; height?: number }): PaperFormat => {
+  if (!paperSize?.width || !paperSize?.height) {
+    return defaultPageLayout.paperFormat;
+  }
+
+  const matchingFormat = (Object.entries(PAPER_SIZE_PRESETS) as [PaperFormat, {
+    width: number;
+    height: number;
+  }][])
+    .filter(([format]) => format !== 'custom')
+    .find(([, preset]) => areSameSize(paperSize as { width: number; height: number }, preset));
+
+  return matchingFormat?.[0] ?? 'custom';
+};
+
 const normalizePageLayout = (layout: Partial<PageLayout> | null | undefined): PageLayout => {
+  const paperFormat = layout?.paperFormat ?? inferPaperFormat(layout?.paperSize);
+  const paperSize =
+    paperFormat === 'custom'
+      ? {
+          width: layout?.paperSize?.width ?? defaultPageLayout.paperSize.width,
+          height: layout?.paperSize?.height ?? defaultPageLayout.paperSize.height
+        }
+      : PAPER_SIZE_PRESETS[paperFormat];
   const cardFormat = layout?.cardFormat ?? inferCardFormat(layout?.cardSize);
   const cardSize =
     cardFormat === 'custom'
@@ -78,10 +130,8 @@ const normalizePageLayout = (layout: Partial<PageLayout> | null | undefined): Pa
   return {
     ...defaultPageLayout,
     ...layout,
-    paperSize: {
-      ...defaultPageLayout.paperSize,
-      ...layout?.paperSize
-    },
+    paperFormat,
+    paperSize,
     cardFormat,
     cardSize,
     adjust: {

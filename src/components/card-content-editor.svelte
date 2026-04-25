@@ -2,11 +2,12 @@
   import { flip } from 'svelte/animate';
   import type { CardContent } from '../model/card';
   import CardEditorContentInput from './card-editor-content-input.svelte';
-  import { dndzone } from 'svelte-dnd-action';
+  import { dragHandleZone } from 'svelte-dnd-action';
   import { Button, Icon, Input, InputGroup, Tooltip } from 'sveltestrap';
   import { createNewCardContent } from '../lib/card-builder';
   import { CardContentTypeV2, CARD_CONTENT_TYPES } from '$lib/card-content-types';
   import { uuid4 } from '$lib/uuid';
+  import { hoveredContentId } from '../stores';
 
   export let contents: CardContent[];
   const flipDurationMs = 200;
@@ -36,15 +37,20 @@
   };
 </script>
 
-<div>
+<div class="content-editor-list">
   <div
-    use:dndzone={{ items: contents, flipDurationMs, dropTargetStyle: {} }}
+    class="content-editor-items"
+    use:dragHandleZone={{ items: contents, flipDurationMs, dropTargetStyle: {} }}
     on:consider={handleSort}
     on:finalize={handleSort}
   >
     {#each contents as content, index (content.id)}
       <div animate:flip={{ duration: flipDurationMs }}>
-        <div class="input-wrapper">
+        <div
+          class="input-wrapper"
+          on:mouseenter={() => hoveredContentId.set(content.id ?? null)}
+          on:mouseleave={() => hoveredContentId.set(null)}
+        >
           <CardEditorContentInput
             bind:content
             on:delete={() => handleDelete(index)}
@@ -67,12 +73,20 @@
 </div>
 
 <style lang="scss">
+  .content-editor-list {
+    display: grid;
+  }
+
+  .content-editor-items {
+    display: grid;
+    gap: 0.5rem;
+  }
+
   .input-wrapper {
     display: flex;
-    margin-bottom: 0.25em;
-    gap: 0.25rem;
     align-items: flex-start;
   }
+
   :global.add-new-selector {
     margin-top: 1rem;
   }

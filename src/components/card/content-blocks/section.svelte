@@ -7,14 +7,23 @@
   export let content: CardContent;
 
   $: [title, rightTitle] = content.content.split(SPLIT_REGEX);
+  $: hasLeftTitle = Boolean(title?.trim());
+  $: hasRightTitle = Boolean(rightTitle?.trim());
 </script>
 
-<h3 class="section" class:with-right={rightTitle}>
-  <div>
-    {@html renderText(title)}
-  </div>
-  {#if rightTitle}
-    <div>
+<h3
+  class="section"
+  class:section-center-only={hasLeftTitle && !hasRightTitle}
+  class:section-right-only={!hasLeftTitle && hasRightTitle}
+  class:section-split={hasLeftTitle && hasRightTitle}
+>
+  {#if hasLeftTitle}
+    <div class="section-left">
+      {@html renderText(title)}
+    </div>
+  {/if}
+  {#if hasRightTitle}
+    <div class="section-right">
       {@html renderText(rightTitle)}
     </div>
   {/if}
@@ -22,34 +31,42 @@
 
 <style lang="scss">
   .section {
-    display: grid;
-
-    > * {
-      grid-row: 1;
-      grid-column: 1;
-    }
+    display: flex;
+    align-items: center;
 
     background-color: var(--card-color);
     color: white;
-    height: 0.3cm;
-    font-size: 0.8em;
-    margin-bottom: 0.2em;
+    font-size: 0.6em;
+    margin-bottom: 0.5em;
     margin-left: -5px;
     margin-right: -5px;
-    padding: 0 0.5em;
+    padding: 0.2em 0.75em 0.1em;
+  }
 
-    :first-child {
-      display: flex;
-      align-items: center;
+  .section-left,
+  .section-right {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .section-center-only {
+    justify-content: center;
+
+    .section-left {
       justify-content: center;
     }
+  }
 
-    &.with-right {
-      :last-child {
-        display: flex;
-        align-items: center;
-        justify-content: end;
-      }
+  .section-right-only {
+    justify-content: flex-end;
+
+    .section-right {
+      justify-content: flex-end;
     }
+  }
+
+  .section-split {
+    justify-content: space-between;
   }
 </style>

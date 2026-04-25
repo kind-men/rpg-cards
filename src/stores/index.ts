@@ -4,3 +4,4 @@ export * from './page-layout';
 export * from './multi-select';
 export * from './settings';
 export * from './recent-colors';
+export * from './hovered-content';

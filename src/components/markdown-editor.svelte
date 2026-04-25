@@ -25,6 +25,7 @@
       height,
       initialValue: value ?? '',
       initialEditType: 'wysiwyg',
+      autofocus: false,
       previewStyle: 'vertical',
       toolbarItems: [['bold', 'italic', 'hr', 'ul']],
       usageStatistics: false,

@@ -29,6 +29,7 @@
   import CssEditor from './css-editor.svelte';
   import IconInput from './game-icon-input.svelte';
   import Hint from './hint.svelte';
+  import ImageUploadInput from './image-upload-input.svelte';
   import SidebarSection from './sidebar-section.svelte';
   import TextEditor from './text-editor.svelte';
 
@@ -55,13 +56,14 @@
     { value: 'none', label: 'None' },
     { value: 'normal', label: 'Normal' }
   ];
+  const isPresetSize = (size?: string) => size === 'cover' || size === 'contain';
 
   const getCardbackImageSizePreset = (image: CardBackImage): CardBackImageSizePreset => {
     if (image?.size === 'cover') {
       return 'cover';
     }
 
-    if (image?.size === 'contain' || !image?.size) {
+    if (image?.size === 'contain') {
       return 'contain';
     }
 
@@ -169,36 +171,24 @@
     card.cardback_images = nextImages;
   };
 
-  const handleCardbackImageFileChange = async (index: number, event: Event) => {
-    const input = event.currentTarget as HTMLInputElement;
-    const file = input.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    const dataUri = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result));
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(file);
-    });
-
-    const nextImages = [...(card.cardback_images ?? [])];
-    nextImages[index] = {
-      ...(nextImages[index] ?? { size: 'contain' }),
-      src: dataUri
+  const handleCardbackImageChange = (index: number, src: string) => {
+      const nextImages = [...(card.cardback_images ?? [])];
+      nextImages[index] = {
+        ...(nextImages[index] ?? { size: 'contain' }),
+        src
+      };
+      card.cardback_images = nextImages;
     };
-    card.cardback_images = nextImages;
-
-    input.value = '';
-  };
 
   const handleCardbackImageSizePresetChange = (index: number, event: Event) => {
     const preset = (event.currentTarget as HTMLSelectElement).value as CardBackImageSizePreset;
     const nextImages = [...(card.cardback_images ?? [])];
     const nextImage = { ...(nextImages[index] ?? { src: '' }) };
-    nextImage.size = preset === 'custom' ? nextImage.size || 'contain' : preset;
+    if (preset === 'custom') {
+      nextImage.size = isPresetSize(nextImage.size) ? '' : nextImage.size || '';
+    } else {
+      nextImage.size = preset;
+    }
     nextImages[index] = nextImage;
     card.cardback_images = nextImages;
   };
@@ -486,20 +476,11 @@
                       {/if}
 
                       {#each cardbackImages as image, index}
-                        <div class="cardback-image-row">
-                          <div class="cardback-image-preview">
-                            {#if image.src}
-                              <img src={image.src} alt={`Cardback image ${index + 1}`} />
-                            {:else}
-                              <span>Empty</span>
-                            {/if}
-                          </div>
-                          <div class="cardback-image-actions">
-                            <Input
-                              type="file"
-                              accept="image/*"
-                              on:change={(event) => handleCardbackImageFileChange(index, event)}
-                            />
+                        <ImageUploadInput
+                          src={image.src}
+                          alt={`Cardback image ${index + 1}`}
+                          on:change={(event) => handleCardbackImageChange(index, event.detail.src)}
+                        >
                             <Input
                               type="select"
                               value={getCardbackImageSizePreset(image)}
@@ -525,8 +506,7 @@
                             >
                               Remove
                             </Button>
-                          </div>
-                        </div>
+                        </ImageUploadInput>
                       {/each}
                     </div>
                   </SidebarSection>
@@ -749,42 +729,6 @@
     border: 1px dashed rgba(18, 38, 63, 0.12);
     border-radius: 0.1875rem;
     color: #7c8799;
-  }
-
-  .cardback-image-row {
-    display: grid;
-    grid-template-columns: 4.25rem minmax(0, 1fr);
-    align-items: start;
-    gap: 0.5rem;
-    padding: 0.35rem;
-    border: 1px solid rgba(18, 38, 63, 0.08);
-    border-radius: 0.25rem;
-    background: #fbfaf7;
-  }
-
-  .cardback-image-preview {
-    width: 4.25rem;
-    height: 4.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border: 1px solid rgba(18, 38, 63, 0.08);
-    border-radius: 0.1875rem;
-    background: #ffffff;
-    color: #a3acba;
-  }
-
-  .cardback-image-preview img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
-
-  .cardback-image-actions {
-    display: grid;
-    gap: 0.25rem;
-    min-width: 0;
   }
 
   .layout-size-fields {

@@ -12,6 +12,7 @@
   } from 'sveltestrap';
   import { SPLIT_REGEX } from '../lib/constants';
   import type { CardContent } from '../model/card';
+  import ImageUploadInput from './image-upload-input.svelte';
   import MarkdownEditor from './markdown-editor.svelte';
 
   export let content: CardContent;
@@ -89,6 +90,16 @@
     >
       {#if content.type === 'text'}
         <MarkdownEditor bind:value={splitContent[0]} height="280px" />
+      {:else if content.type === 'picture'}
+        <ImageUploadInput
+          src={splitContent[0]}
+          alt="Picture content preview"
+          emptyLabel="No image"
+          on:change={(event) => (splitContent[0] = event.detail.src)}
+        >
+          <Input type="text" bind:value={splitContent[0]} placeholder="URL" />
+          <Input type="text" bind:value={splitContent[1]} placeholder="Size (for example 120px, 60%, auto)" />
+        </ImageUploadInput>
       {:else}
         <InputGroup class="editor-content-input-group">
           {#if typeDescriptor.params.length === 0}

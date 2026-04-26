@@ -103,7 +103,11 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
     description: 'A picture from an url',
     params: [
       { name: 'URL', description: 'URL of the picture' },
-      { name: 'Height', description: 'Height of the picture in pixels' }
+      {
+        name: 'Size',
+        description: 'CSS height value such as 120px, 60%, auto, or 12rem',
+        optional: true
+      }
     ],
     renderComponent: Picture
   },

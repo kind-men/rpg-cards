@@ -4,15 +4,16 @@
 
   export let content: CardContent;
 
-  $: [src, height] = content.content.split(SPLIT_REGEX);
+  $: [src, size] = content.content.split(SPLIT_REGEX);
 </script>
 
 <!-- svelte-ignore a11y-img-redundant-alt -->
-<img class="picture" {src} height={`${height}px`} alt="RPG Card picture" />
+<img class="picture" {src} style={size ? `height: ${size};` : ''} alt="RPG Card picture" />
 
 <style lang="scss">
   .picture {
     width: 100%;
+    max-height: 100%;
     object-fit: scale-down;
   }
 </style>

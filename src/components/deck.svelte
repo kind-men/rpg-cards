@@ -89,10 +89,6 @@
     }));
   };
 
-  const handleCardFormatSelectChange = (event: Event) => {
-    handleCardFormatChange((event.currentTarget as HTMLSelectElement).value as CardFormat);
-  };
-
   const handleCustomCardSizeChange = (dimension: 'width' | 'height', event: Event) => {
     const value = Number((event.currentTarget as HTMLInputElement).value);
 
@@ -120,17 +116,19 @@
 
     <div class="deck-settings">
       <div class="deck-settings-field">
-        <Label class="col-form-label" for="card-size-format">Card size</Label>
-        <Input
-          id="card-size-format"
-          type="select"
-          value={$pageLayout.cardFormat}
-          on:change={handleCardFormatSelectChange}
-        >
+        <div class="deck-size-toggle-group" role="group" aria-label="Card size">
           {#each cardFormatOptions as option}
-            <option value={option.value}>{option.label}</option>
+            <Button
+              type="button"
+              color="link"
+              class={`deck-size-toggle ${$pageLayout.cardFormat === option.value ? 'deck-size-toggle-active' : ''}`}
+              aria-pressed={$pageLayout.cardFormat === option.value}
+              on:click={() => handleCardFormatChange(option.value)}
+            >
+              {option.label}
+            </Button>
           {/each}
-        </Input>
+        </div>
       </div>
       {#if $pageLayout.cardFormat === 'custom'}
         <div class="deck-settings-field">
@@ -347,6 +345,13 @@
     gap: 0.25rem;
   }
 
+  .deck-settings-label {
+    padding: 0;
+    color: #223047;
+    font-size: var(--editor-form-font-size);
+    line-height: var(--editor-form-label-line-height);
+  }
+
   .deck-settings :global(.col-form-label) {
     padding: 0;
     color: #223047;
@@ -370,6 +375,42 @@
     padding-top: var(--editor-form-control-padding-y);
     padding-bottom: var(--editor-form-control-padding-y);
     border-radius: var(--editor-form-control-radius);
+  }
+
+  .deck-size-toggle-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .deck-settings :global(.deck-size-toggle) {
+    min-height: 1.7rem;
+    padding: 0.15rem 0.55rem;
+    border: 1px solid rgba(18, 38, 63, 0.12);
+    border-radius: 999px;
+    background: #f6f4ef;
+    color: #5f6d80;
+    opacity: 0.6;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+  }
+
+  .deck-settings :global(.deck-size-toggle:hover) {
+    color: #223047;
+    background: #efebe2;
+    opacity: 0.8;
+  }
+
+  .deck-settings :global(.deck-size-toggle.deck-size-toggle-active),
+  .deck-settings :global(.deck-size-toggle[aria-pressed='true']) {
+    color: #223047;
+    border-color: rgba(18, 38, 63, 0.2);
+    background: #e7e1d2;
+    opacity: 1;
+    box-shadow: inset 0 1px 2px rgba(18, 38, 63, 0.08);
   }
 
   .deck-list-header {

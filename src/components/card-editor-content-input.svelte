@@ -44,7 +44,7 @@
         type="button"
         class="editor-content-drag-handle"
         use:dragHandle
-        aria-label={`Drag ${typeDescriptor.name} content item`}
+        aria-label={`Drag ${typeDescriptor.label ?? typeDescriptor.name} content item`}
       >
         <Icon name="grip-vertical" />
       </button>
@@ -55,7 +55,7 @@
         on:click={() => dispatch('togglecollapse')}
       >
         <Icon name={collapsed ? 'chevron-right' : 'chevron-down'} />
-        <span>{typeDescriptor.name}</span>
+        <span>{typeDescriptor.label ?? typeDescriptor.name}</span>
       </button>
     </div>
     <ButtonGroup class="editor-content-actions">
@@ -89,6 +89,44 @@
     >
       {#if content.type === 'text'}
         <MarkdownEditor bind:value={splitContent[0]} height="280px" />
+      {:else if content.type === 'footer'}
+        <div class="editor-content-labeled-fields">
+          {#each typeDescriptor.params as param, index}
+            <div class="editor-content-embedded-input">
+              <span class="editor-content-input-icon">
+                <Icon name={index === 0 ? 'justify-left' : 'justify-right'} />
+              </span>
+              <Input
+                class="editor-content-input editor-content-input-with-icon"
+                type={param.type ?? 'text'}
+                bind:value={splitContent[index]}
+                placeholder={param.name}
+              />
+            </div>
+          {/each}
+        </div>
+      {:else if content.type === 'section'}
+        <div class="editor-content-labeled-fields">
+          {#each typeDescriptor.params as param, index}
+            <div class="editor-content-embedded-input">
+              <span class="editor-content-input-icon">
+                <Icon
+                  name={index === 0
+                    ? splitContent[1]?.trim()
+                      ? 'justify-left'
+                      : 'justify'
+                    : 'justify-right'}
+                />
+              </span>
+              <Input
+                class="editor-content-input editor-content-input-with-icon"
+                type={param.type ?? 'text'}
+                bind:value={splitContent[index]}
+                placeholder={param.name}
+              />
+            </div>
+          {/each}
+        </div>
       {:else if content.type === 'dndspellblock'}
         <div class="editor-content-labeled-fields">
           {#each typeDescriptor.params as param, index}
@@ -239,6 +277,14 @@
     gap: 0.35rem;
   }
 
+  :global(.editor-content-inline-input-group) {
+    margin-bottom: 0;
+  }
+
+  .editor-content-embedded-input {
+    position: relative;
+  }
+
   :global(.small-input) {
     max-width: 10em;
   }
@@ -246,6 +292,22 @@
   :global(.editor-content-input-group .editor-content-input) {
     width: 100%;
     border-radius: var(--bs-border-radius);
+  }
+
+  .editor-content-embedded-input :global(input.form-control) {
+    padding-left: 2.1rem;
+  }
+
+  .editor-content-input-icon {
+    position: absolute;
+    top: 50%;
+    left: 0.7rem;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    color: #5f6d80;
   }
 
   :global.input-property-title {

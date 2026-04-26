@@ -124,7 +124,7 @@
   <InputGroup class="add-new-selector">
     <Input type="select" bind:value={addType}>
       {#each CARD_CONTENT_TYPES as type}
-        <option id="select-{type.name}" value={type.name}>{type.name}</option>
+        <option id="select-{type.name}" value={type.name}>{type.label ?? type.name}</option>
       {/each}
     </Input>
     <Button color="primary" on:click={handleAdd}>

@@ -25,18 +25,21 @@ const createCardContentTypes = <
 export const CARD_CONTENT_TYPES = createCardContentTypes(
   {
     name: 'cardtitle',
+    label: 'Card Title',
     description: 'Displays the card title using the card header style.',
     params: [],
     renderComponent: CardTitle
   },
   {
     name: 'text',
+    label: 'Text',
     description: 'Simple paragraph',
     params: [{ name: 'Text', description: 'Text', type: 'textarea' }],
     renderComponent: Text
   },
   {
     name: 'subtitle',
+    label: 'Subtitle',
     description: 'Sligtly larger italics text',
     params: [
       { name: 'Subtitle', description: 'Subtitle text' },
@@ -46,12 +49,14 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
   },
   {
     name: 'rule',
+    label: 'Divider',
     description: 'A horizontal line taking up full width',
     params: [],
     renderComponent: Rule
   },
   {
     name: 'property',
+    label: 'Property',
     description:
       'A property with a bold name and normal description - if spanning more than one line, description is indented.',
     params: [
@@ -62,6 +67,7 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
   },
   {
     name: 'description',
+    label: 'Description',
     description: 'Same as `property` but with no indentation and name is italicized.',
     params: [
       { name: 'Name', description: 'Description name (bolded, italicized)' },
@@ -71,6 +77,7 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
   },
   {
     name: 'section',
+    label: 'Section',
     description: 'Section header',
     params: [
       { name: 'Section name', description: 'Section name' },
@@ -80,6 +87,7 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
   },
   {
     name: 'boxes',
+    label: 'Boxes',
     description: 'Empty boxes',
     params: [
       { name: 'Amount', description: 'Amount of boxes', type: 'number' },
@@ -89,18 +97,21 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
   },
   {
     name: 'fill',
+    label: 'Fill',
     description: 'Empty area taking up available space',
     params: [{ name: 'Height', description: 'Height in mm', type: 'number', optional: true }],
     renderComponent: Fill
   },
   {
     name: 'bullet',
+    label: 'Bullet',
     description: 'Bulleted text',
     params: [{ name: 'Text', description: 'Text' }],
     renderComponent: Bullet
   },
   {
     name: 'picture',
+    label: 'Picture',
     description: 'A picture from an url',
     params: [
       { name: 'URL', description: 'URL of the picture' },
@@ -114,6 +125,7 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
   },
   {
     name: 'footer',
+    label: 'Footer',
     description:
       'Transparent footer row with left and right aligned text at the bottom of the card.',
     params: [
@@ -124,6 +136,7 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
   },
   {
     name: 'dndstats',
+    label: 'D&D Stats',
     description: 'A Dungeons & Dragons stat block',
     params: [
       { name: 'Str', description: 'Strength score', type: 'number' },
@@ -137,6 +150,7 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
   },
   {
     name: 'dndspellblock',
+    label: 'D&D Spellblock',
     description: 'A Dungeons & Dragons spell card block',
     params: [
       { name: 'Casting time', description: 'Casting time' },

@@ -13,7 +13,11 @@
   <tbody>
     {#each CARD_CONTENT_TYPES as contentType}
       <tr>
-        <td><code>{contentType.name}</code></td>
+        <td>
+          {contentType.label ?? contentType.name}
+          <br />
+          <code>{contentType.name}</code>
+        </td>
         <td>{contentType.description}</td>
         <td>
           <ul class="param-list">

@@ -55,11 +55,7 @@
     font-size: 9px;
     margin: 0 0.5em;
     color: var(--card-color);
-
-    /* .card-stats-body {
-      display: flex;
-      justify-content: space-between;
-    } */
+    justify-self: stretch;
   }
 
   .card-stats-header,

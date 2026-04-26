@@ -19,18 +19,18 @@
 	<link rel="stylesheet" href="/rpg-cards/_app/assets/Offcanvas.svelte_svelte_type_style_lang-82c1b07d.css">
 	<link rel="stylesheet" href="/rpg-cards/_app/assets/pages/docs/index.svelte-8547cfd7.css">
 	<link rel="stylesheet" href="/rpg-cards/_app/assets/workspace-content-view-8cfe133f.css">
-	<link rel="stylesheet" href="/rpg-cards/_app/assets/workspace-shell-410271e7.css">
-	<link rel="stylesheet" href="/rpg-cards/_app/assets/card-back-f8f347c5.css">
-	<link rel="modulepreload" href="/rpg-cards/_app/start-6f7337ab.js">
+	<link rel="stylesheet" href="/rpg-cards/_app/assets/workspace-shell-383cff87.css">
+	<link rel="stylesheet" href="/rpg-cards/_app/assets/card-back-c05396c1.css">
+	<link rel="modulepreload" href="/rpg-cards/_app/start-38995e7f.js">
 	<link rel="modulepreload" href="/rpg-cards/_app/chunks/index-40ae826d.js">
 	<link rel="modulepreload" href="/rpg-cards/_app/chunks/index-669e8a70.js">
 	<link rel="modulepreload" href="/rpg-cards/_app/chunks/paths-396f020f.js">
 	<link rel="modulepreload" href="/rpg-cards/_app/chunks/singletons-9d21ac94.js">
 	<link rel="modulepreload" href="/rpg-cards/_app/pages/__layout.svelte-c9c3eec1.js">
-	<link rel="modulepreload" href="/rpg-cards/_app/pages/docs/index.svelte-9f8990af.js">
+	<link rel="modulepreload" href="/rpg-cards/_app/pages/docs/index.svelte-8179885e.js">
 	<link rel="modulepreload" href="/rpg-cards/_app/chunks/workspace-content-view-2be596a2.js">
-	<link rel="modulepreload" href="/rpg-cards/_app/chunks/workspace-shell-53da538e.js">
-	<link rel="modulepreload" href="/rpg-cards/_app/chunks/card-back-d1aea9b2.js">
+	<link rel="modulepreload" href="/rpg-cards/_app/chunks/workspace-shell-8dd9e10b.js">
+	<link rel="modulepreload" href="/rpg-cards/_app/chunks/card-back-527087ed.js">
 				<script>
 		if ('serviceWorker' in navigator) {
 			navigator.serviceWorker.register('/rpg-cards/service-worker.js');
@@ -216,17 +216,23 @@
   <table class="table table-striped content-type-table"><thead><tr><th scope="col" class="name">Name</th>
       <th scope="col" class="description svelte-pb82qk">Description</th>
       <th scope="col" class="parameters">Parameters</th></tr></thead>
-  <tbody><tr><td><code>cardtitle</code></td>
+  <tbody><tr><td>Card Title
+          <br>
+          <code>cardtitle</code></td>
         <td>Displays the card title using the card header style.</td>
         <td><ul class="param-list svelte-pb82qk">
           </ul></td>
-      </tr><tr><td><code>text</code></td>
+      </tr><tr><td>Text
+          <br>
+          <code>text</code></td>
         <td>Simple paragraph</td>
         <td><ul class="param-list svelte-pb82qk"><li><i>Text</i> (textarea):
                 Text
               </li>
           </ul></td>
-      </tr><tr><td><code>subtitle</code></td>
+      </tr><tr><td>Subtitle
+          <br>
+          <code>subtitle</code></td>
         <td>Sligtly larger italics text</td>
         <td><ul class="param-list svelte-pb82qk"><li><i>Subtitle</i>:
                 Subtitle text
@@ -234,11 +240,15 @@
                 Additional right-aligned text
               </li>
           </ul></td>
-      </tr><tr><td><code>rule</code></td>
+      </tr><tr><td>Divider
+          <br>
+          <code>rule</code></td>
         <td>A horizontal line taking up full width</td>
         <td><ul class="param-list svelte-pb82qk">
           </ul></td>
-      </tr><tr><td><code>property</code></td>
+      </tr><tr><td>Property
+          <br>
+          <code>property</code></td>
         <td>A property with a bold name and normal description - if spanning more than one line, description is indented.</td>
         <td><ul class="param-list svelte-pb82qk"><li><i>Name</i>:
                 Propety name (bolded)
@@ -246,7 +256,9 @@
                 Propety description
               </li>
           </ul></td>
-      </tr><tr><td><code>description</code></td>
+      </tr><tr><td>Description
+          <br>
+          <code>description</code></td>
         <td>Same as `property` but with no indentation and name is italicized.</td>
         <td><ul class="param-list svelte-pb82qk"><li><i>Name</i>:
                 Description name (bolded, italicized)
@@ -254,7 +266,9 @@
                 Description description
               </li>
           </ul></td>
-      </tr><tr><td><code>section</code></td>
+      </tr><tr><td>Section
+          <br>
+          <code>section</code></td>
         <td>Section header</td>
         <td><ul class="param-list svelte-pb82qk"><li><i>Section name</i>:
                 Section name
@@ -262,7 +276,9 @@
                 Additional right-aligned text
               </li>
           </ul></td>
-      </tr><tr><td><code>boxes</code></td>
+      </tr><tr><td>Boxes
+          <br>
+          <code>boxes</code></td>
         <td>Empty boxes</td>
         <td><ul class="param-list svelte-pb82qk"><li><i>Amount</i> (number):
                 Amount of boxes
@@ -270,19 +286,25 @@
                 Size of the boxes
               </li>
           </ul></td>
-      </tr><tr><td><code>fill</code></td>
+      </tr><tr><td>Fill
+          <br>
+          <code>fill</code></td>
         <td>Empty area taking up available space</td>
         <td><ul class="param-list svelte-pb82qk"><li><i>Height</i> (number):
                 Height in mm
               </li>
           </ul></td>
-      </tr><tr><td><code>bullet</code></td>
+      </tr><tr><td>Bullet
+          <br>
+          <code>bullet</code></td>
         <td>Bulleted text</td>
         <td><ul class="param-list svelte-pb82qk"><li><i>Text</i>:
                 Text
               </li>
           </ul></td>
-      </tr><tr><td><code>picture</code></td>
+      </tr><tr><td>Picture
+          <br>
+          <code>picture</code></td>
         <td>A picture from an url</td>
         <td><ul class="param-list svelte-pb82qk"><li><i>URL</i>:
                 URL of the picture
@@ -290,7 +312,19 @@
                 CSS height value such as 120px, 60%, auto, or 12rem
               </li>
           </ul></td>
-      </tr><tr><td><code>dndstats</code></td>
+      </tr><tr><td>Footer
+          <br>
+          <code>footer</code></td>
+        <td>Transparent footer row with left and right aligned text at the bottom of the card.</td>
+        <td><ul class="param-list svelte-pb82qk"><li><i>Left text</i>:
+                Left-aligned footer text
+              </li><li><i>Right text</i>:
+                Right-aligned footer text
+              </li>
+          </ul></td>
+      </tr><tr><td>D&amp;D Stats
+          <br>
+          <code>dndstats</code></td>
         <td>A Dungeons &amp; Dragons stat block</td>
         <td><ul class="param-list svelte-pb82qk"><li><i>Str</i> (number):
                 Strength score
@@ -306,9 +340,11 @@
                 Charisma score
               </li>
           </ul></td>
-      </tr><tr><td><code>dndspellblock</code></td>
+      </tr><tr><td>D&amp;D Spellblock
+          <br>
+          <code>dndspellblock</code></td>
         <td>A Dungeons &amp; Dragons spell card block</td>
-        <td><ul class="param-list svelte-pb82qk"><li><i>Casting</i>:
+        <td><ul class="param-list svelte-pb82qk"><li><i>Casting time</i>:
                 Casting time
               </li><li><i>Range</i>:
                 Range
@@ -416,10 +452,10 @@
 </div>
 
 
-		<script type="module" data-hydrate="1pbe36p">
-		import { start } from "/rpg-cards/_app/start-6f7337ab.js";
+		<script type="module" data-hydrate="84ipei">
+		import { start } from "/rpg-cards/_app/start-38995e7f.js";
 		start({
-			target: document.querySelector('[data-hydrate="1pbe36p"]').parentNode,
+			target: document.querySelector('[data-hydrate="84ipei"]').parentNode,
 			paths: {"base":"/rpg-cards","assets":"/rpg-cards"},
 			session: {},
 			route: true,
@@ -430,7 +466,7 @@
 				error: null,
 				nodes: [
 					import("/rpg-cards/_app/pages/__layout.svelte-c9c3eec1.js"),
-						import("/rpg-cards/_app/pages/docs/index.svelte-9f8990af.js")
+						import("/rpg-cards/_app/pages/docs/index.svelte-8179885e.js")
 				],
 				params: {},
 				routeId: "docs"

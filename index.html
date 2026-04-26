@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="description" content="" />
+	<link rel="icon" href="/favicon.png" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="manifest" crossorigin="use-credentials" href="manifest.json" />
+	<meta http-equiv="content-security-policy" content=""><title>RPG Card Generator</title><html lang="en" data-svelte="svelte-gyraj7"></html><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" data-svelte="svelte-xjd33q"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" data-svelte="svelte-xjd33q">
+	<link rel="stylesheet" href="/_app/assets/pages/__layout.svelte-c918328c.css">
+	<link rel="stylesheet" href="/_app/assets/Offcanvas.svelte_svelte_type_style_lang-82c1b07d.css">
+	<link rel="stylesheet" href="/_app/assets/index-62f52952.css">
+	<link rel="stylesheet" href="/_app/assets/card-back-cd1d471a.css">
+	<link rel="stylesheet" href="/_app/assets/card-content-types-6291db53.css">
+	<link rel="modulepreload" href="/_app/start-3657b493.js">
+	<link rel="modulepreload" href="/_app/chunks/index-6f75c224.js">
+	<link rel="modulepreload" href="/_app/chunks/index-21fbf49b.js">
+	<link rel="modulepreload" href="/_app/chunks/preload-helper-e4860ae8.js">
+	<link rel="modulepreload" href="/_app/pages/__layout.svelte-f50e4845.js">
+	<link rel="modulepreload" href="/_app/pages/index.svelte-a6790633.js">
+	<link rel="modulepreload" href="/_app/chunks/index-ba4f16ca.js">
+	<link rel="modulepreload" href="/_app/chunks/card-back-fdd2f766.js">
+	<link rel="modulepreload" href="/_app/chunks/card-content-types-eaa21116.js">
+				<script>
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.register('/service-worker.js');
+		}
+	</script>
+</head>
+
+<body>
+	<div id="svelte">
+
+
+
+
+
+
+
+
+<div class="workspace svelte-13vhhij" style="--left-panel-width: 340px; --right-panel-width: 340px;"><div class="canvas-layer svelte-13vhhij"><div class="canvas svelte-xtf6gd"><div class="zoom-input shadow-sm svelte-xtf6gd"><div class="input-group"><span class="p-0 input-group-text"><button class="btn btn-link" value=""><i class="bi-zoom-out"></i></button></span>
+      <input class="form-control" type="number" name="" placeholder="" value="120">
+
+      <span class="input-group-text">%</span>
+      <span class="p-0 input-group-text"><button class="btn btn-link" value=""><i class="bi-zoom-in"></i></button></span></div></div>
+
+  
+</div></div>
+
+  <aside class="sidebar-container svelte-17aj89b sidebar-container-left" style="--sidebar-width: 340px;">
+
+  <div class="sidebar-container-content svelte-17aj89b">
+
+<div class="sidebar-content svelte-2leut3"><div class="hidden svelte-2leut3"><input type="file" accept=".json">
+    <a download="cards.json">Hidden download link
+    </a></div>
+
+  <div class="sidebar-toolbar svelte-2leut3"><div class="general-menu-popover svelte-2leut3"><button class="general-menu-trigger svelte-2leut3" type="button" aria-label="Toggle general actions menu" aria-expanded="false"><img class="general-menu-trigger-image svelte-2leut3" src="/menu-logo.svg" alt="">
+        <span class="general-menu-chevron svelte-2leut3"></span></button>
+
+      </div></div>
+
+  <section class="sidebar-section"><div class="sidebar-section-header"><h2 class="sidebar-section-title">Print</h2>
+        <a class="sidebar-section-action svelte-2leut3" href="/output" aria-label="Open print view"><i class="bi-printer"></i></a>
+      </div>
+
+  <div class="sidebar-section-body"><form class="sidebar-form"><div class="sidebar-field"><div class="sidebar-field-inline sidebar-field-inline-top svelte-2leut3"><label class="col-form-label form-label" for="paper-size">Paper size</label>
+            <button class="sidebar-section-action svelte-2leut3" type="button" aria-label="Show extra print settings" aria-expanded="false"><i class="bi-three-dots"></i></button></div>
+          <select id="paper-size" class="form-select" name=""><option value="a4">A4</option><option value="letter">Letter</option><option value="legal">Legal</option><option value="a3">A3</option><option value="a5">A5</option><option value="custom">Custom</option></select>
+
+  
+
+          </div>
+        </form></div></section>
+  <section class="sidebar-section sidebar-section-grow">
+
+  <div class="sidebar-section-body"><div class="deck-wrapper svelte-1edx9ik"><div class="deck-header svelte-1edx9ik"><h2 class="deck-title svelte-1edx9ik">Deck</h2>
+      <div class="deck-toolbar svelte-1edx9ik"><button class="deck-toolbar-button svelte-1edx9ik" type="button"><i class="bi-plus-lg"></i></button></div></div>
+
+    <div class="deck-settings svelte-1edx9ik"><div class="deck-settings-field svelte-1edx9ik"><label class="col-form-label form-label" for="card-size-format">Card size</label>
+        <select id="card-size-format" class="form-select" name=""><option value="poker">Poker</option><option value="bridge">Bridge</option><option value="tarot">Tarot</option><option value="square-1">Square (1 inches)</option><option value="square-2">Square (2 inches)</option><option value="custom">Custom</option></select>
+
+  
+</div>
+      </div>
+
+    <div class="deck-list svelte-1edx9ik" role="list"><div class="empty-deck svelte-1edx9ik">There are no cards in your deck.</div></div></div>
+
+
+<div></div></div></section>
+  <footer class="sidebar-footer svelte-2leut3"><a class="sidebar-footer-link svelte-2leut3" href="https://github.com/mathiasandresen/rpg-cards" target="_blank" rel="noreferrer" aria-label="Open GitHub repository"><i class="bi-github"></i></a>
+    <button class="sidebar-footer-link svelte-2leut3" type="button" aria-label="Open info dialog"><i class="bi-info-circle-fill"></i></button></footer>
+  
+<div></div>
+  
+<div></div>
+</div></div>
+
+  <button class="sidebar-resize-handle sidebar-resize-handle-right svelte-17aj89b" type="button" aria-label="Resize left sidebar"></button>
+</aside>
+
+  <aside class="sidebar-container svelte-17aj89b  sidebar-container-right" style="--sidebar-width: 340px;"><button class="sidebar-resize-handle sidebar-resize-handle-left svelte-17aj89b" type="button" aria-label="Resize right sidebar"></button>
+
+  <div class="sidebar-container-content svelte-17aj89b"><div class="card-editor-content svelte-19z0i0f"><div class="empty-editor svelte-19z0i0f">No card is selected!</div>
+</div></div>
+
+  
+</aside></div>
+
+<div></div>
+
+
+		<script type="module" data-hydrate="prbdwx">
+		import { start } from "/_app/start-3657b493.js";
+		start({
+			target: document.querySelector('[data-hydrate="prbdwx"]').parentNode,
+			paths: {"base":"","assets":""},
+			session: {},
+			route: true,
+			spa: false,
+			trailing_slash: "never",
+			hydrate: {
+				status: 200,
+				error: null,
+				nodes: [
+					import("/_app/pages/__layout.svelte-f50e4845.js"),
+						import("/_app/pages/index.svelte-a6790633.js")
+				],
+				params: {},
+				routeId: ""
+			}
+		});
+	</script></div>
+</body>
+
+</html>

@@ -43,7 +43,7 @@
     "@codemirror/lint": "^0.19.3",
     "@codemirror/text": "^0.19.6",
     "@codemirror/view": "^0.19.45",
-    "@sveltejs/adapter-static": "^1.0.0-next.29",
+    "@sveltejs/adapter-static": "1.0.0-next.29",
     "@toast-ui/editor": "^3.2.2",
     "@types/markdown-it": "^12.2.3",
     "bootstrap": "^5.1.3",

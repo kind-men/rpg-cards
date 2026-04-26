@@ -4,28 +4,28 @@ const timestamp = {
   }
 };
 const build = [
-  "/rpg-cards/_app/start-b8e84576.js",
+  "/rpg-cards/_app/start-d0c514e2.js",
   "/rpg-cards/_app/pages/__layout.svelte-d54d5114.js",
   "/rpg-cards/_app/assets/pages/__layout.svelte-9c43a6c2.css",
   "/rpg-cards/_app/assets/Offcanvas.svelte_svelte_type_style_lang-82c1b07d.css",
   "/rpg-cards/_app/error.svelte-f5600bac.js",
-  "/rpg-cards/_app/pages/index.svelte-fde35e70.js",
+  "/rpg-cards/_app/pages/index.svelte-6b5b976f.js",
   "/rpg-cards/_app/pages/output.svelte-2b65be9a.js",
   "/rpg-cards/_app/assets/pages/output.svelte-07eb8463.css",
-  "/rpg-cards/_app/pages/docs/index.svelte-a3f3d016.js",
-  "/rpg-cards/_app/assets/pages/docs/index.svelte-8a8af5e4.css",
-  "/rpg-cards/_app/pages/info.svelte-d29c9a74.js",
+  "/rpg-cards/_app/pages/docs/index.svelte-26e91e3c.js",
+  "/rpg-cards/_app/assets/pages/docs/index.svelte-8547cfd7.css",
+  "/rpg-cards/_app/pages/info.svelte-5eb07e4d.js",
   "/rpg-cards/_app/chunks/index-c00e7560.js",
   "/rpg-cards/_app/chunks/index-732ab80d.js",
   "/rpg-cards/_app/chunks/paths-396f020f.js",
   "/rpg-cards/_app/chunks/singletons-9d21ac94.js",
-  "/rpg-cards/_app/chunks/workspace-shell-37fd2179.js",
-  "/rpg-cards/_app/assets/workspace-shell-c07969da.css",
+  "/rpg-cards/_app/chunks/workspace-shell-73201e3e.js",
+  "/rpg-cards/_app/assets/workspace-shell-8168247c.css",
   "/rpg-cards/_app/chunks/card-back-1733e36f.js",
   "/rpg-cards/_app/assets/card-back-11b0c9f4.css",
-  "/rpg-cards/_app/chunks/workspace-content-view-845f67b3.js",
-  "/rpg-cards/_app/assets/workspace-content-view-44a147e1.css",
-  "/rpg-cards/_app/chunks/index-f9752a3a.js"
+  "/rpg-cards/_app/chunks/workspace-content-view-d583cd9d.js",
+  "/rpg-cards/_app/assets/workspace-content-view-8cfe133f.css",
+  "/rpg-cards/_app/chunks/index-fcaa69eb.js"
 ];
 const files = [
   "/rpg-cards/.nojekyll",

@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-b8e84576.js",
+    "file": "start-d0c514e2.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -42,13 +42,13 @@
     ]
   },
   "src/routes/index.svelte": {
-    "file": "pages/index.svelte-fde35e70.js",
+    "file": "pages/index.svelte-6b5b976f.js",
     "src": "src/routes/index.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-c00e7560.js",
-      "_workspace-shell-37fd2179.js",
+      "_workspace-shell-73201e3e.js",
       "_paths-396f020f.js",
       "_singletons-9d21ac94.js",
       "_card-back-1733e36f.js",
@@ -73,35 +73,35 @@
     ]
   },
   "src/routes/docs/index.svelte": {
-    "file": "pages/docs/index.svelte-a3f3d016.js",
+    "file": "pages/docs/index.svelte-26e91e3c.js",
     "src": "src/routes/docs/index.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-c00e7560.js",
-      "_workspace-content-view-845f67b3.js",
-      "_workspace-shell-37fd2179.js",
+      "_workspace-content-view-d583cd9d.js",
+      "_workspace-shell-73201e3e.js",
       "_paths-396f020f.js",
       "_card-back-1733e36f.js",
       "_singletons-9d21ac94.js",
       "_index-732ab80d.js"
     ],
     "css": [
-      "assets/pages/docs/index.svelte-8a8af5e4.css",
+      "assets/pages/docs/index.svelte-8547cfd7.css",
       "assets/Offcanvas.svelte_svelte_type_style_lang-82c1b07d.css"
     ]
   },
   "src/routes/info.svelte": {
-    "file": "pages/info.svelte-d29c9a74.js",
+    "file": "pages/info.svelte-5eb07e4d.js",
     "src": "src/routes/info.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-c00e7560.js",
       "_paths-396f020f.js",
-      "_workspace-shell-37fd2179.js",
+      "_workspace-shell-73201e3e.js",
       "_index-732ab80d.js",
-      "_workspace-content-view-845f67b3.js",
+      "_workspace-content-view-d583cd9d.js",
       "_singletons-9d21ac94.js",
       "_card-back-1733e36f.js"
     ],
@@ -124,8 +124,8 @@
   "_singletons-9d21ac94.js": {
     "file": "chunks/singletons-9d21ac94.js"
   },
-  "_workspace-shell-37fd2179.js": {
-    "file": "chunks/workspace-shell-37fd2179.js",
+  "_workspace-shell-73201e3e.js": {
+    "file": "chunks/workspace-shell-73201e3e.js",
     "imports": [
       "_index-c00e7560.js",
       "_paths-396f020f.js",
@@ -137,7 +137,7 @@
       "node_modules/.pnpm/@toast-ui+editor@3.2.2/node_modules/@toast-ui/editor/dist/esm/index.js"
     ],
     "css": [
-      "assets/workspace-shell-c07969da.css",
+      "assets/workspace-shell-8168247c.css",
       "assets/Offcanvas.svelte_svelte_type_style_lang-82c1b07d.css"
     ]
   },
@@ -151,21 +151,21 @@
       "assets/card-back-11b0c9f4.css"
     ]
   },
-  "_workspace-content-view-845f67b3.js": {
-    "file": "chunks/workspace-content-view-845f67b3.js",
+  "_workspace-content-view-d583cd9d.js": {
+    "file": "chunks/workspace-content-view-d583cd9d.js",
     "imports": [
       "_index-c00e7560.js"
     ],
     "css": [
-      "assets/workspace-content-view-44a147e1.css"
+      "assets/workspace-content-view-8cfe133f.css"
     ]
   },
   "node_modules/.pnpm/@toast-ui+editor@3.2.2/node_modules/@toast-ui/editor/dist/esm/index.js": {
-    "file": "chunks/index-f9752a3a.js",
+    "file": "chunks/index-fcaa69eb.js",
     "src": "node_modules/.pnpm/@toast-ui+editor@3.2.2/node_modules/@toast-ui/editor/dist/esm/index.js",
     "isDynamicEntry": true,
     "imports": [
-      "_workspace-shell-37fd2179.js",
+      "_workspace-shell-73201e3e.js",
       "_index-c00e7560.js",
       "_paths-396f020f.js",
       "_singletons-9d21ac94.js",

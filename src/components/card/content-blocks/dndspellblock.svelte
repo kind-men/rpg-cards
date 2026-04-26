@@ -39,7 +39,7 @@
 
   .block {
     background-color: white;
-    padding-bottom: 0.15em;
+    padding: 0.15em 0 0;
     font-size: var(--card-text-size);
 
 
@@ -51,12 +51,10 @@
     }
 
     h2 {
-      font-size: 1.1em;
       text-transform: uppercase;
       font-weight: normal;
       color: var(--card-color);
-      font-family: Draconis;
-      transform: scaleX(1.4);
+      font-family: 'Overpass', sans-serif;
     }
   }
 </style>

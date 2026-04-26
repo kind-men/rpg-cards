@@ -40,7 +40,7 @@
     margin-bottom: 0.5em;
     margin-left: -5px;
     margin-right: -5px;
-    padding: 0.2em 0.75em 0.1em;
+    padding: 0.3em 0.75em 0.1em;
   }
 
   .section-left,

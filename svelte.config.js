@@ -5,6 +5,8 @@ import { mdsvex } from "mdsvex"
 import rehypeSlug from "rehype-slug";
 import remarkHeadingId from "remark-heading-id";
 
+const basePath = process.env.BASE_PATH || '';
+
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	extensions: ['.svelte', '.md', '.svelte.md', '.svx'],
@@ -19,6 +21,9 @@ const config = {
 	kit: {
 		// hydrate the <div id="svelte"> element in src/app.html
 		adapter: adapter(),
+		paths: {
+			base: basePath,
+		},
 		// trailingSlash: 'always',
 		prerender: {
 			default: true,

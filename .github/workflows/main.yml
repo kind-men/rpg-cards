@@ -29,6 +29,8 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install and build
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}
         run: |
           pnpm install
           pnpm build

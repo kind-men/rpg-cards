@@ -338,12 +338,19 @@
   <footer class="sidebar-footer">
     <a
       class="sidebar-footer-link"
-      href="https://github.com/mathiasandresen/rpg-cards"
+      href="https://github.com/kind-men/rpg-cards/"
       target="_blank"
       rel="noreferrer"
       aria-label="Open GitHub repository"
     >
       <Icon name="github" />
+    </a>
+    <a
+      class="sidebar-footer-link"
+      href={`${base}/docs`}
+      aria-label="Open documentation"
+    >
+      <Icon name="book" />
     </a>
     <button
       class="sidebar-footer-link"

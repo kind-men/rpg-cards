@@ -8,7 +8,6 @@
     InputGroupText,
     Label
   } from 'sveltestrap';
-  import { createEventDispatcher } from 'svelte';
   import { generateExportObject, parseCards } from '../lib/card-json-parser';
   import type Card from '../model/card';
   import { currentCard, deck, pageLayout } from '../stores';
@@ -31,7 +30,6 @@
   let toggleJsonImportModal: () => void;
   let generalMenuOpen = false;
   let printOptionsOpen = false;
-  const dispatch = createEventDispatcher<{ info: void }>();
   const paperFormatOptions: { value: PaperFormat; label: string }[] = [
     { value: 'a4', label: 'A4' },
     { value: 'letter', label: 'Letter' },
@@ -352,14 +350,13 @@
     >
       <Icon name="book" />
     </a>
-    <button
+    <a
       class="sidebar-footer-link"
-      type="button"
-      aria-label="Open info dialog"
-      on:click={() => dispatch('info')}
+      href={`${base}/info`}
+      aria-label="Open info"
     >
       <Icon name="info-circle-fill" />
-    </button>
+    </a>
   </footer>
   <JsonEditorModal bind:toggle={toggleJsonEditor} />
   <JsonImportModal bind:toggle={toggleJsonImportModal} on:import={handleImportFromJSON} />

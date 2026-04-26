@@ -1,10 +1,21 @@
 <script lang="ts">
+  import { assets } from '$app/paths';
   import { Styles } from 'sveltestrap';
+
+  const fontFaceStyle = `<style>
+    :root {
+      --draconis-font-regular: url('${assets}/fonts/draconis-font/Draconis.ttf') format('truetype');
+      --draconis-font-bold: url('${assets}/fonts/draconis-font/DraconisBold.ttf') format('truetype');
+      --draconis-font-bold-italic: url('${assets}/fonts/draconis-font/DraconisBoldItalic.ttf') format('truetype');
+      --draconis-font-italic: url('${assets}/fonts/draconis-font/DraconisItalic.ttf') format('truetype');
+    }
+  </style>`;
 </script>
 
 <svelte:head>
   <title>RPG Card Generator</title>
   <html lang="en" />
+  {@html fontFaceStyle}
 </svelte:head>
 
 <Styles />
@@ -18,27 +29,27 @@
   @font-face {
     font-family: 'Draconis';
     font-style: normal;
-    src: url('/fonts/draconis-font/Draconis.ttf') format('truetype');
+    src: var(--draconis-font-regular);
   }
 
   @font-face {
     font-family: 'Draconis';
     font-style: normal;
     font-weight: 700;
-    src: url('/fonts/draconis-font/DraconisBold.ttf') format('truetype');
+    src: var(--draconis-font-bold);
   }
 
   @font-face {
     font-family: 'Draconis';
     font-style: italic;
     font-weight: 700;
-    src: url('/fonts/draconis-font/DraconisBoldItalic.ttf') format('truetype');
+    src: var(--draconis-font-bold-italic);
   }
 
   @font-face {
     font-family: 'Draconis';
     font-style: italic;
-    src: url('/fonts/draconis-font/DraconisItalic.ttf') format('truetype');
+    src: var(--draconis-font-italic);
   }
 
   :global(html),

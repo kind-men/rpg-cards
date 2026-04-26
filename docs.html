@@ -7,21 +7,30 @@
 	<link rel="icon" href="/rpg-cards/favicon.png" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="manifest" crossorigin="use-credentials" href="/rpg-cards/manifest.json" />
-	<meta http-equiv="content-security-policy" content=""><title>RPG Card Generator</title><html lang="en" data-svelte="svelte-gyraj7"></html><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" data-svelte="svelte-xjd33q"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" data-svelte="svelte-xjd33q">
-	<link rel="stylesheet" href="/rpg-cards/_app/assets/pages/__layout.svelte-c918328c.css">
+	<meta http-equiv="content-security-policy" content=""><title>RPG Card Generator</title><html lang="en" data-svelte="svelte-1y6evpj"></html><!-- HTML_TAG_START --><style>
+    :root {
+      --draconis-font-regular: url('/rpg-cards/fonts/draconis-font/Draconis.ttf') format('truetype');
+      --draconis-font-bold: url('/rpg-cards/fonts/draconis-font/DraconisBold.ttf') format('truetype');
+      --draconis-font-bold-italic: url('/rpg-cards/fonts/draconis-font/DraconisBoldItalic.ttf') format('truetype');
+      --draconis-font-italic: url('/rpg-cards/fonts/draconis-font/DraconisItalic.ttf') format('truetype');
+    }
+  </style><!-- HTML_TAG_END --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" data-svelte="svelte-xjd33q"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" data-svelte="svelte-xjd33q">
+	<link rel="stylesheet" href="/rpg-cards/_app/assets/pages/__layout.svelte-9c43a6c2.css">
 	<link rel="stylesheet" href="/rpg-cards/_app/assets/Offcanvas.svelte_svelte_type_style_lang-82c1b07d.css">
-	<link rel="stylesheet" href="/rpg-cards/_app/assets/pages/docs/__layout.svelte-f36b7b80.css">
-	<link rel="stylesheet" href="/rpg-cards/_app/assets/pages/docs/index.svx-251e9b2c.css">
-	<link rel="stylesheet" href="/rpg-cards/_app/assets/card-content-types-c537601b.css">
-	<link rel="modulepreload" href="/rpg-cards/_app/start-6d423c79.js">
-	<link rel="modulepreload" href="/rpg-cards/_app/chunks/index-6f75c224.js">
-	<link rel="modulepreload" href="/rpg-cards/_app/chunks/index-21fbf49b.js">
+	<link rel="stylesheet" href="/rpg-cards/_app/assets/pages/docs/index.svelte-8a8af5e4.css">
+	<link rel="stylesheet" href="/rpg-cards/_app/assets/workspace-content-view-44a147e1.css">
+	<link rel="stylesheet" href="/rpg-cards/_app/assets/workspace-shell-c07969da.css">
+	<link rel="stylesheet" href="/rpg-cards/_app/assets/card-back-11b0c9f4.css">
+	<link rel="modulepreload" href="/rpg-cards/_app/start-b8e84576.js">
+	<link rel="modulepreload" href="/rpg-cards/_app/chunks/index-c00e7560.js">
+	<link rel="modulepreload" href="/rpg-cards/_app/chunks/index-732ab80d.js">
 	<link rel="modulepreload" href="/rpg-cards/_app/chunks/paths-396f020f.js">
-	<link rel="modulepreload" href="/rpg-cards/_app/chunks/preload-helper-f718feb0.js">
-	<link rel="modulepreload" href="/rpg-cards/_app/pages/__layout.svelte-f50e4845.js">
-	<link rel="modulepreload" href="/rpg-cards/_app/pages/docs/__layout.svelte-4f2c9d69.js">
-	<link rel="modulepreload" href="/rpg-cards/_app/pages/docs/index.svx-23401339.js">
-	<link rel="modulepreload" href="/rpg-cards/_app/chunks/card-content-types-840893ea.js">
+	<link rel="modulepreload" href="/rpg-cards/_app/chunks/singletons-9d21ac94.js">
+	<link rel="modulepreload" href="/rpg-cards/_app/pages/__layout.svelte-d54d5114.js">
+	<link rel="modulepreload" href="/rpg-cards/_app/pages/docs/index.svelte-a3f3d016.js">
+	<link rel="modulepreload" href="/rpg-cards/_app/chunks/workspace-content-view-845f67b3.js">
+	<link rel="modulepreload" href="/rpg-cards/_app/chunks/workspace-shell-37fd2179.js">
+	<link rel="modulepreload" href="/rpg-cards/_app/chunks/card-back-1733e36f.js">
 				<script>
 		if ('serviceWorker' in navigator) {
 			navigator.serviceWorker.register('/rpg-cards/service-worker.js');
@@ -37,13 +46,14 @@
 
 
 
-<div class="docs-shell svelte-irvoz5"><div class="content svelte-irvoz5"><section class="docs-hero"><img class="docs-logo" src="/rpg-cards/logo_512.png" alt="RPG Cards logo">
-  <h1 class="docs-hero-title">RPG Cards Generator</h1>
-  <p class="docs-hero-copy">Build, organize, and print polished RPG cards from one workspace. This guide covers the
-    current editor, import and export formats, and the card data the app understands today.
-  </p>
-  <div class="docs-hero-actions"><a class="docs-button" href="/rpg-cards/">Open the editor</a>
-    <a class="docs-button docs-button-secondary" href="#export-data">Jump to JSON format</a></div></section>
+
+
+<div class="workspace svelte-j31008 workspace-static-view" style="--left-panel-width: 340px; --right-panel-width: 340px;"><main class="content-layer svelte-j31008" aria-label="Documentation"><div class="content-shell svelte-j31008"><div class="content-shell-body svelte-j31008"><div class="workspace-content-view svelte-jst3mb"><section class="docs-hero"><a class="docs-close-button" href="/rpg-cards/" aria-label="Close documentation"><i class="bi-x-lg"></i></a>
+  <div class="docs-hero-header"><img class="docs-logo" src="/rpg-cards/logo_512.png" alt="RPG Cards logo">
+    <div class="docs-hero-text"><h1 class="docs-hero-title">Documentation</h1>
+      <p class="docs-hero-copy">Build, organize, and print polished RPG cards from one workspace. This guide covers the
+        current editor, import and export formats, and the card data the app understands today.
+      </p></div></div></section>
 <section class="docs-section"><h2>Overview</h2>
   <p>The app is built around three areas:</p>
   <ul><li>The left sidebar for deck management, import and export, print settings, and card size presets.</li>
@@ -279,14 +289,70 @@
 <section class="docs-section" id="icons"><h2>Icons</h2>
   <p>Icons available in RPG Cards Generator are provided by
     <a href="https://game-icons.net/">Game-icons.net</a>.
-  </p></section></div>
+  </p></section>
+</div></div></div></main>
+
+  <aside class="sidebar-container svelte-17aj89b sidebar-container-left" style="--sidebar-width: 340px;">
+
+  <div class="sidebar-container-content svelte-17aj89b">
+
+<div class="sidebar-content svelte-2leut3"><div class="hidden svelte-2leut3"><input type="file" accept=".json">
+    <a download="cards.json">Hidden download link
+    </a></div>
+
+  <div class="sidebar-toolbar svelte-2leut3"><div class="general-menu-popover svelte-2leut3"><button class="general-menu-trigger svelte-2leut3" type="button" aria-label="Toggle general actions menu" aria-expanded="false"><img class="general-menu-trigger-image svelte-2leut3" src="/rpg-cards/menu-logo.svg" alt="">
+        <span class="general-menu-chevron svelte-2leut3"></span></button>
+
+      </div></div>
+
+  <section class="sidebar-section"><div class="sidebar-section-header"><h2 class="sidebar-section-title">Print</h2>
+        <a class="sidebar-section-action svelte-2leut3" href="/rpg-cards/output" aria-label="Open print view"><i class="bi-printer"></i></a>
+      </div>
+
+  <div class="sidebar-section-body"><form class="sidebar-form"><div class="sidebar-field"><div class="sidebar-field-inline sidebar-field-inline-top svelte-2leut3"><label class="col-form-label form-label" for="paper-size">Paper size</label>
+            <button class="sidebar-section-action svelte-2leut3" type="button" aria-label="Show extra print settings" aria-expanded="false"><i class="bi-three-dots"></i></button></div>
+          <select id="paper-size" class="form-select" name=""><option value="a4">A4</option><option value="letter">Letter</option><option value="legal">Legal</option><option value="a3">A3</option><option value="a5">A5</option><option value="custom">Custom</option></select>
+
+  
+
+          </div>
+        </form></div></section>
+  <section class="sidebar-section sidebar-section-grow">
+
+  <div class="sidebar-section-body"><div class="deck-wrapper svelte-1edx9ik"><div class="deck-header svelte-1edx9ik"><h2 class="deck-title svelte-1edx9ik">Deck</h2>
+      <div class="deck-toolbar svelte-1edx9ik"><button class="deck-toolbar-button svelte-1edx9ik" type="button"><i class="bi-plus-lg"></i></button></div></div>
+
+    <div class="deck-settings svelte-1edx9ik"><div class="deck-settings-field svelte-1edx9ik"><label class="col-form-label form-label" for="card-size-format">Card size</label>
+        <select id="card-size-format" class="form-select" name=""><option value="poker">Poker</option><option value="bridge">Bridge</option><option value="tarot">Tarot</option><option value="square-1">Square (1 inches)</option><option value="square-2">Square (2 inches)</option><option value="custom">Custom</option></select>
+
+  
+</div>
+      </div>
+
+    <div class="deck-list svelte-1edx9ik" role="list"><div class="empty-deck svelte-1edx9ik">There are no cards in your deck.</div></div></div>
+
+
+<div></div></div></section>
+  <footer class="sidebar-footer svelte-2leut3"><a class="sidebar-footer-link svelte-2leut3" href="https://github.com/kind-men/rpg-cards/" target="_blank" rel="noreferrer" aria-label="Open GitHub repository"><i class="bi-github"></i></a>
+    <a class="sidebar-footer-link svelte-2leut3" href="/rpg-cards/docs" aria-label="Open documentation"><i class="bi-book"></i></a>
+    <a class="sidebar-footer-link svelte-2leut3" href="/rpg-cards/info" aria-label="Open info"><i class="bi-info-circle-fill"></i></a></footer>
+  
+<div></div>
+  
+<div></div>
+</div></div>
+
+  <button class="sidebar-resize-handle sidebar-resize-handle-right svelte-17aj89b" type="button" aria-label="Resize left sidebar"></button>
+</aside>
+
+  
 </div>
 
 
-		<script type="module" data-hydrate="1ayn1sr">
-		import { start } from "/rpg-cards/_app/start-6d423c79.js";
+		<script type="module" data-hydrate="2dld2o">
+		import { start } from "/rpg-cards/_app/start-b8e84576.js";
 		start({
-			target: document.querySelector('[data-hydrate="1ayn1sr"]').parentNode,
+			target: document.querySelector('[data-hydrate="2dld2o"]').parentNode,
 			paths: {"base":"/rpg-cards","assets":"/rpg-cards"},
 			session: {},
 			route: true,
@@ -296,9 +362,8 @@
 				status: 200,
 				error: null,
 				nodes: [
-					import("/rpg-cards/_app/pages/__layout.svelte-f50e4845.js"),
-						import("/rpg-cards/_app/pages/docs/__layout.svelte-4f2c9d69.js"),
-						import("/rpg-cards/_app/pages/docs/index.svx-23401339.js")
+					import("/rpg-cards/_app/pages/__layout.svelte-d54d5114.js"),
+						import("/rpg-cards/_app/pages/docs/index.svelte-a3f3d016.js")
 				],
 				params: {},
 				routeId: "docs"

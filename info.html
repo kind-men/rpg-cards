@@ -19,15 +19,17 @@
 	<link rel="stylesheet" href="/rpg-cards/_app/assets/Offcanvas.svelte_svelte_type_style_lang-82c1b07d.css">
 	<link rel="stylesheet" href="/rpg-cards/_app/assets/workspace-shell-c07969da.css">
 	<link rel="stylesheet" href="/rpg-cards/_app/assets/card-back-11b0c9f4.css">
+	<link rel="stylesheet" href="/rpg-cards/_app/assets/workspace-content-view-44a147e1.css">
 	<link rel="modulepreload" href="/rpg-cards/_app/start-b8e84576.js">
 	<link rel="modulepreload" href="/rpg-cards/_app/chunks/index-c00e7560.js">
 	<link rel="modulepreload" href="/rpg-cards/_app/chunks/index-732ab80d.js">
 	<link rel="modulepreload" href="/rpg-cards/_app/chunks/paths-396f020f.js">
 	<link rel="modulepreload" href="/rpg-cards/_app/chunks/singletons-9d21ac94.js">
 	<link rel="modulepreload" href="/rpg-cards/_app/pages/__layout.svelte-d54d5114.js">
-	<link rel="modulepreload" href="/rpg-cards/_app/pages/index.svelte-fde35e70.js">
+	<link rel="modulepreload" href="/rpg-cards/_app/pages/info.svelte-d29c9a74.js">
 	<link rel="modulepreload" href="/rpg-cards/_app/chunks/workspace-shell-37fd2179.js">
 	<link rel="modulepreload" href="/rpg-cards/_app/chunks/card-back-1733e36f.js">
+	<link rel="modulepreload" href="/rpg-cards/_app/chunks/workspace-content-view-845f67b3.js">
 				<script>
 		if ('serviceWorker' in navigator) {
 			navigator.serviceWorker.register('/rpg-cards/service-worker.js');
@@ -45,14 +47,38 @@
 
 
 
-<div class="workspace svelte-j31008" style="--left-panel-width: 340px; --right-panel-width: 340px;"><div class="canvas-layer svelte-j31008"><div class="canvas svelte-xtf6gd"><div class="zoom-input shadow-sm svelte-xtf6gd"><div class="input-group"><span class="p-0 input-group-text"><button class="btn btn-link" value=""><i class="bi-zoom-out"></i></button></span>
-      <input class="form-control" type="number" name="" placeholder="" value="120">
+<div class="workspace svelte-j31008 workspace-static-view" style="--left-panel-width: 340px; --right-panel-width: 340px;"><main class="content-layer svelte-j31008" aria-label="Information"><div class="content-shell svelte-j31008"><div class="content-shell-body svelte-j31008"><div class="workspace-content-view svelte-jst3mb"><section class="docs-hero"><a class="docs-close-button" href="/rpg-cards/" aria-label="Close info"><i class="bi-x-lg"></i></a>
+      <div class="docs-hero-header"><img class="docs-logo" src="/rpg-cards/logo_512.png" alt="RPG Cards logo">
+        <div class="docs-hero-text"><h1 class="docs-hero-title">Info</h1>
+          <p class="docs-hero-copy">Background, credits, and project notes for the RPG Cards Generator.
+          </p></div></div></section>
 
-      <span class="input-group-text">%</span>
-      <span class="p-0 input-group-text"><button class="btn btn-link" value=""><i class="bi-zoom-in"></i></button></span></div></div>
+    <div class="info-callout"><p>This project is a grateful fork of <a href="https://github.com/mathiasandresen/rpg-cards" rel="nofollow">https://github.com/mathiasandresen/rpg-cards</a>, created by Mathias Andresen. Huge
+thanks to Mathias and to the projects that paved the way, including <a href="https://github.com/mephitrpg/rpg-cards" rel="nofollow">https://github.com/mephitrpg/rpg-cards</a> and the
+original <a href="https://github.com/crobi/rpg-cards" rel="nofollow">https://github.com/crobi/rpg-cards</a>, for making this tool possible.</p></div>
 
+    <section class="docs-section"><div class="accordion accordion-flush"><div class="accordion-item"><h2 class="accordion-header"><button type="button" class="accordion-button">
+    Thanks and licenses</button></h2>
   
-</div></div>
+
+<div style="overflow: hidden;" class="accordion-collapse"><div class="accordion-body"><h6 id="license">License</h6>
+<p>RPG Card Generator is provided under the terms of the MIT License.</p>
+<h6 id="sveltekit">SvelteKit</h6>
+<p>This project is implemented using <a href="https://kit.svelte.dev/" rel="nofollow">SvelteKit</a>.</p>
+<h6 id="game-iconsnet">game-icons.net</h6>
+<p>Icons used in the project as well as the logo are created by various talented artists, and are provided under the terms of the CC BY 3.0 license. They can be found at <a href="https://game-icons.net/" rel="nofollow">https://game-icons.net/</a></p>
+<h6 id="sveltestrap">Sveltestrap</h6>
+<p>UI is implemented using <a href="https://github.com/bestguy/sveltestrap" rel="nofollow">Sveltestrap</a>.</p>
+<h6 id="codemirror">CodeMirror</h6>
+<p>The JSON editor is implemented using <a href="https://github.com/codemirror/codemirror.next/" rel="nofollow">CodeMirror</a>.</p>
+<h6 id="just">just</h6>
+<p>Thanks to <a href="https://github.com/angus-c" rel="nofollow">angus-c</a> for providing ready to use utility functions with <a href="https://github.com/angus-c/just" rel="nofollow">just</a></p>
+<h6 id="svelte-dnd-action">svelte-dnd-action</h6>
+<p>Drag-and-drop functionality is implemented using <a href="https://github.com/isaacHagoel/svelte-dnd-action" rel="nofollow">svelte-dnd-action</a></p>
+<h6 id="others">Others</h6>
+<p>Big thanks to every dependency of this project!
+Not every dependency is listed above, but the whole list can be seen in the <a href="https://github.com/mathiasandresen/rpg-cards/blob/main/package.json" rel="nofollow">package.json</a> file.</p></div></div></div></div></section>
+</div></div></div></main>
 
   <aside class="sidebar-container svelte-17aj89b sidebar-container-left" style="--sidebar-width: 340px;">
 
@@ -107,20 +133,14 @@
   <button class="sidebar-resize-handle sidebar-resize-handle-right svelte-17aj89b" type="button" aria-label="Resize left sidebar"></button>
 </aside>
 
-  <aside class="sidebar-container svelte-17aj89b  sidebar-container-right" style="--sidebar-width: 340px;"><button class="sidebar-resize-handle sidebar-resize-handle-left svelte-17aj89b" type="button" aria-label="Resize right sidebar"></button>
-
-  <div class="sidebar-container-content svelte-17aj89b"><div class="card-editor-content svelte-19z0i0f"><div class="empty-editor svelte-19z0i0f">No card is selected!</div>
-</div></div>
-
   
-</aside>
 </div>
 
 
-		<script type="module" data-hydrate="169huqp">
+		<script type="module" data-hydrate="6rzv02">
 		import { start } from "/rpg-cards/_app/start-b8e84576.js";
 		start({
-			target: document.querySelector('[data-hydrate="169huqp"]').parentNode,
+			target: document.querySelector('[data-hydrate="6rzv02"]').parentNode,
 			paths: {"base":"/rpg-cards","assets":"/rpg-cards"},
 			session: {},
 			route: true,
@@ -131,10 +151,10 @@
 				error: null,
 				nodes: [
 					import("/rpg-cards/_app/pages/__layout.svelte-d54d5114.js"),
-						import("/rpg-cards/_app/pages/index.svelte-fde35e70.js")
+						import("/rpg-cards/_app/pages/info.svelte-d29c9a74.js")
 				],
 				params: {},
-				routeId: ""
+				routeId: "info"
 			}
 		});
 	</script></div>

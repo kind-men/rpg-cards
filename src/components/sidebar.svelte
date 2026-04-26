@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import {
     Form,
     Icon,
@@ -160,7 +161,7 @@
         aria-expanded={generalMenuOpen}
         on:click={toggleGeneralMenu}
       >
-        <img class="general-menu-trigger-image" src="/menu-logo.svg" alt="" />
+        <img class="general-menu-trigger-image" src={`${base}/menu-logo.svg`} alt="" />
         <span class:general-menu-chevron-open={generalMenuOpen} class="general-menu-chevron" />
       </button>
 
@@ -231,7 +232,7 @@
         <h2 class="sidebar-section-title">Print</h2>
         <a
           class="sidebar-section-action"
-          href="/output"
+          href={`${base}/output`}
           aria-label="Open print view"
         >
           <Icon name="printer" />

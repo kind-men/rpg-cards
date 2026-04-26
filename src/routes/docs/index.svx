@@ -1,16 +1,17 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import ContentTypeTable from "$components/docs/content-type-table.svelte";
 </script>
 
 <section class="docs-hero">
-  <img class="docs-logo" src="/logo_512.png" alt="RPG Cards logo" />
+  <img class="docs-logo" src={`${base}/logo_512.png`} alt="RPG Cards logo" />
   <h1 class="docs-hero-title">RPG Cards Generator</h1>
   <p class="docs-hero-copy">
     Build, organize, and print polished RPG cards from one workspace. This guide covers the
     current editor, import and export formats, and the card data the app understands today.
   </p>
   <div class="docs-hero-actions">
-    <a class="docs-button" href="/">Open the editor</a>
+    <a class="docs-button" href={`${base}/`}>Open the editor</a>
     <a class="docs-button docs-button-secondary" href="#export-data">Jump to JSON format</a>
   </div>
 </section>
@@ -68,7 +69,7 @@
 
 <section class="docs-section">
   <h2>Print view</h2>
-  <p>Use the print button in the left sidebar to open <code>/output</code>.</p>
+  <p>Use the print button in the left sidebar to open <code>{base}/output</code>.</p>
   <p>The print settings currently control:</p>
   <ul>
     <li>paper size</li>

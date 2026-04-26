@@ -10,6 +10,7 @@
   import { currentCard } from '../stores';
 
   export let view: 'editor' | 'docs' | 'info' = 'editor';
+  export let contentMaxWidth = '800px';
   const minPanelWidth = 260;
   const maxPanelWidth = 520;
   const minCanvasWidth = 320;
@@ -104,7 +105,7 @@
 <div
   class:workspace-static-view={!isEditorView()}
   class="workspace"
-  style={`--left-panel-width: ${leftPanelWidth}px; --right-panel-width: ${rightPanelWidth}px;`}
+  style={`--left-panel-width: ${leftPanelWidth}px; --right-panel-width: ${rightPanelWidth}px; --content-max-width: ${contentMaxWidth};`}
 >
   {#if isEditorView()}
     <div class="canvas-layer">
@@ -159,7 +160,7 @@
 
   .content-shell-body {
     margin: 0 auto;
-    width: 800px;
+    width: var(--content-max-width);
     max-width: 100%;
   }
 

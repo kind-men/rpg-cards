@@ -128,24 +128,6 @@
     box-shadow: 0 8px 24px rgba(18, 38, 63, 0.05);
   }
 
-  .workspace-content-view :global(.docs-section h2:first-child),
-  .workspace-content-view :global(.docs-section h3:first-child) {
-    margin-top: 0;
-  }
-
-  .workspace-content-view :global(h2) {
-    color: #223047;
-    font-family: 'Overpass', sans-serif;
-    font-size: 1.45rem;
-    font-weight: 700;
-  }
-
-  .workspace-content-view :global(h3) {
-    color: #223047;
-    font-size: 1.05rem;
-    font-weight: 700;
-  }
-
   .workspace-content-view :global(p),
   .workspace-content-view :global(li) {
     color: #425066;

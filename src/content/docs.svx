@@ -20,7 +20,7 @@
   </div>
 </section>
 
-<section class="docs-section">
+<section class="docs-section" id="overview">
   <h2>Overview</h2>
   <p>The app is built around three areas:</p>
   <ul>
@@ -28,13 +28,18 @@
     <li>The center canvas for previewing the currently selected card.</li>
     <li>The right sidebar for editing the selected card, including cardback options, layout, and contents.</li>
   </ul>
+  <p>The right editor is split into two tabs:</p>
+  <ul>
+    <li><strong>Content</strong> for editing content blocks individually or as plain text</li>
+    <li><strong>Style</strong> for colors, title visibility, cardback settings, and custom CSS</li>
+  </ul>
   <p>
     On larger screens, both sidebars can be resized by dragging their outer edges. On smaller
     screens, the layout stacks vertically.
   </p>
 </section>
 
-<section class="docs-section">
+<section class="docs-section" id="working-with-cards">
   <h2>Working with cards</h2>
   <p>In the deck panel you can:</p>
   <ul>
@@ -48,30 +53,37 @@
   <p>In the editor panel you can:</p>
   <ul>
     <li>edit the card title and color</li>
+    <li>toggle whether the built-in card title is shown, unless a <code>cardtitle</code> content block is being used</li>
     <li>switch the cardback between icon mode and image mode</li>
     <li>manage one or more cardback images</li>
+    <li>set cardback image sizing to <code>cover</code>, <code>contain</code>, or a custom CSS background-size value</li>
+    <li>set a cardback background color and border style</li>
     <li>change border and background settings for the back of the card</li>
     <li>adjust layout settings such as title size, text size, and custom CSS</li>
     <li>edit card contents either block-by-block or as plain text</li>
   </ul>
 </section>
 
-<section class="docs-section">
+<section class="docs-section" id="import-export">
   <h2>Import and export</h2>
   <p>The app can open JSON files from the left sidebar and export the current deck as JSON.</p>
   <p>Imports currently accept:</p>
   <ul>
     <li>the current export format: an object with <code>version</code> and <code>cards</code></li>
-    <li>an array of cards</li>
-    <li>a legacy single-card object</li>
+    <li>an array of cards using the current object-based <code>contents</code> format</li>
+    <li>a legacy single-card object where <code>contents</code> is a string array</li>
   </ul>
   <p>
     When importing, the optional conversion toggles can transform subtitle-plus-rule pairs into
     sections and convert D&amp;D spell properties into spell blocks.
   </p>
+  <p>
+    In plain-text content mode, each line is written as <code>type | value | value</code>. The
+    same pipe-separated format is also used when importing legacy <code>contents</code> arrays.
+  </p>
 </section>
 
-<section class="docs-section">
+<section class="docs-section" id="print-view">
   <h2>Print view</h2>
   <p>Use the print button in the left sidebar to open <code>{base}/output</code>.</p>
   <p>The print settings currently control:</p>
@@ -87,7 +99,7 @@
 </section>
 
 <section class="docs-section" id="export-data">
-  <h2>Export JSON data</h2>
+  <h2>JSON Format</h2>
   <p>The current export format is a JSON object with these fields:</p>
   <ul>
     <li><code>version</code> (string): export format version. Current value: <code>"1"</code></li>
@@ -96,12 +108,39 @@
   <p>Example:</p>
   <pre><code>{`{
   "version": "1",
-  "cards": [...]
+  "cards": [
+    {
+      "count": 1,
+      "color": "#4a6898",
+      "title": "Hex",
+      "icon": "sparkles",
+      "icon_back": "magic-swirl",
+      "text_back": "1st Level",
+      "cardback_mode": "icon",
+      "cardback_images": [],
+      "cardback_background_color": "#ffffff",
+      "cardback_border_style": "normal",
+      "tags": [],
+      "layout": {
+        "show_title": true,
+        "title_font_size": "",
+        "text_font_size": "",
+        "custom_css": ""
+      },
+      "contents": [
+        {
+          "type": "text",
+          "content": "Choose one creature you can see within range.",
+          "id": "04ea19f0-2655-44d4-9de5-595c9b554b75"
+        }
+      ]
+    }
+  ]
 }`}</code></pre>
-</section>
 
-<section class="docs-section" id="card-data">
-  <h2>Card JSON data</h2>
+  <hr>
+
+  <h3 id="card-data">Card</h3>
   <p>Cards can contain the following fields:</p>
   <ul>
     <li><code>count</code> (number): amount of this card to print</li>
@@ -116,7 +155,7 @@
     <li><code>cardback_border_style</code> (string, optional): cardback border style. Possible values: <code>"none"</code>, <code>"normal"</code></li>
     <li><code>tags</code> (array): list of tags</li>
     <li><code>layout</code> (object): per-card layout settings</li>
-    <li><code>contents</code> (array): list of content blocks. See <a href="#contents">Contents JSON data</a>.</li>
+    <li><code>contents</code> (array): list of content blocks using object entries with <code>type</code>, <code>content</code>, and optional <code>id</code>. See <a href="#contents">Contents JSON data</a>.</li>
   </ul>
   <p>Example:</p>
   <pre><code>{`{
@@ -132,6 +171,8 @@
   "cardback_border_style": "normal",
   "tags": [],
   "layout": {
+    "show_title": true,
+    "base_font_size": "",
     "title_font_size": "",
     "text_font_size": "",
     "custom_css": ""
@@ -145,35 +186,49 @@
   ]
 }`}</code></pre>
 
-  <h3>Cardback images</h3>
-  <p>Each cardback image can contain:</p>
+  <h4>Cardback images</h4>
+  <p>Each cardback image entry can contain:</p>
   <ul>
     <li><code>src</code> (string): image source, typically a data URL after uploading an image in the editor</li>
-    <li><code>size</code> (string, optional): image sizing mode or custom background-size value</li>
+    <li><code>size</code> (string, optional): image sizing mode or custom CSS background-size value</li>
   </ul>
-</section>
+  <p>
+    For compatibility, imported image arrays may also contain plain strings. Those are normalized to
+    objects with <code>src</code> set to the string value and <code>size</code> defaulting to
+    <code>"contain"</code>.
+  </p>
 
-<section class="docs-section">
-  <h2>Layout JSON data</h2>
+  <hr>
+
+  <h3 id="layout-data">Layout</h3>
   <p>The <code>layout</code> object can contain:</p>
   <ul>
+    <li><code>show_title</code> (boolean, optional): show or hide the built-in card title row</li>
     <li><code>base_font_size</code> (string, optional)</li>
     <li><code>text_font_size</code> (string, optional)</li>
     <li><code>title_font_size</code> (string, optional)</li>
     <li><code>custom_css</code> (string, optional)</li>
   </ul>
-</section>
+  <p>
+    The editor currently exposes title visibility, title size, text size, and custom CSS. The
+    exported layout object may still include <code>base_font_size</code> for compatibility.
+  </p>
 
-<section class="docs-section" id="contents">
-  <h2>Contents JSON data</h2>
+  <hr>
+
+  <h3 id="contents">Contents</h3>
   <p>Content objects have the following fields:</p>
   <ul>
     <li><code>type</code> (string): content type used by the renderer. See <a href="#content-types">the table below</a>.</li>
     <li><code>content</code> (string): content parameters separated by a pipe <code>|</code></li>
     <li><code>id</code> (string, optional): unique id used by the editor</li>
   </ul>
+  <p>
+    The plain-text editor uses the same content encoding, one block per line. Newlines inside a
+    block are stored as escaped <code>\\n</code> sequences in that mode.
+  </p>
 
-  <h3 id="content-types">Content types</h3>
+  <h4 id="content-types">Content types</h4>
   <ContentTypeTable />
 
   <p>Examples:</p>

@@ -107,6 +107,7 @@
           {:else}
             {#each typeDescriptor.params as param, index}
               <Input
+                class="editor-content-input"
                 type={param.type ?? 'text'}
                 bind:value={splitContent[index]}
                 placeholder={param.name}
@@ -203,10 +204,17 @@
 
   :global(.editor-content-input-group) {
     margin-bottom: 0;
+    display: grid;
+    gap: 0.35rem;
   }
 
   :global(.small-input) {
     max-width: 10em;
+  }
+
+  :global(.editor-content-input-group .editor-content-input) {
+    width: 100%;
+    border-radius: var(--bs-border-radius);
   }
 
   :global.input-property-title {

@@ -9,6 +9,8 @@
 
   $: hasTitleContent = card.contents?.some((content) => content.type === 'cardtitle') ?? false;
   $: showTitle = card.layout?.show_title !== false && !hasTitleContent;
+  $: mainContents = card.contents?.filter((content) => content.type !== 'footer') ?? [];
+  $: footerContents = card.contents?.filter((content) => content.type === 'footer') ?? [];
 </script>
 
 <div
@@ -28,10 +30,17 @@
       </div>
     {/if}
     <div class="card-content">
-      {#each card.contents as content}
+      {#each mainContents as content}
         <CardContent {content} {card} />
       {/each}
     </div>
+    {#if footerContents.length}
+      <div class="card-footer">
+        {#each footerContents as content}
+          <CardContent {content} {card} />
+        {/each}
+      </div>
+    {/if}
   </div>
 </div>
 
@@ -126,6 +135,14 @@
         color: var(--card-color);
         font-family: Draconis;
       }
+    }
+
+    .card-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15em;
+      padding-bottom: 0.35em;
+      flex: 0 0 auto;
     }
   }
 </style>

@@ -13,6 +13,7 @@ import Boxes from '$components/card/content-blocks/boxes.svelte';
 import Fill from '$components/card/content-blocks/fill.svelte';
 import Bullet from '$components/card/content-blocks/bullet.svelte';
 import Picture from '$components/card/content-blocks/picture.svelte';
+import Footer from '$components/card/content-blocks/footer.svelte';
 
 const createCardContentTypes = <
   T extends readonly CardContentTypeDescriptor[] & Array<{ name: V }>,
@@ -112,6 +113,16 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
     renderComponent: Picture
   },
   {
+    name: 'footer',
+    description:
+      'Transparent footer row with left and right aligned text at the bottom of the card.',
+    params: [
+      { name: 'Left text', description: 'Left-aligned footer text', optional: true },
+      { name: 'Right text', description: 'Right-aligned footer text', optional: true }
+    ],
+    renderComponent: Footer
+  },
+  {
     name: 'dndstats',
     description: 'A Dungeons & Dragons stat block',
     params: [
@@ -137,7 +148,7 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
   }
 );
 
-export type CardContentTypeV2 = typeof CARD_CONTENT_TYPES[number]['name'];
+export type CardContentTypeV2 = (typeof CARD_CONTENT_TYPES)[number]['name'];
 
 const CARD_CONTENT_TYPE_DESCRIPTOR_MAP = new Map<CardContentTypeV2, CardContentTypeDescriptor>();
 

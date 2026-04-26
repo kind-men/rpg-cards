@@ -37,7 +37,7 @@
     background-color: var(--card-color);
     color: white;
     font-size: 0.6em;
-    margin-bottom: 0.5em;
+    margin-bottom: 0.3em;
     margin-left: -5px;
     margin-right: -5px;
     padding: 0.3em 0.75em 0.1em;

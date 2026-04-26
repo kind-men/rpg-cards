@@ -7,8 +7,7 @@
     ButtonGroup,
     Icon,
     Input,
-    InputGroup,
-    InputGroupText
+    InputGroup
   } from 'sveltestrap';
   import { SPLIT_REGEX } from '../lib/constants';
   import type { CardContent } from '../model/card';
@@ -90,6 +89,20 @@
     >
       {#if content.type === 'text'}
         <MarkdownEditor bind:value={splitContent[0]} height="280px" />
+      {:else if content.type === 'dndspellblock'}
+        <div class="editor-content-labeled-fields">
+          {#each typeDescriptor.params as param, index}
+            <label class="editor-content-field-row">
+              <span class="editor-content-field-label">{param.name}</span>
+              <Input
+                class="editor-content-input"
+                type={param.type ?? 'text'}
+                bind:value={splitContent[index]}
+                placeholder={param.name}
+              />
+            </label>
+          {/each}
+        </div>
       {:else if content.type === 'picture'}
         <ImageUploadInput
           src={splitContent[0]}
@@ -200,6 +213,24 @@
 
   .editor-content-card-body-text {
     padding: 0;
+  }
+
+  .editor-content-labeled-fields {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .editor-content-field-row {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .editor-content-field-label {
+    color: #4d5b6f;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
   }
 
   :global(.editor-content-input-group) {

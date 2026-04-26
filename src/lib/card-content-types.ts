@@ -139,7 +139,7 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
     name: 'dndspellblock',
     description: 'A Dungeons & Dragons spell card block',
     params: [
-      { name: 'Casting', description: 'Casting time' },
+      { name: 'Casting time', description: 'Casting time' },
       { name: 'Range', description: 'Range' },
       { name: 'Components', description: 'Components' },
       { name: 'Duration', description: 'Duration' }

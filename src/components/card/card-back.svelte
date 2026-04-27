@@ -44,7 +44,7 @@
     {#if cardbackMode === 'images'}
       <div
         class="image-surface"
-        style={`background-color: ${card.cardback_background_color ?? '#ffffff'}; ${cardbackImageStyle}`}
+        style={`background-color: ${card.cardback_background_color ?? 'var(--color-surface-base)'}; ${cardbackImageStyle}`}
       />
     {:else}
       <div class="line">

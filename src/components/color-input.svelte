@@ -188,6 +188,13 @@
 
 <style lang="scss">
   .color-input-layout {
+    --color-input-border: var(--color-border-bootstrap);
+    --color-input-surface: var(--color-surface-base);
+    --color-input-surface-muted: var(--color-surface-subtle);
+    --color-input-text: var(--color-ink-900);
+    --color-input-checker: var(--color-border-soft);
+    --color-input-thumb-border: var(--color-surface-base);
+    --color-input-thumb-shadow: var(--color-border-intense);
     display: grid;
     gap: 0.35rem;
   }
@@ -222,14 +229,14 @@
     max-width: none;
     padding: 0.2rem;
     border-radius: var(--editor-form-control-radius);
-    border: 1px solid var(--bs-border-color, #ced4da);
-    background-color: #ffffff;
+    border: 1px solid var(--bs-border-color, var(--color-input-border));
+    background-color: var(--color-input-surface);
     background-image:
-      linear-gradient(45deg, rgba(18, 38, 63, 0.08) 25%, transparent 25%),
-      linear-gradient(-45deg, rgba(18, 38, 63, 0.08) 25%, transparent 25%),
-      linear-gradient(45deg, transparent 75%, rgba(18, 38, 63, 0.08) 75%),
-      linear-gradient(-45deg, transparent 75%, rgba(18, 38, 63, 0.08) 75%),
-      linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, var(--alpha-color) 100%);
+      linear-gradient(45deg, var(--color-input-checker) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--color-input-checker) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--color-input-checker) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--color-input-checker) 75%),
+      linear-gradient(90deg, var(--color-white-0) 0%, var(--alpha-color) 100%);
     background-position:
       0 0,
       0 0.4rem,
@@ -254,10 +261,10 @@
     align-items: center;
     justify-content: center;
     padding: var(--editor-form-control-padding-y) var(--editor-form-control-padding-x);
-    border: 1px solid var(--bs-border-color, #ced4da);
+    border: 1px solid var(--bs-border-color, var(--color-input-border));
     border-radius: var(--editor-form-control-radius);
-    background: #e9ecef;
-    color: #223047;
+    background: var(--color-input-surface-muted);
+    color: var(--color-input-text);
   }
 
   :global(.alpha-input.form-range::-webkit-slider-runnable-track) {
@@ -270,10 +277,10 @@
     width: 0.7rem;
     height: 0.7rem;
     margin-top: .15rem;
-    border: 2px solid #ffffff;
+    border: 2px solid var(--color-input-thumb-border);
     border-radius: 999px;
     background: transparent;
-    box-shadow: 0 1px 3px rgba(18, 38, 63, 0.18);
+    box-shadow: 0 1px 3px var(--color-input-thumb-shadow);
     appearance: none;
     -webkit-appearance: none;
   }
@@ -287,9 +294,9 @@
   :global(.alpha-input.form-range::-moz-range-thumb) {
     width: 0.9rem;
     height: 0.9rem;
-    border: 1px solid rgba(18, 38, 63, 0.18);
+    border: 1px solid var(--color-input-thumb-shadow);
     border-radius: 999px;
-    background: #ffffff;
-    box-shadow: 0 1px 3px rgba(18, 38, 63, 0.18);
+    background: var(--color-input-surface);
+    box-shadow: 0 1px 3px var(--color-input-thumb-shadow);
   }
 </style>

@@ -265,6 +265,20 @@
 
 <style lang="scss">
   .deck-wrapper {
+    --deck-text-primary: var(--color-ink-900);
+    --deck-text-muted: var(--color-ink-575);
+    --deck-text-subtle: var(--color-ink-550);
+    --deck-text-faint: var(--color-ink-500);
+    --deck-divider: var(--color-border-soft);
+    --deck-chip-border: var(--color-border-medium);
+    --deck-chip-border-active: var(--color-border-active);
+    --deck-hover-overlay: var(--color-overlay-muted);
+    --deck-row-hover: var(--color-overlay-faint);
+    --deck-chip-surface: var(--color-surface-panel);
+    --deck-chip-surface-hover: var(--color-surface-panel-strong);
+    --deck-chip-surface-active: var(--color-surface-panel-active);
+    --deck-selected-surface: var(--color-surface-selected);
+    --deck-chip-shadow: var(--color-shadow-medium);
     min-height: 0;
     display: flex;
     flex-direction: column;
@@ -278,12 +292,12 @@
     gap: 0.75rem;
     margin-bottom: 0.6rem;
     padding-bottom: 0.6rem;
-    border-bottom: 1px solid rgba(18, 38, 63, 0.08);
+    border-bottom: 1px solid var(--deck-divider);
   }
 
   .deck-title {
     margin: 0;
-    color: #223047;
+    color: var(--deck-text-primary);
     font-size: var(--section-title-size);
     font-weight: var(--section-title-weight);
     letter-spacing: var(--section-title-spacing);
@@ -308,15 +322,15 @@
     border: 0;
     border-radius: 0.35rem;
     background: transparent;
-    color: #6a7688;
+    color: var(--deck-text-subtle);
     transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;
   }
 
   .deck-toolbar-button:hover,
   .deck-header-action:hover,
   .deck-row-action:hover {
-    background: rgba(18, 38, 63, 0.06);
-    color: #223047;
+    background: var(--deck-hover-overlay);
+    color: var(--deck-text-primary);
   }
 
   .deck-toolbar-button:disabled,
@@ -349,14 +363,14 @@
 
   .deck-settings-label {
     padding: 0;
-    color: #223047;
+    color: var(--deck-text-primary);
     font-size: var(--editor-form-font-size);
     line-height: var(--editor-form-label-line-height);
   }
 
   .deck-settings :global(.col-form-label) {
     padding: 0;
-    color: #223047;
+    color: var(--deck-text-primary);
     font-size: var(--editor-form-font-size);
     line-height: var(--editor-form-label-line-height);
   }
@@ -388,10 +402,10 @@
   .deck-settings :global(.deck-size-toggle) {
     min-height: 1.7rem;
     padding: 0.15rem 0.55rem;
-    border: 1px solid rgba(18, 38, 63, 0.12);
+    border: 1px solid var(--deck-chip-border);
     border-radius: 999px;
-    background: #f6f4ef;
-    color: #5f6d80;
+    background: var(--deck-chip-surface);
+    color: var(--deck-text-muted);
     opacity: 0.6;
     font-size: 0.72rem;
     font-weight: 600;
@@ -401,18 +415,18 @@
   }
 
   .deck-settings :global(.deck-size-toggle:hover) {
-    color: #223047;
-    background: #efebe2;
+    color: var(--deck-text-primary);
+    background: var(--deck-chip-surface-hover);
     opacity: 0.8;
   }
 
   .deck-settings :global(.deck-size-toggle.deck-size-toggle-active),
   .deck-settings :global(.deck-size-toggle[aria-pressed='true']) {
-    color: #223047;
-    border-color: rgba(18, 38, 63, 0.2);
-    background: #e7e1d2;
+    color: var(--deck-text-primary);
+    border-color: var(--deck-chip-border-active);
+    background: var(--deck-chip-surface-active);
     opacity: 1;
-    box-shadow: inset 0 1px 2px rgba(18, 38, 63, 0.08);
+    box-shadow: inset 0 1px 2px var(--deck-chip-shadow);
   }
 
   .deck-list-header {
@@ -422,7 +436,7 @@
     gap: 0.5rem;
     min-height: 1.8rem;
     padding: 0 0.15rem;
-    color: #7c8799;
+    color: var(--deck-text-faint);
     font-size: 0.8rem;
   }
 
@@ -435,7 +449,7 @@
   }
 
   .deck-count {
-    color: #223047;
+    color: var(--deck-text-primary);
   }
 
   .deck-row {
@@ -449,16 +463,16 @@
     border: 0;
     border-radius: 0.35rem;
     background: transparent;
-    color: #223047;
+    color: var(--deck-text-primary);
     text-align: left;
   }
 
   .deck-row:hover {
-    background: rgba(18, 38, 63, 0.04);
+    background: var(--deck-row-hover);
   }
 
   .deck-row.is-active {
-    background: #eef2f7;
+    background: var(--deck-selected-surface);
   }
 
   .deck-row-main {
@@ -474,7 +488,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #7c8799;
+    color: var(--deck-text-faint);
   }
 
   .deck-row-title {
@@ -506,7 +520,7 @@
 
   .empty-deck {
     padding: 0.75rem 0.25rem;
-    color: #7c8799;
+    color: var(--deck-text-faint);
     font-size: 0.78rem;
     text-align: center;
   }

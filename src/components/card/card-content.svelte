@@ -16,12 +16,14 @@
 
 <style lang="scss">
   .card-content-block {
+    --card-content-highlight-surface: var(--color-border-soft);
+    --card-content-highlight-border: var(--color-border-medium);
     border-radius: 0.2rem;
     transition: background-color 120ms ease, box-shadow 120ms ease;
   }
 
   .card-content-highlighted {
-    background: rgba(18, 38, 63, 0.08);
-    box-shadow: 0 0 0 1px rgba(18, 38, 63, 0.12);
+    background: var(--card-content-highlight-surface);
+    box-shadow: 0 0 0 1px var(--card-content-highlight-border);
   }
 </style>

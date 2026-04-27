@@ -65,10 +65,11 @@
     overflow: hidden;
 
     :global(.cm-editor) {
+      --text-editor-surface: var(--color-surface-muted);
       min-height: 0;
       height: 100%;
       flex: 1 1 auto;
-      background: #fbfaf7;
+      background: var(--text-editor-surface);
     }
 
     :global(.cm-scroller) {
@@ -94,8 +95,8 @@
     }
 
     :global(.cm-gutters) {
-      border-right: 1px solid rgba(18, 38, 63, 0.08);
-      background: #f3efe7;
+      border-right: 1px solid var(--color-border-soft);
+      background: var(--color-surface-editor);
     }
   }
 </style>

@@ -66,6 +66,10 @@
 
 <style lang="scss">
   .color-select-button {
+    --color-select-button-text: var(--color-ink-550);
+    --color-select-button-text-hover: var(--color-ink-900);
+    --color-select-button-hover-surface: var(--color-overlay-muted);
+    --color-select-swatch-border: lightgray;
     width: 1.7rem;
     height: 1.7rem;
     display: inline-flex;
@@ -75,13 +79,13 @@
     border: 0;
     border-radius: 0.35rem;
     background: transparent;
-    color: #6a7688;
+    color: var(--color-select-button-text);
     transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;
     cursor: pointer;
 
     &:hover {
-      background: rgba(18, 38, 63, 0.06);
-      color: #223047;
+      background: var(--color-select-button-hover-surface);
+      color: var(--color-select-button-text-hover);
     }
   }
 
@@ -110,7 +114,7 @@
     .color {
       background-color: var(--color);
 
-      border: 1px solid lightgray;
+      border: 1px solid var(--color-select-swatch-border);
 
       width: 2em;
       height: 2em;

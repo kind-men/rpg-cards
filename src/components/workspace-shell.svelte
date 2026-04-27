@@ -146,12 +146,14 @@
   }
 
   .content-layer {
+    --workspace-shell-surface: var(--color-surface-panel);
+    --workspace-shell-glow: var(--color-white-65);
     position: fixed;
     inset: 0 0 0 var(--left-panel-width);
     overflow-y: auto;
     background:
-      radial-gradient(circle at top, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0) 35%),
-      #f6f4ef;
+      radial-gradient(circle at top, var(--workspace-shell-glow), var(--color-white-0) 35%),
+      var(--workspace-shell-surface);
   }
 
   .content-shell {

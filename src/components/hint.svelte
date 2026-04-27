@@ -14,6 +14,9 @@
 
 <style lang="scss">
   .hint-trigger {
+    --hint-trigger-text: var(--color-ink-550);
+    --hint-trigger-text-hover: var(--color-ink-900);
+    --hint-trigger-hover-surface: var(--color-overlay-muted);
     width: 1.1rem;
     height: 1.1rem;
     display: inline-flex;
@@ -23,12 +26,12 @@
     border: 0;
     border-radius: 0.35rem;
     background: transparent;
-    color: #6a7688;
+    color: var(--hint-trigger-text);
     transition: background-color 120ms ease, color 120ms ease;
 
     &:hover {
-      background: rgba(18, 38, 63, 0.06);
-      color: #223047;
+      background: var(--hint-trigger-hover-surface);
+      color: var(--hint-trigger-text-hover);
     }
 
     :global(svg) {

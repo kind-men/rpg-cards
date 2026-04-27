@@ -750,6 +750,33 @@
 
 <style lang="scss">
   .card-editor-content {
+    --card-editor-text-primary: var(--color-ink-900);
+    --card-editor-text-muted: var(--color-ink-575);
+    --card-editor-text-subtle: var(--color-ink-550);
+    --card-editor-text-faint: var(--color-ink-500);
+    --card-editor-text-danger: var(--color-danger);
+    --card-editor-text-danger-strong: var(--color-danger-strong);
+    --card-editor-border-soft: var(--color-border-soft);
+    --card-editor-border-medium: var(--color-border-medium);
+    --card-editor-border-intense: var(--color-border-intense);
+    --card-editor-border-active: var(--color-border-active);
+    --card-editor-surface: var(--color-surface-base);
+    --card-editor-surface-panel: var(--color-surface-panel);
+    --card-editor-surface-panel-strong: var(--color-surface-panel-strong);
+    --card-editor-surface-panel-active: var(--color-surface-panel-active);
+    --card-editor-surface-overlay: var(--color-white-45);
+    --card-editor-hover-overlay: var(--color-overlay-muted);
+    --card-editor-shadow-soft: var(--color-shadow-medium);
+    --card-editor-shadow-strong: var(--color-shadow-strong);
+    --card-editor-danger-border: var(--color-danger-border);
+    --card-editor-danger-surface: var(--color-danger-surface);
+    --card-editor-accent-border: var(--color-accent-border);
+    --card-editor-accent-shadow: var(--color-accent-shadow);
+    --card-editor-wizard-surface: #faf8f3;
+    --card-editor-wizard-surface-hover: #f6f1e7;
+    --card-editor-wizard-surface-active: #efe6d3;
+    --card-editor-wizard-hero-glow: rgba(244, 239, 228, 0.95);
+    --card-editor-wizard-hero-surface: var(--color-white-98);
     height: 100%;
     min-height: 100%;
     display: flex;
@@ -765,17 +792,17 @@
 
   .card-editor-content :global(.editor-inline-button) {
     padding: 0;
-    color: #5f6d80;
+    color: var(--card-editor-text-muted);
     font-size: 0.7rem;
     text-decoration: none;
   }
 
   .card-editor-content :global(.editor-inline-button:hover) {
-    color: #223047;
+    color: var(--card-editor-text-primary);
   }
 
   .card-editor-content :global(.editor-inline-button-danger:hover) {
-    color: #9a3c3c;
+    color: var(--card-editor-text-danger-strong);
   }
 
   .card-editor-content :global(.editor-icon-button) {
@@ -788,21 +815,21 @@
     border: 0;
     border-radius: 0.35rem;
     background: transparent;
-    color: #6a7688;
+    color: var(--card-editor-text-subtle);
     text-decoration: none;
     transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;
   }
 
   .card-editor-content :global(.editor-icon-button:hover) {
-    background: rgba(18, 38, 63, 0.06);
-    color: #223047;
+    background: var(--card-editor-hover-overlay);
+    color: var(--card-editor-text-primary);
   }
 
   .card-editor-content :global(.editor-icon-button:disabled) {
     opacity: 0.45;
     cursor: default;
     background: transparent;
-    color: #6a7688;
+    color: var(--card-editor-text-subtle);
   }
 
   .card-editor-content :global(.editor-mode-toggle) {
@@ -811,29 +838,29 @@
     justify-content: center;
     padding: 0.125rem 0.25rem;
     font-size: 0.8rem;
-    color: #5f6d80;
+    color: var(--card-editor-text-muted);
     text-decoration: none;
-    border: 1px solid rgba(18, 38, 63, 0.12);
+    border: 1px solid var(--card-editor-border-medium);
     border-radius: 0.1875rem;
-    background: #f6f4ef;
+    background: var(--card-editor-surface-panel);
   }
 
   .card-editor-content :global(.editor-mode-toggle:hover) {
-    color: #223047;
-    background: #efebe2;
+    color: var(--card-editor-text-primary);
+    background: var(--card-editor-surface-panel-strong);
   }
 
   .card-editor-content :global(.editor-mode-toggle[aria-pressed='true']) {
-    color: #223047;
-    border-color: rgba(18, 38, 63, 0.2);
-    background: #e7e1d2;
+    color: var(--card-editor-text-primary);
+    border-color: var(--card-editor-border-active);
+    background: var(--card-editor-surface-panel-active);
   }
 
   .card-editor-content :global(.editor-mode-toggle-active) {
-    color: #223047;
-    border-color: rgba(18, 38, 63, 0.2);
-    background: #e7e1d2;
-    box-shadow: inset 0 1px 2px rgba(18, 38, 63, 0.08);
+    color: var(--card-editor-text-primary);
+    border-color: var(--card-editor-border-active);
+    background: var(--card-editor-surface-panel-active);
+    box-shadow: inset 0 1px 2px var(--card-editor-shadow-soft);
   }
 
   .editor-pane-switch {
@@ -842,9 +869,9 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.35rem;
-    border: 1px solid rgba(18, 38, 63, 0.08);
+    border: 1px solid var(--card-editor-border-soft);
     border-radius: 999px;
-    background: #efebe2;
+    background: var(--card-editor-surface-panel-strong);
   }
 
   .card-editor-content :global(.editor-pane-toggle) {
@@ -856,7 +883,7 @@
     border: 0;
     border-radius: 999px;
     background: transparent;
-    color: #6a7688;
+    color: var(--card-editor-text-subtle);
     font-size: 0.82rem;
     font-weight: 600;
     text-decoration: none;
@@ -864,14 +891,14 @@
   }
 
   .card-editor-content :global(.editor-pane-toggle:hover) {
-    color: #223047;
-    background: rgba(255, 255, 255, 0.45);
+    color: var(--card-editor-text-primary);
+    background: var(--card-editor-surface-overlay);
   }
 
   .card-editor-content :global(.editor-pane-toggle.editor-pane-toggle-active) {
-    color: #223047;
-    background: #ffffff;
-    box-shadow: 0 1px 4px rgba(18, 38, 63, 0.08);
+    color: var(--card-editor-text-primary);
+    background: var(--card-editor-surface);
+    box-shadow: 0 1px 4px var(--card-editor-shadow-soft);
   }
 
   .cardback-image-list {
@@ -884,7 +911,7 @@
     margin: 0 0 0.9rem;
     display: grid;
     gap: 0.5rem;
-    background: #ffffff;
+    background: var(--card-editor-surface);
   }
 
   .card-setup-wizard {
@@ -897,11 +924,11 @@
     display: grid;
     gap: 0.85rem;
     justify-items: center;
-    border: 1px solid rgba(18, 38, 63, 0.08);
+    border: 1px solid var(--card-editor-border-soft);
     border-radius: 1rem;
     background:
-      linear-gradient(180deg, rgba(244, 239, 228, 0.95), rgba(255, 255, 255, 0.98)),
-      #ffffff;
+      linear-gradient(180deg, var(--card-editor-wizard-hero-glow), var(--card-editor-wizard-hero-surface)),
+      var(--card-editor-surface);
     text-align: center;
   }
 
@@ -910,7 +937,7 @@
     height: 4.75rem;
     display: block;
     object-fit: contain;
-    filter: drop-shadow(0 8px 18px rgba(18, 38, 63, 0.12));
+    filter: drop-shadow(0 8px 18px var(--card-editor-shadow-strong));
   }
 
   .wizard-copy {
@@ -920,28 +947,28 @@
 
   .wizard-title {
     margin: 0;
-    color: #223047;
+    color: var(--card-editor-text-primary);
     font-size: 1.15rem;
     font-weight: 700;
   }
 
   .wizard-text {
     margin: 0;
-    color: #5f6d80;
+    color: var(--card-editor-text-muted);
     font-size: 0.86rem;
     line-height: 1.5;
   }
 
   .wizard-choice-label {
     margin-bottom: 0.45rem;
-    color: #223047;
+    color: var(--card-editor-text-primary);
     font-size: 0.82rem;
     font-weight: 600;
   }
 
   .wizard-field-error {
     margin-top: 0.35rem;
-    color: #8f3535;
+    color: var(--card-editor-text-danger);
     font-size: 0.76rem;
     line-height: 1.4;
   }
@@ -956,23 +983,23 @@
     display: grid;
     gap: 0.25rem;
     text-align: left;
-    border: 1px solid rgba(18, 38, 63, 0.12);
+    border: 1px solid var(--card-editor-border-medium);
     border-radius: 0.8rem;
-    background: #faf8f3;
-    color: #223047;
+    background: var(--card-editor-wizard-surface);
+    color: var(--card-editor-text-primary);
     transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease,
       transform 120ms ease;
   }
 
   .wizard-choice-card:hover {
-    background: #f6f1e7;
-    border-color: rgba(18, 38, 63, 0.18);
+    background: var(--card-editor-wizard-surface-hover);
+    border-color: var(--card-editor-border-intense);
   }
 
   .wizard-choice-card-active {
-    background: #efe6d3;
-    border-color: rgba(74, 104, 152, 0.45);
-    box-shadow: 0 0 0 1px rgba(74, 104, 152, 0.12);
+    background: var(--card-editor-wizard-surface-active);
+    border-color: var(--card-editor-accent-border);
+    box-shadow: 0 0 0 1px var(--card-editor-accent-shadow);
     transform: translateY(-1px);
   }
 
@@ -982,17 +1009,17 @@
   }
 
   .wizard-choice-description {
-    color: #5f6d80;
+    color: var(--card-editor-text-muted);
     font-size: 0.76rem;
     line-height: 1.45;
   }
 
   .wizard-error {
     padding: 0.65rem 0.75rem;
-    border: 1px solid rgba(154, 60, 60, 0.18);
+    border: 1px solid var(--card-editor-danger-border);
     border-radius: 0.7rem;
-    background: rgba(154, 60, 60, 0.06);
-    color: #8f3535;
+    background: var(--card-editor-danger-surface);
+    color: var(--card-editor-text-danger);
     font-size: 0.78rem;
   }
 
@@ -1016,9 +1043,9 @@
 
   .cardback-image-empty {
     padding: 0.45rem 0.55rem;
-    border: 1px dashed rgba(18, 38, 63, 0.12);
+    border: 1px dashed var(--card-editor-border-medium);
     border-radius: 0.1875rem;
-    color: #7c8799;
+    color: var(--card-editor-text-faint);
   }
 
   .layout-size-fields {
@@ -1064,7 +1091,7 @@
     padding: 0;
     display: flex;
     align-items: center;
-    color: #223047;
+    color: var(--card-editor-text-primary);
     font-size: 1.25rem;
     font-weight: 500;
     overflow: hidden;
@@ -1100,13 +1127,13 @@
     min-height: 100%;
     height: 100%;
     flex: 1 1 auto;
-    border: 1px solid rgba(18, 38, 63, 0.12);
+    border: 1px solid var(--card-editor-border-medium);
     border-radius: var(--bs-border-radius);
-    box-shadow: inset 0 1px 2px rgba(18, 38, 63, 0.04);
+    box-shadow: inset 0 1px 2px var(--color-shadow-soft);
   }
 
   :global(.content-editor-textarea .cm-editor.cm-focused) {
-    background: #ffffff;
+    background: var(--card-editor-surface);
   }
 
   .empty-editor {

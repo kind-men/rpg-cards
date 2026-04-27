@@ -44,6 +44,11 @@
 
 <style lang="scss">
   .sidebar-container {
+    --sidebar-container-surface: var(--color-surface-base);
+    --sidebar-container-divider: var(--color-border-strong);
+    --sidebar-container-divider-hover: var(--color-overlay-heavy);
+    --sidebar-container-section-divider: var(--color-border-soft);
+    --sidebar-container-title: var(--color-ink-900);
     position: fixed;
     top: 0;
     bottom: 0;
@@ -51,18 +56,18 @@
     width: var(--sidebar-width);
     padding: 1rem 1rem .5rem 1rem;
     overflow: hidden;
-    background: #ffffff;
+    background: var(--sidebar-container-surface);
     box-shadow: none;
   }
 
   .sidebar-container-left {
     left: 0;
-    border-right: 1px solid rgba(18, 38, 63, 0.14);
+    border-right: 1px solid var(--sidebar-container-divider);
   }
 
   .sidebar-container-right {
     right: 0;
-    border-left: 1px solid rgba(18, 38, 63, 0.14);
+    border-left: 1px solid var(--sidebar-container-divider);
   }
 
   .sidebar-container-content {
@@ -94,14 +99,14 @@
     bottom: 0;
     left: 50%;
     width: 1px;
-    background: rgba(18, 38, 63, 0.14);
+    background: var(--sidebar-container-divider);
     transform: translateX(-50%);
     transition: background-color 120ms ease, width 120ms ease;
   }
 
   .sidebar-resize-handle:hover::after {
     width: 2px;
-    background: rgba(18, 38, 63, 0.35);
+    background: var(--sidebar-container-divider-hover);
   }
 
   .sidebar-resize-handle-right {
@@ -116,7 +121,7 @@
 
   .sidebar-container-content :global(.sidebar-section) {
     padding: .5rem 0 1rem;
-    border-bottom: 1px solid rgba(18, 38, 63, 0.08);
+    border-bottom: 1px solid var(--sidebar-container-section-divider);
   }
 
   .sidebar-container-content :global(.sidebar-section:first-child) {
@@ -145,7 +150,7 @@
 
   .sidebar-container-content :global(.sidebar-section-title) {
     margin: 0;
-    color: #223047;
+    color: var(--sidebar-container-title);
     font-size: var(--section-title-size);
     font-weight: var(--section-title-weight);
     letter-spacing: var(--section-title-spacing);
@@ -190,7 +195,7 @@
 
   .sidebar-container-content :global(.col-form-label) {
     padding: 0;
-    color: #223047;
+    color: var(--sidebar-container-title);
     font-size: var(--editor-form-font-size);
     line-height: var(--editor-form-label-line-height);
     font-weight: 500;
@@ -222,7 +227,7 @@
       width: auto;
       min-height: 0;
       overflow: visible;
-      border: 1px solid rgba(18, 38, 63, 0.14);
+      border: 1px solid var(--sidebar-container-divider);
     }
 
     .sidebar-resize-handle {

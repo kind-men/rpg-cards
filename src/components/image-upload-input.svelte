@@ -45,14 +45,18 @@
 
 <style lang="scss">
   .image-upload-row {
+    --image-upload-border: var(--color-border-soft);
+    --image-upload-surface: var(--color-surface-muted);
+    --image-upload-preview-surface: var(--color-surface-base);
+    --image-upload-preview-placeholder: var(--color-ink-300);
     display: grid;
     grid-template-columns: 4.25rem minmax(0, 1fr);
     align-items: start;
     gap: 0.5rem;
     padding: 0.35rem;
-    border: 1px solid rgba(18, 38, 63, 0.08);
+    border: 1px solid var(--image-upload-border);
     border-radius: 0.25rem;
-    background: #fbfaf7;
+    background: var(--image-upload-surface);
   }
 
   .image-upload-preview {
@@ -62,10 +66,10 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border: 1px solid rgba(18, 38, 63, 0.08);
+    border: 1px solid var(--image-upload-border);
     border-radius: 0.1875rem;
-    background: #ffffff;
-    color: #a3acba;
+    background: var(--image-upload-preview-surface);
+    color: var(--image-upload-preview-placeholder);
   }
 
   .image-upload-preview img {

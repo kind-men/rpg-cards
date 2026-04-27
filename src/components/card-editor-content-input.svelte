@@ -173,13 +173,22 @@
 
 <style lang="scss">
   .editor-content-card {
+    --editor-content-card-border: var(--color-border-soft);
+    --editor-content-card-surface: var(--color-surface-base);
+    --editor-content-card-shadow: var(--color-shadow-light);
+    --editor-content-card-text: var(--color-ink-900);
+    --editor-content-card-text-hover: var(--color-ink-925);
+    --editor-content-card-text-muted: var(--color-ink-575);
+    --editor-content-card-text-subtle: var(--color-ink-450);
+    --editor-content-card-label: var(--color-ink-675);
+    --editor-content-card-hover-overlay: var(--color-overlay-muted);
     width: 100%;
     display: grid;
-    border: 1px solid rgba(18, 38, 63, 0.08);
+    border: 1px solid var(--editor-content-card-border);
     border-radius: var(--bs-border-radius);
-    background: #ffffff;
+    background: var(--editor-content-card-surface);
     overflow: hidden;
-    box-shadow: 0 3px 10px rgba(18, 38, 63, 0.06);
+    box-shadow: 0 3px 10px var(--editor-content-card-shadow);
   }
 
   .editor-content-card-header {
@@ -188,7 +197,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    border-bottom: 1px solid rgba(18, 38, 63, 0.08);
+    border-bottom: 1px solid var(--editor-content-card-border);
   }
 
   .editor-content-card-heading {
@@ -209,7 +218,7 @@
     padding: 0;
     border: 0;
     background: transparent;
-    color: #223047;
+    color: var(--editor-content-card-text);
     font-size: 0.74rem;
     font-weight: 600;
     letter-spacing: 0.02em;
@@ -218,7 +227,7 @@
   }
 
   .editor-content-card-title:hover {
-    color: #111c2d;
+    color: var(--editor-content-card-text-hover);
   }
 
   .editor-content-drag-handle {
@@ -231,14 +240,14 @@
     border: 0;
     border-radius: var(--bs-border-radius-sm);
     background: transparent;
-    color: #8b96a8;
+    color: var(--editor-content-card-text-subtle);
     cursor: grab;
     flex: 0 0 auto;
   }
 
   .editor-content-drag-handle:hover {
-    background: rgba(18, 38, 63, 0.06);
-    color: #223047;
+    background: var(--editor-content-card-hover-overlay);
+    color: var(--editor-content-card-text);
   }
 
   .editor-content-drag-handle:active {
@@ -264,7 +273,7 @@
   }
 
   .editor-content-field-label {
-    color: #4d5b6f;
+    color: var(--editor-content-card-label);
     font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.02em;
@@ -307,7 +316,7 @@
     align-items: center;
     justify-content: center;
     pointer-events: none;
-    color: #5f6d80;
+    color: var(--editor-content-card-text-muted);
   }
 
   :global.input-property-title {
@@ -316,7 +325,7 @@
 
   :global(.editor-content-actions .btn) {
     padding: 0.125rem 0.25rem;
-    color: #5f6d80;
+    color: var(--editor-content-card-text-muted);
   }
 
   :global(.editor-content-actions) {
@@ -329,6 +338,6 @@
   }
 
   :global(.editor-content-actions .btn:hover) {
-    color: #223047;
+    color: var(--editor-content-card-text);
   }
 </style>

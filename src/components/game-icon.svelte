@@ -7,7 +7,7 @@
   let icon: IconModel;
   $: icon = getIcon(name);
 
-  export let color: ColorResolvable = '#ffffff';
+  export let color: ColorResolvable = 'var(--color-surface-base)';
   export let size: string = '1em';
 </script>
 

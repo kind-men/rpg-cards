@@ -93,26 +93,30 @@
 
 <style lang="scss">
   .canvas {
+    --current-card-canvas-glow: var(--color-white-90);
+    --current-card-canvas-paper: rgba(244, 241, 231, 0.96);
+    --current-card-grid-line: rgba(24, 32, 47, 0.04);
     position: relative;
     width: 100%;
     height: 100%;
     overflow: auto;
     background:
-      radial-gradient(circle at top, rgba(255, 255, 255, 0.9), rgba(244, 241, 231, 0.96)),
-      linear-gradient(90deg, rgba(24, 32, 47, 0.04) 1px, transparent 1px),
-      linear-gradient(rgba(24, 32, 47, 0.04) 1px, transparent 1px);
+      radial-gradient(circle at top, var(--current-card-canvas-glow), var(--current-card-canvas-paper)),
+      linear-gradient(90deg, var(--current-card-grid-line) 1px, transparent 1px),
+      linear-gradient(var(--current-card-grid-line) 1px, transparent 1px);
     background-size: auto, 32px 32px, 32px 32px;
     background-position: 0 0, center center, center center;
   }
 
   .zoom-input {
+    --current-card-zoom-surface: var(--color-white-96);
     position: sticky;
     top: 1rem;
     left: 1rem;
     z-index: 2;
     margin: 1rem;
     width: 13em;
-    background: rgba(255, 255, 255, 0.96);
+    background: var(--current-card-zoom-surface);
     border-radius: 0.75rem;
   }
 
@@ -125,9 +129,10 @@
   }
 
   .card-stage {
+    --current-card-stage-shadow: rgba(24, 32, 47, 0.18);
     position: relative;
     flex: none;
-    filter: drop-shadow(0 1.25rem 2.5rem rgba(24, 32, 47, 0.18));
+    filter: drop-shadow(0 1.25rem 2.5rem var(--current-card-stage-shadow));
   }
 
   .card-preview-row {
@@ -139,6 +144,9 @@
   }
 
   .card-overflow-warning {
+    --current-card-warning-surface: var(--color-warning-surface);
+    --current-card-warning-text: var(--color-warning);
+    --current-card-warning-shadow: rgba(24, 32, 47, 0.16);
     position: absolute;
     right: 0.45rem;
     bottom: 0.45rem;
@@ -149,9 +157,9 @@
     align-items: center;
     justify-content: center;
     border-radius: 999px;
-    background: rgba(255, 242, 184, 0.96);
-    color: #9a6b00;
-    box-shadow: 0 0.25rem 0.8rem rgba(24, 32, 47, 0.16);
+    background: var(--current-card-warning-surface);
+    color: var(--current-card-warning-text);
+    box-shadow: 0 0.25rem 0.8rem var(--current-card-warning-shadow);
   }
 
   @media (max-width: 1100px) {

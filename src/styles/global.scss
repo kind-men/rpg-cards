@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@400;500;600;700;800&display=swap');
+
+@import './tokens.scss';
+
+:global(.btn-primary) {
+  --layout-btn-primary-bg: var(--color-brand-primary);
+  --bs-btn-bg: var(--layout-btn-primary-bg) !important;
+}
+
+:global(.accordion-item) {
+  --layout-accordion-border: var(--color-border-medium);
+  --layout-accordion-surface: var(--color-surface-panel);
+  --layout-accordion-text: var(--color-ink-900);
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--layout-accordion-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: var(--layout-accordion-surface);
+  --bs-accordion-btn-bg: var(--layout-accordion-surface);
+  --bs-accordion-active-bg: var(--layout-accordion-surface);
+  --bs-accordion-btn-color: var(--layout-accordion-text);
+  --bs-accordion-active-color: var(--layout-accordion-text);
+  --bs-accordion-border-color: var(--layout-accordion-border);
+  --bs-accordion-btn-focus-box-shadow: none;
+  --bs-accordion-btn-icon: none;
+  --bs-accordion-btn-active-icon: none;
+}
+
+:global(.accordion-item:last-child) {
+  margin-bottom: 0;
+}
+
+:global(.accordion-button) {
+  --layout-accordion-button-surface: var(--color-surface-panel);
+  --layout-accordion-button-text: var(--color-ink-900);
+  padding: 0.55rem 0.875rem;
+  background: var(--layout-accordion-button-surface) !important;
+  color: var(--layout-accordion-button-text) !important;
+  font-size: 0.95rem;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+:global(.accordion-button:not(.collapsed)) {
+  background: var(--layout-accordion-button-surface) !important;
+  color: var(--layout-accordion-button-text) !important;
+  box-shadow: none;
+}
+
+:global(.accordion-button:focus) {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+:global(.accordion-button::after) {
+  --layout-accordion-icon: var(--color-ink-600);
+  width: auto;
+  height: auto;
+  margin-left: auto;
+  background-image: none !important;
+  content: '+';
+  color: var(--layout-accordion-icon);
+  font-size: 1.15rem;
+  font-weight: 500;
+  line-height: 1;
+  transform: none;
+}
+
+:global(.accordion-button:not(.collapsed)::after) {
+  background-image: none !important;
+  content: '-';
+  transform: none;
+}
+
+:global(.accordion-body) {
+  --layout-accordion-body-surface: var(--color-surface-panel);
+  background: var(--layout-accordion-body-surface);
+}
+
+:global(hr) {
+  margin: 0.5rem 0 !important;
+}

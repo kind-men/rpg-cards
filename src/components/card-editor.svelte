@@ -47,6 +47,7 @@
   let isEditingName = false;
   let textFieldContent = getContentAsString(card?.contents);
   let wizardName = '';
+  let wizardNameError = '';
   let selectedTemplateId = '';
   let wizardError = '';
   let isApplyingTemplate = false;
@@ -141,6 +142,7 @@
     textFieldContent = getContentAsString(card?.contents);
     isEditingName = false;
     wizardName = card?.title ?? '';
+    wizardNameError = '';
     selectedTemplateId = '';
     wizardError = '';
     isApplyingTemplate = false;
@@ -286,7 +288,14 @@
   const handleCompleteWizard = async () => {
     const nextTitle = wizardName.trim();
 
-    if (!card || !nextTitle || !selectedTemplateId || cardIndex < 0) {
+    if (!nextTitle) {
+      wizardNameError = 'Please enter a name for your card.';
+      return;
+    }
+
+    wizardNameError = '';
+
+    if (!card || !selectedTemplateId || cardIndex < 0) {
       return;
     }
 
@@ -358,14 +367,23 @@
                   id="wizard-card-name"
                   type="text"
                   bind:value={wizardName}
+                  invalid={Boolean(wizardNameError)}
                   placeholder="Enter card name"
+                  on:input={() => {
+                    if (wizardNameError && wizardName.trim()) {
+                      wizardNameError = '';
+                    }
+                  }}
                   on:keydown={(event) => {
-                    if (event.key === 'Enter' && wizardName.trim() && selectedTemplateId) {
+                    if (event.key === 'Enter' && selectedTemplateId) {
                       event.preventDefault();
                       void handleCompleteWizard();
                     }
                   }}
                 />
+                {#if wizardNameError}
+                  <div class="wizard-field-error" role="alert">{wizardNameError}</div>
+                {/if}
               </div>
 
               <div class="sidebar-field">
@@ -393,7 +411,7 @@
                 <Button
                   type="button"
                   color="primary"
-                  disabled={!wizardName.trim() || !selectedTemplateId || isApplyingTemplate}
+                  disabled={!selectedTemplateId || isApplyingTemplate}
                   on:click={handleCompleteWizard}
                 >
                   {isApplyingTemplate ? 'Preparing...' : 'Continue'}
@@ -919,6 +937,13 @@
     color: #223047;
     font-size: 0.82rem;
     font-weight: 600;
+  }
+
+  .wizard-field-error {
+    margin-top: 0.35rem;
+    color: #8f3535;
+    font-size: 0.76rem;
+    line-height: 1.4;
   }
 
   .wizard-choice-grid {

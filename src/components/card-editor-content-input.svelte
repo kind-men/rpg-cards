@@ -175,7 +175,7 @@
   .editor-content-card {
     --editor-content-card-border: var(--color-border-soft);
     --editor-content-card-surface: var(--color-surface-base);
-    --editor-content-card-shadow: var(--color-shadow-light);
+    --editor-content-card-shadow: var(--color-shadow-100);
     --editor-content-card-text: var(--color-ink-900);
     --editor-content-card-text-hover: var(--color-ink-925);
     --editor-content-card-text-muted: var(--color-ink-575);

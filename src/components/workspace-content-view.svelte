@@ -10,9 +10,9 @@
 <style lang="scss">
   .workspace-content-view {
     --workspace-content-view-panel-border: var(--color-border-soft);
-    --workspace-content-view-panel-shadow: var(--color-shadow-medium);
-    --workspace-content-view-panel-shadow-soft: var(--color-shadow-muted);
-    --workspace-content-view-panel-shadow-deep: var(--color-shadow-deep);
+    --workspace-content-view-panel-shadow: var(--color-shadow-200);
+    --workspace-content-view-panel-shadow-soft: var(--color-shadow-100);
+    --workspace-content-view-panel-shadow-deep: var(--color-shadow-300);
     --workspace-content-view-surface: var(--color-surface-base);
     --workspace-content-view-surface-muted: var(--color-surface-muted);
     --workspace-content-view-surface-code: var(--color-surface-panel);

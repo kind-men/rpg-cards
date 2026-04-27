@@ -373,7 +373,7 @@
     --sidebar-panel-surface: var(--color-white-98);
     --sidebar-hover-surface: var(--color-surface-panel);
     --sidebar-hover-overlay: var(--color-overlay-muted);
-    --sidebar-panel-shadow: var(--color-shadow-strong);
+    --sidebar-panel-shadow: var(--color-shadow-300);
     height: 100%;
     min-height: 0;
     display: flex;

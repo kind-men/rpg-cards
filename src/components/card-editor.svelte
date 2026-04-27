@@ -766,8 +766,8 @@
     --card-editor-surface-panel-active: var(--color-surface-panel-active);
     --card-editor-surface-overlay: var(--color-white-45);
     --card-editor-hover-overlay: var(--color-overlay-muted);
-    --card-editor-shadow-soft: var(--color-shadow-medium);
-    --card-editor-shadow-strong: var(--color-shadow-strong);
+    --card-editor-shadow-soft: var(--color-shadow-200);
+    --card-editor-shadow-strong: var(--color-shadow-300);
     --card-editor-danger-border: var(--color-danger-border);
     --card-editor-danger-surface: var(--color-danger-surface);
     --card-editor-accent-border: var(--color-accent-border);
@@ -1129,7 +1129,7 @@
     flex: 1 1 auto;
     border: 1px solid var(--card-editor-border-medium);
     border-radius: var(--bs-border-radius);
-    box-shadow: inset 0 1px 2px var(--color-shadow-soft);
+    box-shadow: inset 0 1px 2px var(--color-shadow-50);
   }
 
   :global(.content-editor-textarea .cm-editor.cm-focused) {

@@ -24,7 +24,7 @@
   .docs-toc {
     --docs-toc-border: var(--color-border-soft);
     --docs-toc-surface: var(--color-white-90);
-    --docs-toc-shadow: var(--color-shadow-muted);
+    --docs-toc-shadow: var(--color-shadow-100);
     --docs-toc-title: var(--color-ink-900);
     --docs-toc-link: var(--color-ink-700);
     --docs-toc-link-hover-surface: var(--color-surface-panel);

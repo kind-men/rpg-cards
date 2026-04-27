@@ -278,7 +278,7 @@
     --deck-chip-surface-hover: var(--color-surface-panel-strong);
     --deck-chip-surface-active: var(--color-surface-panel-active);
     --deck-selected-surface: var(--color-surface-selected);
-    --deck-chip-shadow: var(--color-shadow-medium);
+    --deck-chip-shadow: var(--color-shadow-200);
     min-height: 0;
     display: flex;
     flex-direction: column;

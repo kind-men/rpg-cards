@@ -32,29 +32,26 @@
   --color-white-96: rgba(255, 255, 255, 0.96);
   --color-white-98: rgba(255, 255, 255, 0.98);
 
-  --color-shadow-soft: rgba(18, 38, 63, 0.04);
-  --color-shadow-muted: rgba(18, 38, 63, 0.05);
-  --color-shadow-light: rgba(18, 38, 63, 0.06);
-  --color-shadow-medium: rgba(18, 38, 63, 0.08);
-  --color-shadow-strong: rgba(18, 38, 63, 0.12);
-  --color-shadow-deep: rgba(18, 38, 63, 0.14);
-  --color-shadow-intense: rgba(18, 38, 63, 0.18);
-  --color-shadow-intenser: rgba(18, 38, 63, 0.2);
-  --color-shadow-heavy: rgba(18, 38, 63, 0.35);
+  --color-shadow-50: rgba(18, 38, 63, 0.04);
+  --color-shadow-100: rgba(18, 38, 63, 0.06);
+  --color-shadow-200: rgba(18, 38, 63, 0.08);
+  --color-shadow-300: rgba(18, 38, 63, 0.12);
+  --color-shadow-400: rgba(18, 38, 63, 0.18);
+  --color-shadow-500: rgba(18, 38, 63, 0.35);
 
   --color-border-bootstrap: #ced4da;
-  --color-border-soft: var(--color-shadow-medium);
-  --color-border-medium: var(--color-shadow-strong);
-  --color-border-strong: var(--color-shadow-deep);
-  --color-border-intense: var(--color-shadow-intense);
-  --color-border-active: var(--color-shadow-intenser);
+  --color-border-soft: var(--color-shadow-200);
+  --color-border-medium: var(--color-shadow-300);
+  --color-border-strong: var(--color-shadow-300);
+  --color-border-intense: var(--color-shadow-400);
+  --color-border-active: var(--color-shadow-400);
 
-  --color-overlay-faint: var(--color-shadow-soft);
-  --color-overlay-soft: var(--color-shadow-muted);
-  --color-overlay-muted: var(--color-shadow-light);
-  --color-overlay-medium: var(--color-shadow-medium);
-  --color-overlay-strong: var(--color-shadow-deep);
-  --color-overlay-heavy: var(--color-shadow-heavy);
+  --color-overlay-faint: var(--color-shadow-50);
+  --color-overlay-soft: var(--color-shadow-100);
+  --color-overlay-muted: var(--color-shadow-100);
+  --color-overlay-medium: var(--color-shadow-200);
+  --color-overlay-strong: var(--color-shadow-300);
+  --color-overlay-heavy: var(--color-shadow-500);
 
   --color-danger: #8f3535;
   --color-danger-strong: #9a3c3c;

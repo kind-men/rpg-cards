@@ -101,6 +101,8 @@
       }
     }));
   };
+
+  const getCardDisplayTitle = (card: Card) => card.title || 'Untitled card';
 </script>
 
 <ConfirmationDialog let:confirm={confirmThis} danger>
@@ -217,7 +219,7 @@
               <span class="deck-row-icon">
                 <Icon name="phone" />
               </span>
-              <span class="deck-row-title">{card.title}</span>
+              <span class="deck-row-title">{getCardDisplayTitle(card)}</span>
             </div>
             <div class="deck-row-actions">
               <button
@@ -243,8 +245,8 @@
                   e.stopPropagation();
                   confirmThis({
                     func: () => handleDeleteCard(index),
-                    title: `Delete ${card.title}`,
-                    body: `Are you sure you want to delete ${card.title}?`
+                    title: `Delete ${getCardDisplayTitle(card)}`,
+                    body: `Are you sure you want to delete ${getCardDisplayTitle(card)}?`
                   });
                 }}
               >

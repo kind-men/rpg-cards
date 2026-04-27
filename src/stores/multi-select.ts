@@ -36,10 +36,15 @@ function createMultiSelect() {
 }
 
 export const multiSelect = createMultiSelect();
+let isSyncingFromCurrentCard = false;
 
 multiSelect.subscribe((current) => {
   if (browser) {
     localStorage.setItem('multiSelect', JSON.stringify(Array.from(current.values())));
+  }
+
+  if (isSyncingFromCurrentCard) {
+    return;
   }
 
   if (current.size === 1) {
@@ -50,8 +55,13 @@ multiSelect.subscribe((current) => {
 });
 
 currentCard.subscribe((current) => {
+  isSyncingFromCurrentCard = true;
+
   if (current > -1) {
-    multiSelect.clear();
-    multiSelect.add(current);
+    multiSelect.set(new Set([current]));
+  } else if (current === -1) {
+    multiSelect.set(new Set());
   }
+
+  isSyncingFromCurrentCard = false;
 });

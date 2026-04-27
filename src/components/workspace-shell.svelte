@@ -127,7 +127,9 @@
 
   {#if isEditorView()}
     <SidebarContainer side="right" width={rightPanelWidth} on:resizestart={startResize}>
-      <CardEditor />
+      {#key $currentCard}
+        <CardEditor />
+      {/key}
     </SidebarContainer>
   {/if}
 </div>

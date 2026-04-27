@@ -1,0 +1,25 @@
+[
+  {
+    "count": 1,
+    "color": "#7a5a3a",
+    "title": "Item Template",
+    "icon": "round-shield",
+    "icon_back": "round-shield",
+    "contents": [
+      "subtitle | Wondrous item",
+      "rule",
+      "property | Rarity | Uncommon",
+      "property | Attunement | No",
+      "rule",
+      "text | Describe the item's purpose and fantasy here.",
+      "section | Effect",
+      "text | Explain what happens when the item is used.",
+      "section | Notes",
+      "text | Add charges, limitations, or crafting notes here."
+    ],
+    "tags": ["template", "item"],
+    "layout": {
+      "show_title": true
+    }
+  }
+]

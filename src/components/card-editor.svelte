@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import { DEFAULT_LAYOUT } from '$lib/defaults';
+  import { CARD_TEMPLATES } from '$lib/card-templates';
   import extend from 'just-extend';
   import { tick } from 'svelte';
   import {
@@ -14,6 +16,7 @@
   import {
     getContentAsString,
     normalizeCardbackImages,
+    parseCards,
     parseCardContents
   } from '../lib/card-json-parser';
   import type Card from '../model/card';
@@ -24,6 +27,7 @@
     CardBackMode
   } from '../model/card';
   import { currentCard, deck, multiSelect } from '../stores';
+  import { settings } from '../stores/settings';
   import CardContentEditor from './card-content-editor.svelte';
   import ColorInput from './color-input.svelte';
   import CssEditor from './css-editor.svelte';
@@ -34,6 +38,7 @@
   import TextEditor from './text-editor.svelte';
 
   let card: Card = $deck[$currentCard];
+  let cardIndex = $currentCard;
   let editorPane: 'content' | 'style' = 'content';
   let contentEditorMode: 'individual' | 'textfield' = 'individual';
   let setCollapsedVersion = 0;
@@ -41,12 +46,18 @@
   let hasExpandedContentItems = false;
   let isEditingName = false;
   let textFieldContent = getContentAsString(card?.contents);
-  let nameInput: HTMLInputElement;
+  let wizardName = '';
+  let selectedTemplateId = '';
+  let wizardError = '';
+  let isApplyingTemplate = false;
   $: isMultiEditing = $multiSelect.size > 1;
   $: cardbackMode = card?.cardback_mode ?? 'icon';
   $: cardbackImages = card?.cardback_images ?? [];
   $: hasTitleContent = card?.contents?.some((content) => content.type === 'cardtitle') ?? false;
   $: isTitleVisible = hasTitleContent || card?.layout?.show_title !== false;
+  $: selectedDeckCard = $currentCard > -1 ? $deck[$currentCard] : undefined;
+  $: isWizardVisible =
+    !isMultiEditing && Boolean(selectedDeckCard) && (selectedDeckCard.contents?.length ?? 0) === 0;
   const cardbackSizeOptions: { value: CardBackImageSizePreset; label: string }[] = [
     { value: 'cover', label: 'Cover' },
     { value: 'contain', label: 'Contain' },
@@ -105,7 +116,11 @@
       return;
     }
 
-    deck.setCard($currentCard, card);
+    if (cardIndex < 0) {
+      return;
+    }
+
+    deck.setCard(cardIndex, card);
 
     if (contentEditorMode !== 'textfield') {
       textFieldContent = getContentAsString(card?.contents);
@@ -115,14 +130,20 @@
   const onCurrentCardChanged = () => {
     if ($currentCard < 0) {
       card = undefined;
+      cardIndex = $currentCard;
       isEditingName = false;
       return;
     }
 
     card = $deck[$currentCard];
+    cardIndex = $currentCard;
     ensureCardbackState(card);
     textFieldContent = getContentAsString(card?.contents);
     isEditingName = false;
+    wizardName = card?.title ?? '';
+    selectedTemplateId = '';
+    wizardError = '';
+    isApplyingTemplate = false;
     setCollapsed = true;
     setCollapsedVersion += 1;
     hasExpandedContentItems = false;
@@ -130,6 +151,15 @@
 
   const updateCardContents = () => {
     try {
+      if (!card || contentEditorMode !== 'textfield' || isWizardVisible) {
+        return;
+      }
+
+      if (!textFieldContent?.trim()) {
+        card.contents = [];
+        return;
+      }
+
       card.contents = parseCardContents(textFieldContent?.split('\n')) ?? card.contents;
     } catch (error) {}
   };
@@ -143,9 +173,11 @@
   const handleMultiEditingChanging = () => {
     if (isMultiEditing) {
       card = createMultiCard($deck.filter((_, index) => $multiSelect.has(index))) as Card;
+      cardIndex = -1;
       return;
     }
     card = $deck[$currentCard];
+    cardIndex = $currentCard;
     ensureCardbackState(card);
   };
   $: $multiSelect, isMultiEditing !== undefined && handleMultiEditingChanging();
@@ -215,8 +247,11 @@
     if (!isEditingName) {
       isEditingName = true;
       await tick();
-      nameInput?.focus();
-      nameInput?.select();
+      const input = document.getElementById('name');
+      if (input instanceof HTMLInputElement) {
+        input.focus();
+        input.select();
+      }
       return;
     }
 
@@ -238,143 +273,265 @@
     setCollapsedVersion += 1;
     hasExpandedContentItems = false;
   };
+
+  const cloneTemplateCard = (templateCard: Card, title: string): Card => ({
+    ...templateCard,
+    title,
+    tags: [...(templateCard.tags ?? [])],
+    contents: (templateCard.contents ?? []).map((content) => ({ ...content })),
+    layout: { ...(templateCard.layout ?? {}) },
+    cardback_images: (templateCard.cardback_images ?? []).map((image) => ({ ...image }))
+  });
+
+  const handleCompleteWizard = async () => {
+    const nextTitle = wizardName.trim();
+
+    if (!card || !nextTitle || !selectedTemplateId || cardIndex < 0) {
+      return;
+    }
+
+    wizardError = '';
+    isApplyingTemplate = true;
+
+    try {
+      const templateDefinition = CARD_TEMPLATES.find(
+        (template) => template.id === selectedTemplateId
+      );
+
+      if (!templateDefinition) {
+        wizardError = 'Choose a valid starting point before continuing.';
+        return;
+      }
+
+      const jsonText = await fetch(`${base}${templateDefinition.path}`).then((res) => {
+        if (!res.ok) {
+          throw new Error(`Template request failed with ${res.status}`);
+        }
+
+        return res.text();
+      });
+      const [templateCard] = parseCards(
+        jsonText,
+        $settings.convertFirstSubtitle,
+        $settings.convertDndSpellblock
+      );
+
+      if (!templateCard) {
+        wizardError = 'This template did not contain a usable card.';
+        return;
+      }
+
+      card = cloneTemplateCard(templateCard, nextTitle);
+      ensureCardbackState(card);
+      deck.setCard(cardIndex, card);
+      textFieldContent = getContentAsString(card.contents);
+    } catch (error) {
+      console.error(error);
+      wizardError = 'The selected template could not be loaded.';
+    } finally {
+      isApplyingTemplate = false;
+    }
+  };
 </script>
 
 <div class="card-editor-content">
   {#if card}
     <Form class="sidebar-form">
       <div class="card-editor-shell">
-        <div class="card-editor-header-shell">
-          <div class="card-editor-header">
-            <div class="sidebar-field">
-              <div class="name-field-row">
-                {#if isEditingName}
-                  <Input
-                    bind:this={nameInput}
-                    type="text"
-                    name="name"
-                    id="name"
-                    bind:value={card.title}
-                    placeholder={isMultiEditing && card.title === null ? '*' : 'Name'}
-                    on:blur={stopEditingName}
-                    on:keydown={(event) => {
-                      if (event.key === 'Enter') {
-                        event.preventDefault();
-                        stopEditingName();
-                      }
-                    }}
-                  />
-                {:else}
-                  <div class="name-display" id="name">
-                    {card.title || (isMultiEditing && card.title === null ? '*' : 'Untitled card')}
-                  </div>
-                {/if}
-
-                <Button
-                  type="button"
-                  color="link"
-                  class="editor-icon-button"
-                  aria-label={isEditingName ? 'Finish editing card name' : 'Edit card name'}
-                  on:click={startEditingName}
-                >
-                  <Icon name={isEditingName ? 'check-lg' : 'pencil'} />
-                </Button>
-                <Button
-                  type="button"
-                  color="link"
-                  class="editor-icon-button"
-                  aria-label={hasTitleContent
-                    ? 'Title visibility is controlled by a title content block'
-                    : isTitleVisible
-                      ? 'Hide title on card'
-                      : 'Show title on card'}
-                  aria-pressed={isTitleVisible}
-                  disabled={hasTitleContent}
-                  on:click={toggleTitleVisibility}
-                >
-                  <Icon name={isTitleVisible ? 'eye' : 'eye-slash'} />
-                </Button>
+        {#if isWizardVisible}
+          <div class="card-setup-wizard">
+            <div class="wizard-hero">
+              <img class="wizard-logo" src={`${base}/logo_512.png`} alt="RPG Cards logo" />
+              <div class="wizard-copy">
+                <h2 class="wizard-title">Create a new card</h2>
+                <p class="wizard-text">
+                  Give your card a name, then choose whether to begin from a project template or a
+                  clean starter card.
+                </p>
               </div>
             </div>
-          </div>
 
-          <div class="editor-pane-switch" role="tablist" aria-label="Card editor mode">
-            <Button
-              type="button"
-              color="link"
-              class={`editor-pane-toggle ${editorPane === 'content' ? 'editor-pane-toggle-active' : ''}`}
-              role="tab"
-              aria-selected={editorPane === 'content'}
-              on:click={() => (editorPane = 'content')}
-            >
-              Content
-            </Button>
-            <Button
-              type="button"
-              color="link"
-              class={`editor-pane-toggle ${editorPane === 'style' ? 'editor-pane-toggle-active' : ''}`}
-              role="tab"
-              aria-selected={editorPane === 'style'}
-              on:click={() => (editorPane = 'style')}
-            >
-              Style
-            </Button>
-          </div>
-        </div>
+            <SidebarSection title="Card setup">
+              <div class="sidebar-field">
+                <Label class="col-form-label" for="wizard-card-name">Card name</Label>
+                <Input
+                  id="wizard-card-name"
+                  type="text"
+                  bind:value={wizardName}
+                  placeholder="Enter card name"
+                  on:keydown={(event) => {
+                    if (event.key === 'Enter' && wizardName.trim() && selectedTemplateId) {
+                      event.preventDefault();
+                      void handleCompleteWizard();
+                    }
+                  }}
+                />
+              </div>
 
-        <div class="card-editor-sections-scroll">
-          {#if editorPane === 'content'}
-        <SidebarSection grow={contentEditorMode === 'textfield'}>
-          <svelte:fragment slot="header">
-            <h2 class="sidebar-section-title">Contents</h2>
-            <div class="contents-header-actions">
-              <Button
-                type="button"
-                color="link"
-                class="editor-icon-button"
-                aria-label={hasExpandedContentItems
-                  ? 'Collapse all content items'
-                  : 'Expand all content items'}
-                on:click={toggleAllContentItems}
-              >
-                <Icon name={hasExpandedContentItems ? 'arrows-collapse' : 'arrows-expand'} />
-              </Button>
-              <Button
-                type="button"
-                color="link"
-                class={`editor-icon-button ${contentEditorMode === 'textfield' ? 'editor-mode-toggle editor-mode-toggle-active' : ''}`}
-                aria-label="Toggle textfield mode"
-                aria-pressed={contentEditorMode === 'textfield'}
-                on:click={toggleContentEditorMode}
-              >
-                <Icon name="code-slash" />
-              </Button>
-            </div>
-          </svelte:fragment>
-              {#if !isMultiEditing && card.contents}
-                <div class="sidebar-field" class:sidebar-field-grow={contentEditorMode === 'textfield'}>
-                  {#if contentEditorMode === 'individual'}
-                    <CardContentEditor
-                      bind:contents={card.contents}
-                      {setCollapsedVersion}
-                      {setCollapsed}
-                      on:collapsechange={(event) =>
-                        (hasExpandedContentItems = event.detail.hasExpandedItems)}
+              <div class="sidebar-field">
+                <div class="wizard-choice-label">Choose how to start</div>
+                <div class="wizard-choice-grid" role="radiogroup" aria-label="Card template choice">
+                  {#each CARD_TEMPLATES as template}
+                    <button
+                      type="button"
+                      class={`wizard-choice-card ${selectedTemplateId === template.id ? 'wizard-choice-card-active' : ''}`}
+                      aria-pressed={selectedTemplateId === template.id}
+                      on:click={() => (selectedTemplateId = template.id)}
+                    >
+                      <span class="wizard-choice-title">{template.label}</span>
+                      <span class="wizard-choice-description">{template.description}</span>
+                    </button>
+                  {/each}
+                </div>
+              </div>
+
+              {#if wizardError}
+                <div class="wizard-error" role="alert">{wizardError}</div>
+              {/if}
+
+              <div class="wizard-actions">
+                <Button
+                  type="button"
+                  color="primary"
+                  disabled={!wizardName.trim() || !selectedTemplateId || isApplyingTemplate}
+                  on:click={handleCompleteWizard}
+                >
+                  {isApplyingTemplate ? 'Preparing...' : 'Continue'}
+                </Button>
+              </div>
+            </SidebarSection>
+          </div>
+        {:else}
+          <div class="card-editor-header-shell">
+            <div class="card-editor-header">
+              <div class="sidebar-field">
+                <div class="name-field-row">
+                  {#if isEditingName}
+                    <Input
+                      type="text"
+                      name="name"
+                      id="name"
+                      bind:value={card.title}
+                      placeholder={isMultiEditing && card.title === null ? '*' : 'Name'}
+                      on:blur={stopEditingName}
+                      on:keydown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.preventDefault();
+                          stopEditingName();
+                        }
+                      }}
                     />
                   {:else}
-                    <div class="raw-content-editor">
-                      <TextEditor
-                        id="content-editor-raw"
-                        class="content-editor-textarea"
-                        bind:value={textFieldContent}
-                      />
+                    <div class="name-display" id="name">
+                      {card.title || (isMultiEditing && card.title === null ? '*' : 'Untitled card')}
                     </div>
                   {/if}
+
+                  <Button
+                    type="button"
+                    color="link"
+                    class="editor-icon-button"
+                    aria-label={isEditingName ? 'Finish editing card name' : 'Edit card name'}
+                    on:click={startEditingName}
+                  >
+                    <Icon name={isEditingName ? 'check-lg' : 'pencil'} />
+                  </Button>
+                  <Button
+                    type="button"
+                    color="link"
+                    class="editor-icon-button"
+                    aria-label={hasTitleContent
+                      ? 'Title visibility is controlled by a title content block'
+                      : isTitleVisible
+                        ? 'Hide title on card'
+                        : 'Show title on card'}
+                    aria-pressed={isTitleVisible}
+                    disabled={hasTitleContent}
+                    on:click={toggleTitleVisibility}
+                  >
+                    <Icon name={isTitleVisible ? 'eye' : 'eye-slash'} />
+                  </Button>
                 </div>
-              {/if}
-          </SidebarSection>
-          {:else}
-            <SidebarSection title="Card Style">
+              </div>
+            </div>
+
+            <div class="editor-pane-switch" role="tablist" aria-label="Card editor mode">
+              <Button
+                type="button"
+                color="link"
+                class={`editor-pane-toggle ${editorPane === 'content' ? 'editor-pane-toggle-active' : ''}`}
+                role="tab"
+                aria-selected={editorPane === 'content'}
+                on:click={() => (editorPane = 'content')}
+              >
+                Content
+              </Button>
+              <Button
+                type="button"
+                color="link"
+                class={`editor-pane-toggle ${editorPane === 'style' ? 'editor-pane-toggle-active' : ''}`}
+                role="tab"
+                aria-selected={editorPane === 'style'}
+                on:click={() => (editorPane = 'style')}
+              >
+                Style
+              </Button>
+            </div>
+          </div>
+
+          <div class="card-editor-sections-scroll">
+            {#if editorPane === 'content'}
+              <SidebarSection grow={contentEditorMode === 'textfield'}>
+                <svelte:fragment slot="header">
+                  <h2 class="sidebar-section-title">Contents</h2>
+                  <div class="contents-header-actions">
+                    <Button
+                      type="button"
+                      color="link"
+                      class="editor-icon-button"
+                      aria-label={hasExpandedContentItems
+                        ? 'Collapse all content items'
+                        : 'Expand all content items'}
+                      on:click={toggleAllContentItems}
+                    >
+                      <Icon name={hasExpandedContentItems ? 'arrows-collapse' : 'arrows-expand'} />
+                    </Button>
+                    <Button
+                      type="button"
+                      color="link"
+                      class={`editor-icon-button ${contentEditorMode === 'textfield' ? 'editor-mode-toggle editor-mode-toggle-active' : ''}`}
+                      aria-label="Toggle textfield mode"
+                      aria-pressed={contentEditorMode === 'textfield'}
+                      on:click={toggleContentEditorMode}
+                    >
+                      <Icon name="code-slash" />
+                    </Button>
+                  </div>
+                </svelte:fragment>
+                {#if !isMultiEditing && card.contents}
+                  <div class="sidebar-field" class:sidebar-field-grow={contentEditorMode === 'textfield'}>
+                    {#if contentEditorMode === 'individual'}
+                      <CardContentEditor
+                        bind:contents={card.contents}
+                        {setCollapsedVersion}
+                        {setCollapsed}
+                        on:collapsechange={(event) =>
+                          (hasExpandedContentItems = event.detail.hasExpandedItems)}
+                      />
+                    {:else}
+                      <div class="raw-content-editor">
+                        <TextEditor
+                          id="content-editor-raw"
+                          class="content-editor-textarea"
+                          bind:value={textFieldContent}
+                        />
+                      </div>
+                    {/if}
+                  </div>
+                {/if}
+              </SidebarSection>
+            {:else}
+              <SidebarSection title="Card Style">
               <div class="layout-size-fields">
                 <div class="sidebar-field">
                   <Label class="col-form-label" for="title-size">Title size</Label>
@@ -563,8 +720,9 @@
                       </div>
                     {/if}
             </SidebarSection>
-          {/if}
-        </div>
+            {/if}
+          </div>
+        {/if}
       </div>
     </Form>
   {:else}
@@ -709,6 +867,113 @@
     display: grid;
     gap: 0.5rem;
     background: #ffffff;
+  }
+
+  .card-setup-wizard {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .wizard-hero {
+    padding: 1rem;
+    display: grid;
+    gap: 0.85rem;
+    justify-items: center;
+    border: 1px solid rgba(18, 38, 63, 0.08);
+    border-radius: 1rem;
+    background:
+      linear-gradient(180deg, rgba(244, 239, 228, 0.95), rgba(255, 255, 255, 0.98)),
+      #ffffff;
+    text-align: center;
+  }
+
+  .wizard-logo {
+    width: 4.75rem;
+    height: 4.75rem;
+    display: block;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 18px rgba(18, 38, 63, 0.12));
+  }
+
+  .wizard-copy {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .wizard-title {
+    margin: 0;
+    color: #223047;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .wizard-text {
+    margin: 0;
+    color: #5f6d80;
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+
+  .wizard-choice-label {
+    margin-bottom: 0.45rem;
+    color: #223047;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .wizard-choice-grid {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .wizard-choice-card {
+    padding: 0.8rem 0.85rem;
+    display: grid;
+    gap: 0.25rem;
+    text-align: left;
+    border: 1px solid rgba(18, 38, 63, 0.12);
+    border-radius: 0.8rem;
+    background: #faf8f3;
+    color: #223047;
+    transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease,
+      transform 120ms ease;
+  }
+
+  .wizard-choice-card:hover {
+    background: #f6f1e7;
+    border-color: rgba(18, 38, 63, 0.18);
+  }
+
+  .wizard-choice-card-active {
+    background: #efe6d3;
+    border-color: rgba(74, 104, 152, 0.45);
+    box-shadow: 0 0 0 1px rgba(74, 104, 152, 0.12);
+    transform: translateY(-1px);
+  }
+
+  .wizard-choice-title {
+    font-size: 0.86rem;
+    font-weight: 700;
+  }
+
+  .wizard-choice-description {
+    color: #5f6d80;
+    font-size: 0.76rem;
+    line-height: 1.45;
+  }
+
+  .wizard-error {
+    padding: 0.65rem 0.75rem;
+    border: 1px solid rgba(154, 60, 60, 0.18);
+    border-radius: 0.7rem;
+    background: rgba(154, 60, 60, 0.06);
+    color: #8f3535;
+    font-size: 0.78rem;
+  }
+
+  .wizard-actions {
+    display: flex;
+    justify-content: flex-end;
   }
 
   .card-editor-shell {

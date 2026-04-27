@@ -23,5 +23,11 @@ export const CARD_TEMPLATES: CardTemplateDefinition[] = [
     label: 'Item Card',
     description: 'An equipment-style starter with sections for traits and effects.',
     path: '/card-templates/item-template.json'
+  },
+  {
+    id: 'character',
+    label: 'Character Card',
+    description: 'A character-style starter with role, stats, and abilities.',
+    path: '/card-templates/character-template.json'
   }
 ];

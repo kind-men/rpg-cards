@@ -4,31 +4,34 @@ const timestamp = {
   }
 };
 const build = [
-  "/rpg-cards/_app/start-38995e7f.js",
+  "/rpg-cards/_app/start-44c293c3.js",
   "/rpg-cards/_app/pages/__layout.svelte-c9c3eec1.js",
   "/rpg-cards/_app/assets/pages/__layout.svelte-9c43a6c2.css",
   "/rpg-cards/_app/assets/Offcanvas.svelte_svelte_type_style_lang-82c1b07d.css",
   "/rpg-cards/_app/error.svelte-bb2d8011.js",
-  "/rpg-cards/_app/pages/index.svelte-567afcea.js",
-  "/rpg-cards/_app/pages/output.svelte-60c05b7f.js",
+  "/rpg-cards/_app/pages/index.svelte-dd763f67.js",
+  "/rpg-cards/_app/pages/output.svelte-c3564995.js",
   "/rpg-cards/_app/assets/pages/output.svelte-07eb8463.css",
-  "/rpg-cards/_app/pages/docs/index.svelte-8179885e.js",
+  "/rpg-cards/_app/pages/docs/index.svelte-7c467da0.js",
   "/rpg-cards/_app/assets/pages/docs/index.svelte-8547cfd7.css",
-  "/rpg-cards/_app/pages/info.svelte-1bfe7475.js",
+  "/rpg-cards/_app/pages/info.svelte-edb06d43.js",
   "/rpg-cards/_app/chunks/index-40ae826d.js",
   "/rpg-cards/_app/chunks/index-669e8a70.js",
   "/rpg-cards/_app/chunks/paths-396f020f.js",
   "/rpg-cards/_app/chunks/singletons-9d21ac94.js",
-  "/rpg-cards/_app/chunks/workspace-shell-8dd9e10b.js",
-  "/rpg-cards/_app/assets/workspace-shell-383cff87.css",
-  "/rpg-cards/_app/chunks/card-back-527087ed.js",
+  "/rpg-cards/_app/chunks/workspace-shell-6deb943f.js",
+  "/rpg-cards/_app/assets/workspace-shell-6793c5a5.css",
+  "/rpg-cards/_app/chunks/card-back-a1b57751.js",
   "/rpg-cards/_app/assets/card-back-c05396c1.css",
   "/rpg-cards/_app/chunks/workspace-content-view-2be596a2.js",
   "/rpg-cards/_app/assets/workspace-content-view-8cfe133f.css",
-  "/rpg-cards/_app/chunks/index-75aea03e.js"
+  "/rpg-cards/_app/chunks/index-e98010f5.js"
 ];
 const files = [
   "/rpg-cards/.nojekyll",
+  "/rpg-cards/card-templates/item-template.json",
+  "/rpg-cards/card-templates/scratch-template.json",
+  "/rpg-cards/card-templates/spell-template.json",
   "/rpg-cards/colors.json",
   "/rpg-cards/favicon.png",
   "/rpg-cards/fonts/draconis-font/Draconis.ttf",

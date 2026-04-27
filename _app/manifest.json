@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-44c293c3.js",
+    "file": "start-6b540fa8.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -42,13 +42,13 @@
     ]
   },
   "src/routes/index.svelte": {
-    "file": "pages/index.svelte-dd763f67.js",
+    "file": "pages/index.svelte-2ff2c43f.js",
     "src": "src/routes/index.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-40ae826d.js",
-      "_workspace-shell-6deb943f.js",
+      "_workspace-shell-188fa992.js",
       "_paths-396f020f.js",
       "_singletons-9d21ac94.js",
       "_card-back-a1b57751.js",
@@ -73,14 +73,14 @@
     ]
   },
   "src/routes/docs/index.svelte": {
-    "file": "pages/docs/index.svelte-7c467da0.js",
+    "file": "pages/docs/index.svelte-8b4fb49a.js",
     "src": "src/routes/docs/index.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-40ae826d.js",
       "_workspace-content-view-2be596a2.js",
-      "_workspace-shell-6deb943f.js",
+      "_workspace-shell-188fa992.js",
       "_paths-396f020f.js",
       "_card-back-a1b57751.js",
       "_singletons-9d21ac94.js",
@@ -92,14 +92,14 @@
     ]
   },
   "src/routes/info.svelte": {
-    "file": "pages/info.svelte-edb06d43.js",
+    "file": "pages/info.svelte-18f811cd.js",
     "src": "src/routes/info.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-40ae826d.js",
       "_paths-396f020f.js",
-      "_workspace-shell-6deb943f.js",
+      "_workspace-shell-188fa992.js",
       "_index-669e8a70.js",
       "_workspace-content-view-2be596a2.js",
       "_singletons-9d21ac94.js",
@@ -124,8 +124,8 @@
   "_singletons-9d21ac94.js": {
     "file": "chunks/singletons-9d21ac94.js"
   },
-  "_workspace-shell-6deb943f.js": {
-    "file": "chunks/workspace-shell-6deb943f.js",
+  "_workspace-shell-188fa992.js": {
+    "file": "chunks/workspace-shell-188fa992.js",
     "imports": [
       "_index-40ae826d.js",
       "_paths-396f020f.js",
@@ -137,7 +137,7 @@
       "node_modules/.pnpm/@toast-ui+editor@3.2.2/node_modules/@toast-ui/editor/dist/esm/index.js"
     ],
     "css": [
-      "assets/workspace-shell-6793c5a5.css",
+      "assets/workspace-shell-553fc70c.css",
       "assets/Offcanvas.svelte_svelte_type_style_lang-82c1b07d.css"
     ]
   },
@@ -161,11 +161,11 @@
     ]
   },
   "node_modules/.pnpm/@toast-ui+editor@3.2.2/node_modules/@toast-ui/editor/dist/esm/index.js": {
-    "file": "chunks/index-e98010f5.js",
+    "file": "chunks/index-94c7ad7b.js",
     "src": "node_modules/.pnpm/@toast-ui+editor@3.2.2/node_modules/@toast-ui/editor/dist/esm/index.js",
     "isDynamicEntry": true,
     "imports": [
-      "_workspace-shell-6deb943f.js",
+      "_workspace-shell-188fa992.js",
       "_index-40ae826d.js",
       "_paths-396f020f.js",
       "_singletons-9d21ac94.js",

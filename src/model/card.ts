@@ -10,6 +10,22 @@ export interface CardBackImage {
   size?: string;
 }
 
+export interface BaseCardContent {
+  id?: string;
+}
+
+export interface FlatCardContent extends BaseCardContent {
+  type: Exclude<CardContentTypeV2, 'row'>;
+  content: string;
+}
+
+export interface RowCardContent extends BaseCardContent {
+  type: 'row';
+  columns: CardContent[][];
+}
+
+export type CardContent = FlatCardContent | RowCardContent;
+
 export default interface Card {
   count: number;
   color: ColorResolvable;
@@ -24,12 +40,6 @@ export default interface Card {
   contents: CardContent[];
   tags: string[];
   layout: CardLayout;
-}
-
-export interface CardContent {
-  type: CardContentTypeV2;
-  content: string;
-  id?: string;
 }
 
 export interface CardLayout {

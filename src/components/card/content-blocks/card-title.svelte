@@ -1,8 +1,8 @@
 <script lang="ts">
   import type Card from '$model/card';
-  import type { CardContent } from '$model/card';
+  import type { FlatCardContent } from '$model/card';
 
-  export let content: CardContent;
+  export let content: FlatCardContent;
   export let card: Card;
   $: void content;
 </script>

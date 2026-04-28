@@ -14,6 +14,7 @@ import Fill from '$components/card/content-blocks/fill.svelte';
 import Bullet from '$components/card/content-blocks/bullet.svelte';
 import Picture from '$components/card/content-blocks/picture.svelte';
 import Footer from '$components/card/content-blocks/footer.svelte';
+import Row from '$components/card/content-blocks/row.svelte';
 
 const createCardContentTypes = <
   T extends readonly CardContentTypeDescriptor[] & Array<{ name: V }>,
@@ -133,6 +134,13 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
       { name: 'Right text', description: 'Right-aligned footer text', optional: true }
     ],
     renderComponent: Footer
+  },
+  {
+    name: 'row',
+    label: 'Row',
+    description: 'A horizontal row with evenly sized columns that can contain nested content.',
+    params: [],
+    renderComponent: Row
   },
   {
     name: 'dndstats',

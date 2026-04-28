@@ -1,8 +1,8 @@
 <script lang="ts">
   import { renderText } from '$lib/card-render-util';
-  import type { CardContent } from '$model/card';
+  import type { FlatCardContent } from '$model/card';
 
-  export let content: CardContent;
+  export let content: FlatCardContent;
 </script>
 
 <ul class="bullet">

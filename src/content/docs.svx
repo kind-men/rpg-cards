@@ -78,8 +78,10 @@
     sections and convert D&amp;D spell properties into spell blocks.
   </p>
   <p>
-    In plain-text content mode, each line is written as <code>type | value | value</code>. The
-    same pipe-separated format is also used when importing legacy <code>contents</code> arrays.
+    In plain-text content mode, flat blocks use <code>type | value | value</code>. Nested rows use
+    indentation: a <code>row</code> line contains indented <code>column</code> entries, and each
+    column contains more indented content blocks. The same pipe-separated format is also used when
+    importing legacy <code>contents</code> arrays.
   </p>
 </section>
 
@@ -129,9 +131,24 @@
       },
       "contents": [
         {
-          "type": "text",
-          "content": "Choose one creature you can see within range.",
-          "id": "04ea19f0-2655-44d4-9de5-595c9b554b75"
+          "type": "row",
+          "id": "04ea19f0-2655-44d4-9de5-595c9b554b75",
+          "columns": [
+            [
+              {
+                "type": "text",
+                "content": "Choose one creature you can see within range.",
+                "id": "1a75fbc0-14b1-4285-9d8a-6e4e4f55ec8b"
+              }
+            ],
+            [
+              {
+                "type": "bullet",
+                "content": "Target takes necrotic damage.",
+                "id": "89c7fb26-c2ba-4b28-a0bb-01c7c3dc9b11"
+              }
+            ]
+          ]
         }
       ]
     }
@@ -155,7 +172,7 @@
     <li><code>cardback_border_style</code> (string, optional): cardback border style. Possible values: <code>"none"</code>, <code>"normal"</code></li>
     <li><code>tags</code> (array): list of tags</li>
     <li><code>layout</code> (object): per-card layout settings</li>
-    <li><code>contents</code> (array): list of content blocks using object entries with <code>type</code>, <code>content</code>, and optional <code>id</code>. See <a href="#contents">Contents JSON data</a>.</li>
+    <li><code>contents</code> (array): list of content blocks using object entries with <code>type</code> and optional <code>id</code>. Most blocks store <code>content</code>; <code>row</code> stores <code>columns</code>. See <a href="#contents">Contents JSON data</a>.</li>
   </ul>
   <p>Example:</p>
   <pre><code>{`{
@@ -179,9 +196,24 @@
   },
   "contents": [
     {
-      "type": "text",
-      "content": "Choose one creature you can see within range.",
-      "id": "04ea19f0-2655-44d4-9de5-595c9b554b75"
+      "type": "row",
+      "id": "04ea19f0-2655-44d4-9de5-595c9b554b75",
+      "columns": [
+        [
+          {
+            "type": "text",
+            "content": "Choose one creature you can see within range.",
+            "id": "1a75fbc0-14b1-4285-9d8a-6e4e4f55ec8b"
+          }
+        ],
+        [
+          {
+            "type": "bullet",
+            "content": "Target takes necrotic damage.",
+            "id": "89c7fb26-c2ba-4b28-a0bb-01c7c3dc9b11"
+          }
+        ]
+      ]
     }
   ]
 }`}</code></pre>
@@ -220,12 +252,14 @@
   <p>Content objects have the following fields:</p>
   <ul>
     <li><code>type</code> (string): content type used by the renderer. See <a href="#content-types">the table below</a>.</li>
-    <li><code>content</code> (string): content parameters separated by a pipe <code>|</code></li>
+    <li><code>content</code> (string): content parameters separated by a pipe <code>|</code> for non-row blocks</li>
+    <li><code>columns</code> (array): nested column lists for <code>row</code> blocks only</li>
     <li><code>id</code> (string, optional): unique id used by the editor</li>
   </ul>
   <p>
-    The plain-text editor uses the same content encoding, one block per line. Newlines inside a
-    block are stored as escaped <code>\\n</code> sequences in that mode.
+    <code>footer</code> remains a top-level block and is not valid inside a <code>row</code>
+    column. The plain-text editor uses the same content encoding, one block per line. Newlines
+    inside a block are stored as escaped <code>\\n</code> sequences in that mode.
   </p>
 
   <h4 id="content-types">Content types</h4>
@@ -233,6 +267,26 @@
 
   <p>Examples:</p>
   <pre><code>{`[
+  {
+    "type": "row",
+    "id": "0d50737a-8fb3-4fc8-a21a-66211c447bab",
+    "columns": [
+      [
+        {
+          "type": "text",
+          "content": "Left column text",
+          "id": "04ea19f0-2655-44d4-9de5-595c9b554b75"
+        }
+      ],
+      [
+        {
+          "type": "picture",
+          "content": "https://example.com/spell.png | 90px",
+          "id": "49dc81d8-a8d8-4e68-9f1c-01839f8ed47f"
+        }
+      ]
+    ]
+  },
   {
     "type": "dndspellblock",
     "content": "1 action | Self (15-foot radius) | V | Instantaneous",
@@ -249,6 +303,20 @@
     "id": "04ea19f0-2655-44d4-9de5-595c9b554b75"
   }
 ]`}</code></pre>
+
+  <p>Plain-text example:</p>
+  <pre><code>{`section | Traits
+row
+  column
+    text | Left column text
+    row
+      column
+        bullet | Nested A
+      column
+        bullet | Nested B
+  column
+    picture | https://example.com/spell.png | 90px
+footer | left | right`}</code></pre>
 </section>
 
 <section class="docs-section" id="icons">

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { CardContent } from '$model/card';
+  import type { FlatCardContent } from '$model/card';
 
-  export let content: CardContent;
+  export let content: FlatCardContent;
 
   $: height = Number.parseFloat(content.content) || undefined;
 </script>

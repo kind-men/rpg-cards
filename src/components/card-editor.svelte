@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { base } from '$app/paths';
   import { DEFAULT_LAYOUT } from '$lib/defaults';
-  import { CARD_TEMPLATES } from '$lib/card-templates';
+  import { isFlatCardContent } from '$lib/card-content';
   import extend from 'just-extend';
   import { tick } from 'svelte';
   import {
@@ -14,9 +13,9 @@
   } from 'sveltestrap';
   import { createMultiCard, removeEmpty } from '../lib/card-builder';
   import {
+    CardContentError,
     getContentAsString,
     normalizeCardbackImages,
-    parseCards,
     parseCardContents
   } from '../lib/card-json-parser';
   import type Card from '../model/card';
@@ -27,8 +26,8 @@
     CardBackMode
   } from '../model/card';
   import { currentCard, deck, multiSelect } from '../stores';
-  import { settings } from '../stores/settings';
   import CardContentEditor from './card-content-editor.svelte';
+  import CardSetupWizard from './card-setup-wizard.svelte';
   import ColorInput from './color-input.svelte';
   import CssEditor from './css-editor.svelte';
   import IconInput from './game-icon-input.svelte';
@@ -45,16 +44,13 @@
   let setCollapsed = true;
   let hasExpandedContentItems = false;
   let isEditingName = false;
+  let rawContentError = '';
   let textFieldContent = getContentAsString(card?.contents);
-  let wizardName = '';
-  let wizardNameError = '';
-  let selectedTemplateId = '';
-  let wizardError = '';
-  let isApplyingTemplate = false;
   $: isMultiEditing = $multiSelect.size > 1;
   $: cardbackMode = card?.cardback_mode ?? 'icon';
   $: cardbackImages = card?.cardback_images ?? [];
-  $: hasTitleContent = card?.contents?.some((content) => content.type === 'cardtitle') ?? false;
+  $: hasTitleContent =
+    card?.contents?.some((content) => isFlatCardContent(content) && content.type === 'cardtitle') ?? false;
   $: isTitleVisible = hasTitleContent || card?.layout?.show_title !== false;
   $: selectedDeckCard = $currentCard > -1 ? $deck[$currentCard] : undefined;
   $: isWizardVisible =
@@ -139,13 +135,9 @@
     card = $deck[$currentCard];
     cardIndex = $currentCard;
     ensureCardbackState(card);
+    rawContentError = '';
     textFieldContent = getContentAsString(card?.contents);
     isEditingName = false;
-    wizardName = card?.title ?? '';
-    wizardNameError = '';
-    selectedTemplateId = '';
-    wizardError = '';
-    isApplyingTemplate = false;
     setCollapsed = true;
     setCollapsedVersion += 1;
     hasExpandedContentItems = false;
@@ -154,16 +146,24 @@
   const updateCardContents = () => {
     try {
       if (!card || contentEditorMode !== 'textfield' || isWizardVisible) {
+        rawContentError = '';
         return;
       }
 
       if (!textFieldContent?.trim()) {
         card.contents = [];
+        rawContentError = '';
         return;
       }
 
       card.contents = parseCardContents(textFieldContent?.split('\n')) ?? card.contents;
-    } catch (error) {}
+      rawContentError = '';
+    } catch (error) {
+      rawContentError =
+        error instanceof CardContentError || error instanceof Error
+          ? error.message
+          : 'The content format is invalid.';
+    }
   };
 
   $: void textFieldContent, updateCardContents();
@@ -274,72 +274,19 @@
     setCollapsed = true;
     setCollapsedVersion += 1;
     hasExpandedContentItems = false;
+    rawContentError = '';
   };
 
-  const cloneTemplateCard = (templateCard: Card, title: string): Card => ({
-    ...templateCard,
-    title,
-    tags: [...(templateCard.tags ?? [])],
-    contents: (templateCard.contents ?? []).map((content) => ({ ...content })),
-    layout: { ...(templateCard.layout ?? {}) },
-    cardback_images: (templateCard.cardback_images ?? []).map((image) => ({ ...image }))
-  });
-
-  const handleCompleteWizard = async () => {
-    const nextTitle = wizardName.trim();
-
-    if (!nextTitle) {
-      wizardNameError = 'Please enter a name for your card.';
+  const handleWizardComplete = (event: CustomEvent<{ card: Card; textFieldContent: string }>) => {
+    if (cardIndex < 0) {
       return;
     }
 
-    wizardNameError = '';
-
-    if (!card || !selectedTemplateId || cardIndex < 0) {
-      return;
-    }
-
-    wizardError = '';
-    isApplyingTemplate = true;
-
-    try {
-      const templateDefinition = CARD_TEMPLATES.find(
-        (template) => template.id === selectedTemplateId
-      );
-
-      if (!templateDefinition) {
-        wizardError = 'Choose a valid starting point before continuing.';
-        return;
-      }
-
-      const jsonText = await fetch(`${base}${templateDefinition.path}`).then((res) => {
-        if (!res.ok) {
-          throw new Error(`Template request failed with ${res.status}`);
-        }
-
-        return res.text();
-      });
-      const [templateCard] = parseCards(
-        jsonText,
-        $settings.convertFirstSubtitle,
-        $settings.convertDndSpellblock
-      );
-
-      if (!templateCard) {
-        wizardError = 'This template did not contain a usable card.';
-        return;
-      }
-
-      card = cloneTemplateCard(templateCard, nextTitle);
-      ensureCardbackState(card);
-      deck.setCard(cardIndex, card);
-      textFieldContent = getContentAsString(card.contents);
-    } catch (error) {
-      console.error(error);
-      wizardError = 'The selected template could not be loaded.';
-    } finally {
-      isApplyingTemplate = false;
-    }
+    card = event.detail.card;
+    ensureCardbackState(card);
+    deck.setCard(cardIndex, card);
+    rawContentError = '';
+    textFieldContent = event.detail.textFieldContent;
   };
 </script>
 
@@ -348,77 +295,9 @@
     <Form class="sidebar-form">
       <div class="card-editor-shell">
         {#if isWizardVisible}
-          <div class="card-setup-wizard">
-            <div class="wizard-hero">
-              <img class="wizard-logo" src={`${base}/logo_512.png`} alt="RPG Cards logo" />
-              <div class="wizard-copy">
-                <h2 class="wizard-title">Create a new card</h2>
-                <p class="wizard-text">
-                  Give your card a name, then choose whether to begin from a project template or a
-                  clean starter card.
-                </p>
-              </div>
-            </div>
-
-            <SidebarSection title="Card setup">
-              <div class="sidebar-field">
-                <Label class="col-form-label" for="wizard-card-name">Card name</Label>
-                <Input
-                  id="wizard-card-name"
-                  type="text"
-                  bind:value={wizardName}
-                  invalid={Boolean(wizardNameError)}
-                  placeholder="Enter card name"
-                  on:input={() => {
-                    if (wizardNameError && wizardName.trim()) {
-                      wizardNameError = '';
-                    }
-                  }}
-                  on:keydown={(event) => {
-                    if (event.key === 'Enter' && selectedTemplateId) {
-                      event.preventDefault();
-                      void handleCompleteWizard();
-                    }
-                  }}
-                />
-                {#if wizardNameError}
-                  <div class="wizard-field-error" role="alert">{wizardNameError}</div>
-                {/if}
-              </div>
-
-              <div class="sidebar-field">
-                <div class="wizard-choice-label">Choose how to start</div>
-                <div class="wizard-choice-grid" role="radiogroup" aria-label="Card template choice">
-                  {#each CARD_TEMPLATES as template}
-                    <button
-                      type="button"
-                      class={`wizard-choice-card ${selectedTemplateId === template.id ? 'wizard-choice-card-active' : ''}`}
-                      aria-pressed={selectedTemplateId === template.id}
-                      on:click={() => (selectedTemplateId = template.id)}
-                    >
-                      <span class="wizard-choice-title">{template.label}</span>
-                      <span class="wizard-choice-description">{template.description}</span>
-                    </button>
-                  {/each}
-                </div>
-              </div>
-
-              {#if wizardError}
-                <div class="wizard-error" role="alert">{wizardError}</div>
-              {/if}
-
-              <div class="wizard-actions">
-                <Button
-                  type="button"
-                  color="primary"
-                  disabled={!selectedTemplateId || isApplyingTemplate}
-                  on:click={handleCompleteWizard}
-                >
-                  {isApplyingTemplate ? 'Preparing...' : 'Continue'}
-                </Button>
-              </div>
-            </SidebarSection>
-          </div>
+          {#key cardIndex}
+            <CardSetupWizard initialName={card?.title ?? ''} on:complete={handleWizardComplete} />
+          {/key}
         {:else}
           <div class="card-editor-header-shell">
             <div class="card-editor-header">
@@ -544,6 +423,9 @@
                           bind:value={textFieldContent}
                         />
                       </div>
+                      {#if rawContentError}
+                        <div class="raw-content-error" role="alert">{rawContentError}</div>
+                      {/if}
                     {/if}
                   </div>
                 {/if}
@@ -772,11 +654,6 @@
     --card-editor-danger-surface: var(--color-danger-surface);
     --card-editor-accent-border: var(--color-accent-border);
     --card-editor-accent-shadow: var(--color-accent-shadow);
-    --card-editor-wizard-surface: #faf8f3;
-    --card-editor-wizard-surface-hover: #f6f1e7;
-    --card-editor-wizard-surface-active: #efe6d3;
-    --card-editor-wizard-hero-glow: rgba(244, 239, 228, 0.95);
-    --card-editor-wizard-hero-surface: var(--color-white-98);
     height: 100%;
     min-height: 100%;
     display: flex;
@@ -914,120 +791,6 @@
     background: var(--card-editor-surface);
   }
 
-  .card-setup-wizard {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .wizard-hero {
-    padding: 1rem;
-    display: grid;
-    gap: 0.85rem;
-    justify-items: center;
-    border: 1px solid var(--card-editor-border-soft);
-    border-radius: 1rem;
-    background:
-      linear-gradient(180deg, var(--card-editor-wizard-hero-glow), var(--card-editor-wizard-hero-surface)),
-      var(--card-editor-surface);
-    text-align: center;
-  }
-
-  .wizard-logo {
-    width: 4.75rem;
-    height: 4.75rem;
-    display: block;
-    object-fit: contain;
-    filter: drop-shadow(0 8px 18px var(--card-editor-shadow-strong));
-  }
-
-  .wizard-copy {
-    display: grid;
-    gap: 0.35rem;
-  }
-
-  .wizard-title {
-    margin: 0;
-    color: var(--card-editor-text-primary);
-    font-size: 1.15rem;
-    font-weight: 700;
-  }
-
-  .wizard-text {
-    margin: 0;
-    color: var(--card-editor-text-muted);
-    font-size: 0.86rem;
-    line-height: 1.5;
-  }
-
-  .wizard-choice-label {
-    margin-bottom: 0.45rem;
-    color: var(--card-editor-text-primary);
-    font-size: 0.82rem;
-    font-weight: 600;
-  }
-
-  .wizard-field-error {
-    margin-top: 0.35rem;
-    color: var(--card-editor-text-danger);
-    font-size: 0.76rem;
-    line-height: 1.4;
-  }
-
-  .wizard-choice-grid {
-    display: grid;
-    gap: 0.6rem;
-  }
-
-  .wizard-choice-card {
-    padding: 0.8rem 0.85rem;
-    display: grid;
-    gap: 0.25rem;
-    text-align: left;
-    border: 1px solid var(--card-editor-border-medium);
-    border-radius: 0.8rem;
-    background: var(--card-editor-wizard-surface);
-    color: var(--card-editor-text-primary);
-    transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease,
-      transform 120ms ease;
-  }
-
-  .wizard-choice-card:hover {
-    background: var(--card-editor-wizard-surface-hover);
-    border-color: var(--card-editor-border-intense);
-  }
-
-  .wizard-choice-card-active {
-    background: var(--card-editor-wizard-surface-active);
-    border-color: var(--card-editor-accent-border);
-    box-shadow: 0 0 0 1px var(--card-editor-accent-shadow);
-    transform: translateY(-1px);
-  }
-
-  .wizard-choice-title {
-    font-size: 0.86rem;
-    font-weight: 700;
-  }
-
-  .wizard-choice-description {
-    color: var(--card-editor-text-muted);
-    font-size: 0.76rem;
-    line-height: 1.45;
-  }
-
-  .wizard-error {
-    padding: 0.65rem 0.75rem;
-    border: 1px solid var(--card-editor-danger-border);
-    border-radius: 0.7rem;
-    background: var(--card-editor-danger-surface);
-    color: var(--card-editor-text-danger);
-    font-size: 0.78rem;
-  }
-
-  .wizard-actions {
-    display: flex;
-    justify-content: flex-end;
-  }
-
   .card-editor-shell {
     height: 100%;
     min-height: 0;
@@ -1063,11 +826,6 @@
     align-items: center;
     gap: 0.35rem;
     margin-left: auto;
-  }
-
-  .sidebar-form-content {
-    height: 100%;
-    min-height: 0;
   }
 
   .card-editor-sections-scroll {
@@ -1115,6 +873,17 @@
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
+  }
+
+  .raw-content-error {
+    margin-top: 0.5rem;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid var(--card-editor-danger-border);
+    border-radius: 0.4rem;
+    background: var(--card-editor-danger-surface);
+    color: var(--card-editor-text-danger);
+    font-size: 0.76rem;
+    line-height: 1.45;
   }
 
   @media (max-width: 520px) {

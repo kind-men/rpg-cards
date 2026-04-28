@@ -1,44 +1,80 @@
 <script lang="ts">
   import { getContentTypeDescriptor } from '$lib/card-content-types';
+  import { isFlatCardContent, isRowCardContent } from '$lib/card-content';
   import { createEventDispatcher } from 'svelte';
   import { dragHandle } from 'svelte-dnd-action';
-  import {
-    Button,
-    ButtonGroup,
-    Icon,
-    Input,
-    InputGroup
-  } from 'sveltestrap';
+  import { Button, ButtonGroup, Icon, Input, InputGroup } from 'sveltestrap';
   import { SPLIT_REGEX } from '../lib/constants';
   import type { CardContent } from '../model/card';
   import ImageUploadInput from './image-upload-input.svelte';
   import MarkdownEditor from './markdown-editor.svelte';
 
-  export let content: CardContent;
+  export let canRemoveColumn = false;
   export let collapsed = true;
-  $: typeDescriptor = getContentTypeDescriptor(content.type);
-
-  let splitContent = content.content?.split(SPLIT_REGEX) ?? typeDescriptor.params.map(() => '');
+  export let columnCount = 0;
+  export let content: CardContent;
 
   const dispatch = createEventDispatcher();
+  let splitContent: string[] = [];
+  let lastSyncedContentId: string | undefined;
+  let lastSyncedSerializedContent = '';
+
+  $: typeDescriptor = getContentTypeDescriptor(content.type);
+
+  const getSplitContentFromValue = (value: string) =>
+    value?.split(SPLIT_REGEX) ?? typeDescriptor.params.map(() => '');
+
+  $: if (isFlatCardContent(content)) {
+    const serializedContent = content.content ?? '';
+    const shouldResync =
+      content.id !== lastSyncedContentId || serializedContent !== lastSyncedSerializedContent;
+
+    if (shouldResync) {
+      splitContent = getSplitContentFromValue(serializedContent);
+      lastSyncedContentId = content.id;
+      lastSyncedSerializedContent = serializedContent;
+    }
+  } else if (splitContent.length !== 0) {
+    splitContent = [];
+    lastSyncedContentId = content.id;
+    lastSyncedSerializedContent = '';
+  }
 
   const updateContent = () => {
-    content.content =
+    if (!isFlatCardContent(content)) {
+      return;
+    }
+
+    const nextContent =
       splitContent
         ?.map((c) => {
           if (typeof c !== 'string') {
             c = '' + c;
           }
+
           return c.replace(/[^\\]\|/, '\\|');
         })
         .join(' | ') ?? '';
+
+    if (content.content === nextContent) {
+      return;
+    }
+
+    content = {
+      ...content,
+      content: nextContent
+    };
+    lastSyncedContentId = content.id;
+    lastSyncedSerializedContent = nextContent;
   };
 
-  $: splitContent && updateContent();
+  $: if (isFlatCardContent(content) && splitContent) {
+    updateContent();
+  }
 </script>
 
 <div class="editor-content-card">
-  <div class="editor-content-card-header">
+  <div class="editor-content-card-header" class:editor-content-card-header-collapsed={collapsed}>
     <div class="editor-content-card-heading">
       <button
         type="button"
@@ -56,6 +92,9 @@
       >
         <Icon name={collapsed ? 'chevron-right' : 'chevron-down'} />
         <span>{typeDescriptor.label ?? typeDescriptor.name}</span>
+        {#if isRowCardContent(content)}
+          <span class="editor-content-card-meta">{columnCount} columns</span>
+        {/if}
       </button>
     </div>
     <ButtonGroup class="editor-content-actions">
@@ -130,7 +169,7 @@
       {:else if content.type === 'dndspellblock'}
         <div class="editor-content-labeled-fields">
           {#each typeDescriptor.params as param, index}
-            <label class="editor-content-field-row">
+            <div class="editor-content-field-row">
               <span class="editor-content-field-label">{param.name}</span>
               <Input
                 class="editor-content-input"
@@ -138,7 +177,7 @@
                 bind:value={splitContent[index]}
                 placeholder={param.name}
               />
-            </label>
+            </div>
           {/each}
         </div>
       {:else if content.type === 'picture'}
@@ -149,8 +188,48 @@
           on:change={(event) => (splitContent[0] = event.detail.src)}
         >
           <Input type="text" bind:value={splitContent[0]} placeholder="URL" />
-          <Input type="text" bind:value={splitContent[1]} placeholder="Size (for example 120px, 60%, auto)" />
+          <Input
+            type="text"
+            bind:value={splitContent[1]}
+            placeholder="Size (for example 120px, 60%, auto)"
+          />
         </ImageUploadInput>
+      {:else if content.type === 'row'}
+        <div class="editor-row-summary">
+          <div class="editor-row-summary-header">
+            <div class="editor-row-summary-label">Nested layout</div>
+          </div>
+          <p class="editor-row-summary-text">
+            Columns are stacked below in the sidebar and rendered evenly across the card.
+          </p>
+          <div class="editor-row-summary-actions">
+            <Button
+              color="link"
+              class="editor-row-action"
+              aria-label="Add row column"
+              on:click={(e) => {
+                  e.preventDefault();
+                  dispatch('addcolumn');
+                }}
+            >
+              <Icon name="plus-lg" />
+              <span>Add column</span>
+            </Button>
+            <Button
+              color="link"
+              class="editor-row-action"
+              aria-label="Remove row column"
+              disabled={!canRemoveColumn}
+              on:click={(e) => {
+                  e.preventDefault();
+                  dispatch('removecolumn');
+                }}
+            >
+              <Icon name="dash-lg" />
+              <span>Remove column</span>
+            </Button>
+          </div>
+        </div>
       {:else}
         <InputGroup class="editor-content-input-group">
           {#if typeDescriptor.params.length === 0}
@@ -200,6 +279,10 @@
     border-bottom: 1px solid var(--editor-content-card-border);
   }
 
+  .editor-content-card-header-collapsed {
+    border-bottom: 0;
+  }
+
   .editor-content-card-heading {
     min-width: 0;
     display: flex;
@@ -228,6 +311,14 @@
 
   .editor-content-card-title:hover {
     color: var(--editor-content-card-text-hover);
+  }
+
+  .editor-content-card-meta {
+    margin-left: auto;
+    color: var(--editor-content-card-text-muted);
+    font-size: 0.68rem;
+    font-weight: 500;
+    text-transform: none;
   }
 
   .editor-content-drag-handle {
@@ -280,6 +371,64 @@
     text-transform: uppercase;
   }
 
+  .editor-row-summary {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .editor-row-summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .editor-row-summary-label {
+    color: var(--editor-content-card-label);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .editor-row-summary-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  :global(.editor-row-action.btn) {
+    padding: 0.125rem 0.4rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border: 1px solid var(--editor-content-card-border);
+    border-radius: 999px;
+    color: var(--editor-content-card-text-muted);
+    font-size: 0.7rem;
+    text-decoration: none;
+  }
+
+  :global(.editor-row-action.btn:hover) {
+    color: var(--editor-content-card-text);
+    background: var(--editor-content-card-hover-overlay);
+  }
+
+  :global(.editor-row-action.btn:disabled) {
+    opacity: 0.45;
+    background: transparent;
+    color: var(--editor-content-card-text-subtle);
+  }
+
+  .editor-row-summary-text {
+    margin: 0;
+    color: var(--editor-content-card-text-muted);
+    font-size: 0.76rem;
+    line-height: 1.45;
+  }
+
   :global(.editor-content-input-group) {
     margin-bottom: 0;
     display: grid;
@@ -319,7 +468,11 @@
     color: var(--editor-content-card-text-muted);
   }
 
-  :global.input-property-title {
+  :global(input.form-control.editor-content-input-with-icon) {
+    padding-left: 2.1rem;
+  }
+
+  :global(.input-property-title) {
     max-width: 10em;
   }
 

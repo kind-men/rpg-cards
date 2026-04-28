@@ -1,8 +1,8 @@
 <script lang="ts">
   import { SPLIT_REGEX } from '$lib/constants';
-  import type { CardContent } from '$model/card';
+  import type { FlatCardContent } from '$model/card';
 
-  export let content: CardContent;
+  export let content: FlatCardContent;
 
   let str = 0,
     dex = 0,

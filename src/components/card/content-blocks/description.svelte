@@ -1,9 +1,9 @@
 <script lang="ts">
   import { renderText } from '$lib/card-render-util';
   import { SPLIT_REGEX } from '$lib/constants';
-  import type { CardContent } from '$model/card';
+  import type { FlatCardContent } from '$model/card';
 
-  export let content: CardContent;
+  export let content: FlatCardContent;
 
   $: [name, description] = content.content.split(SPLIT_REGEX);
 </script>

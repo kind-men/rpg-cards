@@ -1,12 +1,26 @@
 import type Card from '../model/card';
-import type { CardContent } from '../model/card';
-import type { CardBackImage } from '../model/card';
-import { SPLIT_REGEX } from './constants';
-import { uuid4 } from './uuid';
+import type { CardBackImage, CardContent, FlatCardContent } from '../model/card';
+import type { LegacyCard } from '../model/legacy-card';
 import type { CardCollection } from '../model/card-collection';
 import { isCardCollection } from '../model/card-collection';
-import { isCardContentType } from '$lib/card-content-types';
 import { isLegacyCard } from '$model/legacy-card';
+import { isCardContentType } from '$lib/card-content-types';
+import { isFlatCardContent, isRowCardContent, withContentIds } from './card-content';
+import { SPLIT_REGEX } from './constants';
+import { uuid4 } from './uuid';
+
+const RAW_CONTENT_INDENT = 2;
+
+type RawContentContext = 'top' | 'column';
+type ParseCardContentOptions = {
+  allowNestedFooter?: boolean;
+  strict?: boolean;
+};
+type RawLine = {
+  indent: number;
+  lineNumber: number;
+  text: string;
+};
 
 export function parseCards(
   json: string,
@@ -17,11 +31,11 @@ export function parseCards(
   let cards: Card[];
 
   if (isCardCollection(importObject)) {
-    cards = importObject.cards;
+    cards = importObject.cards.map((card) => normalizeCard(card));
   } else if (Array.isArray(importObject)) {
-    cards = JSON.parse(json, (key, value: never) => transformer(key, value)) as Card[];
+    cards = importObject.map((card) => normalizeCard(card as Card));
   } else if (typeof importObject === 'object' && isLegacyCard(importObject)) {
-    cards = [JSON.parse(json, (key, value: never) => transformer(key, value)) as Card];
+    cards = [normalizeLegacyCard(importObject)];
   } else {
     console.warn('Uknown import format!');
     return [];
@@ -47,11 +61,11 @@ export function parseCards(
     }
 
     if (shouldConvertSubtitlePlusRuleToSection) {
-      card.contents = convertSubtitlePlusRuleToSection(card.contents);
+      card.contents = withContentIds(convertSubtitlePlusRuleToSection(card.contents));
     }
 
     if (shouldConvertDndSpellcardBlocks) {
-      card.contents = convertDndSpellBlock(card.contents);
+      card.contents = withContentIds(convertDndSpellBlock(card.contents));
     }
   });
 
@@ -87,23 +101,103 @@ export function normalizeCardbackImages(images: unknown): CardBackImage[] {
     .filter((image): image is CardBackImage => Boolean(image));
 }
 
+function normalizeLegacyCard(card: LegacyCard): Card {
+  return normalizeCard({
+    ...card,
+    contents: parseCardContents(card.contents)
+  } as Card);
+}
+
+function normalizeCard(card: Card): Card {
+  return {
+    ...card,
+    contents: normalizeCardContentArray(card?.contents, { allowNestedFooter: true })
+  };
+}
+
+function normalizeCardContentArray(
+  contents: unknown,
+  options: ParseCardContentOptions = {}
+): CardContent[] {
+  if (!Array.isArray(contents)) {
+    return [];
+  }
+
+  if (contents.every((content) => typeof content === 'string')) {
+    return parseCardContents(contents as string[], options);
+  }
+
+  const normalized = contents
+    .map((content) => normalizeCardContentObject(content, options))
+    .filter((content): content is CardContent => Boolean(content));
+
+  return withContentIds(normalized);
+}
+
+function normalizeCardContentObject(
+  content: unknown,
+  options: ParseCardContentOptions = {}
+): CardContent | null {
+  if (!content || typeof content !== 'object') {
+    return null;
+  }
+
+  const rawType = 'type' in content && typeof content.type === 'string' ? content.type : 'text';
+  const id = 'id' in content && typeof content.id === 'string' ? content.id : uuid4();
+
+  if (rawType === 'row') {
+    const rawColumns = 'columns' in content && Array.isArray(content.columns) ? content.columns : [[], []];
+    const columns = rawColumns.map((column) =>
+      normalizeCardContentArray(column, {
+        ...options,
+        allowNestedFooter: false
+      }).filter((columnContent) => !isFlatCardContent(columnContent) || columnContent.type !== 'footer')
+    );
+
+    while (columns.length < 2) {
+      columns.push([]);
+    }
+
+    return {
+      id,
+      type: 'row',
+      columns
+    };
+  }
+
+  const type = isCardContentType(rawType) && rawType !== 'row' ? rawType : 'text';
+
+  if (type === 'footer' && options.allowNestedFooter === false) {
+    return null;
+  }
+
+  return {
+    id,
+    type: type as FlatCardContent['type'],
+    content: 'content' in content && typeof content.content === 'string' ? content.content : ''
+  };
+}
+
 function convertSubtitlePlusRuleToSection(contents: CardContent[]): CardContent[] {
   let subtitleIndex = -1;
   const subtitleToSectionList: number[] = [];
-
   const newContents = [...contents];
 
   newContents.forEach((content, index) => {
-    if (content.type === 'subtitle') {
+    if (isFlatCardContent(content) && content.type === 'subtitle') {
       subtitleIndex = index;
-    } else if (content.type === 'rule' && subtitleIndex + 1 === index) {
+    } else if (isFlatCardContent(content) && content.type === 'rule' && subtitleIndex + 1 === index) {
       subtitleToSectionList.push(subtitleIndex);
     }
   });
 
   subtitleToSectionList.forEach((index) => {
-    newContents[index].type = 'section';
-    newContents.splice(index + 1, 1);
+    const content = newContents[index];
+
+    if (content && isFlatCardContent(content)) {
+      content.type = 'section';
+      newContents.splice(index + 1, 1);
+    }
   });
 
   return newContents;
@@ -113,43 +207,52 @@ function convertDndSpellBlock(contents: CardContent[]): CardContent[] {
   const newContents = [...contents];
 
   type Spellblock = {
-    index: number;
     castingTime: string;
-    range: string;
     components: string;
     duration: string;
+    index: number;
+    range: string;
   };
 
   const blocks: Spellblock[] = [];
 
   newContents.forEach((content, index) => {
-    if (content.type === 'property') {
+    if (!isFlatCardContent(content) || content.type !== 'property') {
+      return;
+    }
+
+    const nextOne = newContents[index + 1];
+    const nextTwo = newContents[index + 2];
+    const nextThree = newContents[index + 3];
+
+    if (
+      !isFlatCardContent(nextOne) ||
+      !isFlatCardContent(nextTwo) ||
+      !isFlatCardContent(nextThree)
+    ) {
+      return;
+    }
+
+    if (
+      nextOne.type === 'property' &&
+      nextTwo.type === 'property' &&
+      nextThree.type === 'property'
+    ) {
       if (
-        newContents[index + 1].type === 'property' &&
-        newContents[index + 2].type === 'property' &&
-        newContents[index + 3].type === 'property'
+        content.content.split(SPLIT_REGEX)[0] === 'Casting Time' &&
+        nextOne.content.split(SPLIT_REGEX)[0] === 'Range' &&
+        nextTwo.content.split(SPLIT_REGEX)[0] === 'Components' &&
+        nextThree.content.split(SPLIT_REGEX)[0] === 'Duration'
       ) {
-        if (
-          newContents[index].content.split(SPLIT_REGEX)[0] === 'Casting Time' &&
-          newContents[index + 1].content.split(SPLIT_REGEX)[0] === 'Range' &&
-          newContents[index + 2].content.split(SPLIT_REGEX)[0] === 'Components' &&
-          newContents[index + 3].content.split(SPLIT_REGEX)[0] === 'Duration'
-        ) {
-          const castingTime = newContents[index].content.split(SPLIT_REGEX)[1];
-          const range = newContents[index + 1].content.split(SPLIT_REGEX)[1];
-          const components = newContents[index + 2].content.split(SPLIT_REGEX)[1];
-          const duration = newContents[index + 3].content.split(SPLIT_REGEX)[1];
+        blocks.push({
+          index,
+          castingTime: content.content.split(SPLIT_REGEX)[1],
+          components: nextTwo.content.split(SPLIT_REGEX)[1],
+          duration: nextThree.content.split(SPLIT_REGEX)[1],
+          range: nextOne.content.split(SPLIT_REGEX)[1]
+        });
 
-          blocks.push({
-            index,
-            castingTime,
-            components,
-            duration,
-            range
-          });
-
-          newContents.splice(index, 4);
-        }
+        newContents.splice(index, 4);
       }
     }
   });
@@ -165,43 +268,181 @@ function convertDndSpellBlock(contents: CardContent[]): CardContent[] {
   return newContents;
 }
 
-function transformer(key: string, value: never) {
-  if (key === 'contents') {
-    return parseCardContents(value);
-  }
-
-  return value;
-}
-
-export function parseCardContents(value: string[]): CardContent[] {
-  const mapped: CardContent[] = value?.map((element: string) => {
-    // eslint-disable-next-line prefer-const
-    let [type, ...content] = element.split(SPLIT_REGEX);
-
-    if (!isCardContentType(type)) {
-      // throw new CardContentError(`'${type}' is not a valid content type`)
-      type = 'text';
-    }
-
-    return {
-      type: type,
-      content: content.join(' | ').replace(/(\\\\n)/g, '\n'),
-      id: uuid4()
-    } as CardContent;
+export function parseCardContents(
+  value: string[],
+  options: ParseCardContentOptions = {}
+): CardContent[] {
+  const lines = tokenizeRawContent(value);
+  const state = { index: 0 };
+  const contents = parseRawContentList(lines, state, 0, 'top', {
+    allowNestedFooter: options.allowNestedFooter ?? true,
+    strict: options.strict ?? true
   });
 
-  return mapped;
+  if (state.index < lines.length) {
+    throw new CardContentError(`Unexpected content on line ${lines[state.index].lineNumber}.`);
+  }
+
+  return withContentIds(contents);
+}
+
+function tokenizeRawContent(value: string[]): RawLine[] {
+  return (value ?? [])
+    .map((text, index) => ({
+      lineNumber: index + 1,
+      text: text ?? ''
+    }))
+    .filter(({ text }) => text.trim().length > 0)
+    .map(({ lineNumber, text }) => {
+      const indent = text.match(/^ */)?.[0].length ?? 0;
+
+      if (indent % RAW_CONTENT_INDENT !== 0) {
+        throw new CardContentError(
+          `Line ${lineNumber} must use indentation in multiples of ${RAW_CONTENT_INDENT} spaces.`
+        );
+      }
+
+      return {
+        indent,
+        lineNumber,
+        text: text.trim()
+      };
+    });
+}
+
+function parseRawContentList(
+  lines: RawLine[],
+  state: { index: number },
+  indent: number,
+  context: RawContentContext,
+  options: Required<ParseCardContentOptions>
+): CardContent[] {
+  const contents: CardContent[] = [];
+
+  while (state.index < lines.length) {
+    const line = lines[state.index];
+
+    if (line.indent < indent) {
+      break;
+    }
+
+    if (line.indent > indent) {
+      throw new CardContentError(`Unexpected indentation on line ${line.lineNumber}.`);
+    }
+
+    if (line.text === 'column') {
+      break;
+    }
+
+    contents.push(parseRawContentLine(lines, state, indent, context, options));
+  }
+
+  return contents;
+}
+
+function parseRawContentLine(
+  lines: RawLine[],
+  state: { index: number },
+  indent: number,
+  context: RawContentContext,
+  options: Required<ParseCardContentOptions>
+): CardContent {
+  const line = lines[state.index];
+  const [rawType, ...contentParts] = line.text.split(SPLIT_REGEX);
+
+  if (rawType === 'row') {
+    state.index += 1;
+    return parseRawRow(lines, state, indent, options, line.lineNumber);
+  }
+
+  if (rawType === 'column') {
+    throw new CardContentError(`Unexpected column declaration on line ${line.lineNumber}.`);
+  }
+
+  let type = rawType;
+
+  if (!isCardContentType(type) || type === 'row') {
+    type = 'text';
+  }
+
+  if (type === 'footer' && context !== 'top' && !options.allowNestedFooter) {
+    throw new CardContentError(`Footer is only allowed at the top level (line ${line.lineNumber}).`);
+  }
+
+  state.index += 1;
+
+  return {
+    id: uuid4(),
+    type: type as FlatCardContent['type'],
+    content: contentParts.join(' | ').replace(/(\\\\n)/g, '\n')
+  };
+}
+
+function parseRawRow(
+  lines: RawLine[],
+  state: { index: number },
+  indent: number,
+  options: Required<ParseCardContentOptions>,
+  lineNumber: number
+): CardContent {
+  const columnIndent = indent + RAW_CONTENT_INDENT;
+  const contentIndent = columnIndent + RAW_CONTENT_INDENT;
+  const columns: CardContent[][] = [];
+
+  while (state.index < lines.length) {
+    const line = lines[state.index];
+
+    if (line.indent < columnIndent) {
+      break;
+    }
+
+    if (line.indent > columnIndent) {
+      throw new CardContentError(`Expected a column declaration on line ${line.lineNumber}.`);
+    }
+
+    if (line.text !== 'column') {
+      throw new CardContentError(`Expected "column" on line ${line.lineNumber}.`);
+    }
+
+    state.index += 1;
+    columns.push(parseRawContentList(lines, state, contentIndent, 'column', options));
+  }
+
+  if (columns.length === 0) {
+    throw new CardContentError(`Row on line ${lineNumber} must include at least one column.`);
+  }
+
+  while (columns.length < 2) {
+    columns.push([]);
+  }
+
+  return {
+    id: uuid4(),
+    type: 'row',
+    columns
+  };
+}
+
+function serializeContent(content: CardContent, indent = 0): string[] {
+  const padding = ' '.repeat(indent);
+
+  if (isRowCardContent(content)) {
+    return [
+      `${padding}row`,
+      ...content.columns.flatMap((column) => [
+        `${padding}${' '.repeat(RAW_CONTENT_INDENT)}column`,
+        ...column.flatMap((columnContent) => serializeContent(columnContent, indent + RAW_CONTENT_INDENT * 2))
+      ])
+    ];
+  }
+
+  return [
+    `${padding}${content.type}${content.content ? ` | ${content.content.replace(/\n/g, '\\\\n')}` : ''}`
+  ];
 }
 
 export function getContentAsString(contents: CardContent[]): string {
-  return contents
-    ?.map((content) =>
-      (content.content
-        ? [content.type, content.content.replace(/\n/g, '\\\\n')]
-        : [content.type]
-      )?.join(' | ')
-    )
-    ?.join('\n');
+  return contents?.flatMap((content) => serializeContent(content))?.join('\n');
 }
 
 export class CardContentError extends Error {}

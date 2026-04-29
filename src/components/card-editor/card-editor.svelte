@@ -28,11 +28,11 @@
   import { currentCard, deck, multiSelect } from '../../stores';
   import CardContentEditor from './card-content-editor.svelte';
   import CardSetupWizard from './card-setup-wizard.svelte';
-  import ColorInput from './color-input.svelte';
+  import ColorInput from '../form/color.svelte';
   import CssEditor from './css-editor.svelte';
-  import IconInput from './game-icon-input.svelte';
+  import IconInput from '../form/game-icon.svelte';
   import Hint from '../hint.svelte';
-  import ImageUploadInput from './image-upload-input.svelte';
+  import ImageUploadInput from '../form/image-upload.svelte';
   import SidebarSection from '../sidebar-section.svelte';
   import TextEditor from './text-editor.svelte';
 

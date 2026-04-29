@@ -31,7 +31,12 @@ export const createCardFromDefaultTemplate = (title = ''): Card =>
 
 export async function loadCardTemplate(
   templateDefinition: CardTemplateDefinition,
-  { base = '', convertFirstSubtitle, convertDndSpellblock, fetchImpl = fetch }: LoadCardTemplateOptions
+  {
+    base = '',
+    convertFirstSubtitle,
+    convertDndSpellblock,
+    fetchImpl = fetch
+  }: LoadCardTemplateOptions
 ): Promise<Card | null> {
   if (templateDefinition.card) {
     return templateDefinition.card;

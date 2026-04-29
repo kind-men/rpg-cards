@@ -86,10 +86,15 @@ const inferCardFormat = (cardSize?: { width?: number; height?: number }): CardFo
     return defaultPageLayout.cardFormat;
   }
 
-  const matchingFormat = (Object.entries(CARD_SIZE_PRESETS) as [CardFormat, {
-    width: number;
-    height: number;
-  }][]).find(([, preset]) => areSameSize(cardSize as { width: number; height: number }, preset));
+  const matchingFormat = (
+    Object.entries(CARD_SIZE_PRESETS) as [
+      CardFormat,
+      {
+        width: number;
+        height: number;
+      }
+    ][]
+  ).find(([, preset]) => areSameSize(cardSize as { width: number; height: number }, preset));
 
   return matchingFormat?.[0] ?? defaultPageLayout.cardFormat;
 };
@@ -99,10 +104,15 @@ const inferPaperFormat = (paperSize?: { width?: number; height?: number }): Pape
     return defaultPageLayout.paperFormat;
   }
 
-  const matchingFormat = (Object.entries(PAPER_SIZE_PRESETS) as [PaperFormat, {
-    width: number;
-    height: number;
-  }][])
+  const matchingFormat = (
+    Object.entries(PAPER_SIZE_PRESETS) as [
+      PaperFormat,
+      {
+        width: number;
+        height: number;
+      }
+    ][]
+  )
     .filter(([format]) => format !== 'custom')
     .find(([, preset]) => areSameSize(paperSize as { width: number; height: number }, preset));
 

@@ -34,11 +34,6 @@
     currentCard.set(index);
   };
 
-  const handleClearDeck = () => {
-    deck.set([]);
-    $multiSelect.clear();
-  };
-
   const handleDeleteCard = (index: number) => {
     deck.removeCards(index);
     if ($currentCard > $deck.length - 1) {

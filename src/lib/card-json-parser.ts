@@ -152,7 +152,8 @@ function normalizeCardContentObject(
   const id = 'id' in content && typeof content.id === 'string' ? content.id : uuid4();
 
   if (rawType === 'row') {
-    const rawChildren = 'children' in content && Array.isArray(content.children) ? content.children : [[], []];
+    const rawChildren =
+      'children' in content && Array.isArray(content.children) ? content.children : [[], []];
     const children = rawChildren.map((column) =>
       normalizeCardContentArray(column, {
         ...options,
@@ -378,7 +379,9 @@ function parseRawContentLine(
   }
 
   if (type === 'footer' && context !== 'top' && !options.allowNestedFooter) {
-    throw new CardContentError(`Footer is only allowed at the top level (line ${line.lineNumber}).`);
+    throw new CardContentError(
+      `Footer is only allowed at the top level (line ${line.lineNumber}).`
+    );
   }
 
   state.index += 1;
@@ -443,7 +446,9 @@ function serializeContent(content: CardContent, indent = 0): string[] {
       `${padding}row`,
       ...getContentChildren(content).flatMap((column) => [
         `${padding}${' '.repeat(RAW_CONTENT_INDENT)}column`,
-        ...column.flatMap((columnContent) => serializeContent(columnContent, indent + RAW_CONTENT_INDENT * 2))
+        ...column.flatMap((columnContent) =>
+          serializeContent(columnContent, indent + RAW_CONTENT_INDENT * 2)
+        )
       ])
     ];
   }

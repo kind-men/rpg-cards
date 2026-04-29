@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { assets } from '$app/paths';
   import { Styles } from '@sveltestrap/sveltestrap';
 </script>
 

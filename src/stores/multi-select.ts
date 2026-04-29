@@ -5,7 +5,9 @@ import { currentCard } from '.';
 function createMultiSelect() {
   let defaultValue = new Set<number>();
   if (browser) {
-    defaultValue = new Set(JSON.parse(localStorage.getItem('multiSelect') ?? '[]') as Array<number>);
+    defaultValue = new Set(
+      JSON.parse(localStorage.getItem('multiSelect') ?? '[]') as Array<number>
+    );
   }
 
   const { subscribe, set, update } = writable<Set<number>>(defaultValue);

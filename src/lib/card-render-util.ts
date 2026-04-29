@@ -1,7 +1,6 @@
-import sanitize from 'sanitize-html';
 import MarkdownIt from 'markdown-it';
 
-const md = new MarkdownIt({ html: true });
+const md = new MarkdownIt({ html: false });
 
 type RenderTextMarkdownOptions = {
   disabled?: boolean;
@@ -26,13 +25,16 @@ export function renderText(input?: string, options?: RenderTextOptions): string 
       html = md.render(input);
     }
   } else {
-    html = input;
+    html = escapeHtml(input);
   }
 
-  return sanitizeHtml(html?.replace('\\|', '|') ?? '');
+  return html?.replace('\\|', '|') ?? '';
 }
 
-export const sanitizeHtml = (input: string): string =>
-  sanitize(input, {
-    allowedSchemes: ['http', 'https']
-  });
+const escapeHtml = (input: string): string =>
+  input
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');

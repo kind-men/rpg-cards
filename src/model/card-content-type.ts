@@ -1,12 +1,12 @@
-import type { SvelteComponent } from 'svelte';
+import type { ComponentType } from 'svelte';
 
 export default interface CardContentTypeDescriptor {
   readonly name: string;
   readonly label?: string;
   readonly description: string;
   readonly params: readonly CardContentTypeParam[];
-  readonly renderComponent: typeof SvelteComponent;
-  readonly editorComponent: typeof SvelteComponent;
+  readonly renderComponent: ComponentType;
+  readonly editorComponent: ComponentType;
 }
 
 export interface CardContentTypeParam {

@@ -3,8 +3,8 @@
   import { Accordion, AccordionItem, Icon } from 'sveltestrap';
   import WorkspaceContentView from '$components/workspace-content-view.svelte';
   import WorkspaceShell from '$components/workspace-shell.svelte';
-  import InfoContent from '../content/info.svx';
-  import ThanksAndLicensesContent from '../content/thanks-and-licenses.svx';
+  import InfoContent from '../../content/info.svx';
+  import ThanksAndLicensesContent from '../../content/thanks-and-licenses.svx';
 </script>
 
 <WorkspaceShell view="info">

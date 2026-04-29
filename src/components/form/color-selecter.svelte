@@ -42,20 +42,27 @@
   <Icon name="palette-fill" />
 </button>
 <Popover class="popover" placement="bottom" target={id} bind:isOpen>
-  <div class="wrapper" on:click|preventDefault|stopPropagation>
+  <div
+    class="wrapper"
+    role="presentation"
+    on:click|preventDefault|stopPropagation
+    on:keydown|stopPropagation
+  >
     <TabContent vertical pills>
       {#each [...colorSets, recentsSet] as set, setIndex}
         <TabPane tabId={setIndex} tab={set.set} active={setIndex === 0}>
           <div class="color-set">
             {#each set.colors as color, index (`${set.set}-${index}-${color.name}-${color.color}`)}
-              <div
+              <button
                 class="color-item"
                 id="color-item-{setIndex}-{index}"
+                type="button"
+                aria-label={`Select color ${color.name}`}
                 on:click={() => handleColorClick(color.color)}
               >
-                <div class="color rounded" style="--color: {color.color}" />
+                <div class="color rounded" style="--color: {color.color}"></div>
                 <Tooltip target="color-item-{setIndex}-{index}">{color.name}</Tooltip>
-              </div>
+              </button>
             {/each}
           </div>
         </TabPane>

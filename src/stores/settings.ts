@@ -1,4 +1,4 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 
 export default interface Settings {
@@ -18,7 +18,7 @@ function createSettings() {
   if (browser) {
     defaultValue = {
       ...defaultValue,
-      ...JSON.parse(localStorage?.getItem('settings'))
+      ...JSON.parse(localStorage.getItem('settings') ?? '{}')
     };
   }
   const { subscribe, set } = writable<Settings>(defaultValue);

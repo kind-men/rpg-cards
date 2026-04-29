@@ -1,4 +1,4 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 import type PageLayout from '../model/page-layout';
 import type { CardFormat } from '../model/page-layout';
@@ -142,7 +142,7 @@ const normalizePageLayout = (layout: Partial<PageLayout> | null | undefined): Pa
 };
 
 const fromLocalStorage = browser
-  ? normalizePageLayout(JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY)))
+  ? normalizePageLayout(JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) ?? 'null'))
   : defaultPageLayout;
 
 export const pageLayout = writable<PageLayout>(fromLocalStorage);

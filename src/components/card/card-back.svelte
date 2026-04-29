@@ -45,7 +45,7 @@
       <div
         class="image-surface"
         style={`background-color: ${card.cardback_background_color ?? 'var(--color-surface-base)'}; ${cardbackImageStyle}`}
-      />
+      ></div>
     {:else}
       <div class="line">
         <div class="content-top">

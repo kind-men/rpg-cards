@@ -134,6 +134,7 @@
       <div animate:flip={{ duration: flipDurationMs }}>
         <div
           class="input-wrapper"
+          role="presentation"
           on:mouseenter={() => hoveredContentId.set(content.id ?? null)}
           on:mouseleave={() => hoveredContentId.set(null)}
         >

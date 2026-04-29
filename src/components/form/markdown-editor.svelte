@@ -17,24 +17,32 @@
     value = editor.getMarkdown();
   };
 
-  onMount(async () => {
-    const { Editor } = await import('@toast-ui/editor');
+  onMount(() => {
+    let disposed = false;
 
-    editor = new Editor({
-      el: host,
-      height,
-      initialValue: value ?? '',
-      initialEditType: 'wysiwyg',
-      autofocus: false,
-      previewStyle: 'vertical',
-      toolbarItems: [['bold', 'italic', 'hr', 'ul']],
-      usageStatistics: false,
-      hideModeSwitch: false
-    });
+    void (async () => {
+      const { Editor } = await import('@toast-ui/editor');
+      if (disposed) {
+        return;
+      }
 
-    editor.on('change', syncFromEditor);
+      editor = new Editor({
+        el: host,
+        height,
+        initialValue: value ?? '',
+        initialEditType: 'wysiwyg',
+        autofocus: false,
+        previewStyle: 'vertical',
+        toolbarItems: [['bold', 'italic', 'hr', 'ul']],
+        usageStatistics: false,
+        hideModeSwitch: false
+      });
+
+      editor.on('change', syncFromEditor);
+    })();
 
     return () => {
+      disposed = true;
       if (editor) {
         editor.off?.('change', syncFromEditor);
         editor.destroy?.();
@@ -54,7 +62,7 @@
   }
 </script>
 
-<div class="markdown-editor" bind:this={host} />
+<div class="markdown-editor" bind:this={host}></div>
 
 <style lang="scss">
   .markdown-editor {

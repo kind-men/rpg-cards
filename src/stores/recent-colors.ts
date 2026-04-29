@@ -1,10 +1,10 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 
 function createRecentColors() {
   let defaultValue = [];
   if (browser) {
-    defaultValue = JSON.parse(localStorage?.getItem('recentColors')) ?? [];
+    defaultValue = JSON.parse(localStorage.getItem('recentColors') ?? '[]') ?? [];
   }
 
   const { subscribe, set, update } = writable<string[]>(defaultValue);

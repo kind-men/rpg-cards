@@ -39,9 +39,11 @@ async function downloadFile(url: string, dest: string) {
 
 async function unzipIconFiles(path: string, output: string) {
   const temp_folder = output + '_temp';
+  const extractedIconsDir = Path.join(temp_folder, 'icons', 'ffffff', 'transparent', '1x1');
 
   await extract(path, { dir: Path.resolve(temp_folder) });
-  await fs.move(Path.join(temp_folder, 'icons', 'ffffff', 'transparent', '1x1'), output);
+  await fs.emptyDir(output);
+  await fs.copy(extractedIconsDir, output, { overwrite: true });
   await fs.rm(temp_folder, { recursive: true, force: true });
 }
 
@@ -74,9 +76,9 @@ export async function pullIcons(): Promise<void> {
     console.log('Indexing...');
     await indexFiles(tempIconsPath, tempJsonPath);
     console.log('Removing old icons...');
-    await fs.remove(outputDir);
+    await fs.emptyDir(outputDir);
     console.log('Moving...');
-    await fs.move(tempIconsPath, outputDir);
+    await fs.copy(tempIconsPath, outputDir, { overwrite: true });
   } catch (error) {
     console.warn(
       'There was a problem downloading icons - falling back to currently downloaded icons'

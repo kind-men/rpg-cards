@@ -361,13 +361,6 @@
     gap: 0.25rem;
   }
 
-  .deck-settings-label {
-    padding: 0;
-    color: var(--deck-text-primary);
-    font-size: var(--editor-form-font-size);
-    line-height: var(--editor-form-label-line-height);
-  }
-
   .deck-settings :global(.col-form-label) {
     padding: 0;
     color: var(--deck-text-primary);

@@ -1,5 +1,5 @@
 import type { CardContentType } from '$lib/card-content-types';
-import type ColorResolvable from './color-resolvable';
+import type { ColorResolvable } from './color-resolvable';
 
 export type CardBackMode = 'icon' | 'images';
 export type CardBackImageSizePreset = 'cover' | 'contain' | 'custom';

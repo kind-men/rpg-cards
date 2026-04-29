@@ -5,7 +5,6 @@
 
 <svelte:head>
   <title>RPG Card Generator</title>
-  <html lang="en" />
 </svelte:head>
 
 <Styles />
@@ -13,5 +12,5 @@
 <slot />
 
 <style lang="scss">
-  @import '../styles/global.scss';
+  @use '../styles/global.scss';
 </style>

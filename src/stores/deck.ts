@@ -1,11 +1,11 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 import type Card from '../model/card';
 
 function createDeck() {
   let defaultValue = [];
   if (browser) {
-    defaultValue = JSON.parse(localStorage?.getItem('deck')) ?? [];
+    defaultValue = JSON.parse(localStorage.getItem('deck') ?? '[]') ?? [];
   }
   const { subscribe, set, update } = writable<Card[]>(defaultValue);
 

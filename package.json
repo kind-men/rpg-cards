@@ -2,19 +2,21 @@
   "name": "rpg-cards",
   "version": "0.0.1",
   "scripts": {
-    "dev": "svelte-kit dev --port 3001",
-    "build": "npm run update-icons && svelte-kit build",
-    "package": "svelte-kit package",
-    "preview": "svelte-kit preview --port 3001",
+    "dev": "vite dev --port 3001",
+    "build": "vite build",
+    "package": "vite build",
+    "preview": "vite preview --port 3001",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
-    "update-icons": "node --loader ts-node/esm  ./tools/pull-icons.ts ",
-    "prepare": "npm run update-icons"
+    "update-icons": "node --loader ts-node/esm ./tools/pull-icons.ts",
+    "postinstall": "node ./tools/patch-sveltestrap.js",
+    "prepare": "node ./tools/patch-sveltestrap.js && svelte-kit sync"
   },
   "devDependencies": {
-    "@sveltejs/kit": "1.0.0-next.304",
+    "@sveltejs/kit": "^2.58.0",
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@types/fs-extra": "^9.0.13",
     "@types/sanitize-html": "^2.6.2",
     "@types/yauzl": "^2.9.2",
@@ -23,17 +25,16 @@
     "eslint": "^8.9.0",
     "eslint-config-prettier": "^8.4.0",
     "eslint-plugin-svelte3": "^3.4.1",
-    "mdsvex": "^0.10.5",
-    "node-sass": "^7.0.1",
+    "mdsvex": "^0.12.7",
     "prettier": "^2.5.1",
     "prettier-plugin-svelte": "^2.6.0",
     "simple-svelte-autocomplete": "2.2.4",
-    "svelte": "3.46.6",
-    "svelte-check": "^2.4.6",
-    "svelte-preprocess": "^4.10.4",
+    "svelte": "^5.55.5",
+    "svelte-check": "^4.4.6",
     "ts-node": "^10.5.0",
     "tslib": "^2.3.1",
-    "typescript": "^4.5.5"
+    "typescript": "^6.0.3",
+    "vite": "^8.0.10"
   },
   "type": "module",
   "dependencies": {
@@ -43,7 +44,7 @@
     "@codemirror/lint": "^0.19.3",
     "@codemirror/text": "^0.19.6",
     "@codemirror/view": "^0.19.45",
-    "@sveltejs/adapter-static": "1.0.0-next.29",
+    "@sveltejs/adapter-static": "^3.0.10",
     "@toast-ui/editor": "^3.2.2",
     "@types/markdown-it": "^12.2.3",
     "bootstrap": "^5.1.3",
@@ -60,14 +61,9 @@
     "ress": "^4.0.0",
     "rimraf": "^3.0.2",
     "sanitize-html": "^2.7.0",
-    "sass": "^1.49.8",
+    "sass": "^1.99.0",
     "svelte-dnd-action": "^0.9.15",
     "sveltestrap": "^5.9.0",
     "yauzl": "^2.10.0"
-  },
-  "pnpm": {
-    "overrides": {
-      "@sveltejs/vite-plugin-svelte": "1.0.0-next.32"
-    }
   }
 }

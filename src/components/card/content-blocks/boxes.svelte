@@ -12,7 +12,7 @@
 <div class="boxes">
   {#if amount !== 0}
     {#each Array(amount || 1) as _}
-      <div class="box" style="width: {size || 2}em; height: {size || 2}em;" />
+      <div class="box" style="width: {size || 2}em; height: {size || 2}em;"></div>
     {/each}
   {/if}
 </div>

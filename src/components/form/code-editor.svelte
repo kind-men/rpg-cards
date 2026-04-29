@@ -68,7 +68,7 @@
   }
 </script>
 
-<div {id} class={`wrapper form-control input ${className}`.trim()} bind:this={parent} />
+<div {id} class={`wrapper form-control input ${className}`.trim()} bind:this={parent}></div>
 
 <style lang="scss">
   .wrapper {

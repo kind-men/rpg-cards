@@ -205,10 +205,6 @@
     align-items: center;
   }
 
-  .color-text-group {
-    min-width: 0;
-  }
-
   .alpha-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;

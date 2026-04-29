@@ -1,3 +1,3 @@
 type ColorResolvable = string;
 
-export default ColorResolvable;
+export type { ColorResolvable };

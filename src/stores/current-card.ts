@@ -1,10 +1,10 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 
 function createCurrentCard() {
   let currentCardDefaultValue = 0;
   if (browser) {
-    currentCardDefaultValue = Number.parseInt(localStorage?.getItem('currentCard')) ?? 0;
+    currentCardDefaultValue = Number.parseInt(localStorage.getItem('currentCard') ?? '0') || 0;
   }
 
   const { subscribe, set, update } = writable<number>(currentCardDefaultValue);

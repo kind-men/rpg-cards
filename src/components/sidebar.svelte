@@ -16,9 +16,10 @@
   import Deck from './deck.svelte';
   import Hint from './hint.svelte';
   import DeckEditorDialog from './deck-editor-dialog.svelte';
-  import DeckImportDialog, { ImportEventPayload } from './deck-import-dialog.svelte';
+  import DeckImportDialog from './deck-import-dialog.svelte';
   import SidebarSection from './sidebar-section.svelte';
   import type { PaperFormat } from '../model/page-layout';
+  import type { ImportEventPayload } from './deck-import-dialog.svelte';
 
   let importFileSelector: HTMLInputElement;
   let importFiles: FileList;
@@ -151,7 +152,12 @@
   </div>
 
   <div class="sidebar-toolbar">
-    <div class="general-menu-popover" on:click|stopPropagation>
+    <div
+      class="general-menu-popover"
+      role="presentation"
+      on:click|stopPropagation
+      on:keydown|stopPropagation
+    >
       <button
         class="general-menu-trigger"
         type="button"
@@ -160,7 +166,7 @@
         on:click={toggleGeneralMenu}
       >
         <img class="general-menu-trigger-image" src={`${base}/menu-logo.svg`} alt="" />
-        <span class:general-menu-chevron-open={generalMenuOpen} class="general-menu-chevron" />
+        <span class:general-menu-chevron-open={generalMenuOpen} class="general-menu-chevron"></span>
       </button>
 
       {#if generalMenuOpen}
@@ -172,7 +178,7 @@
             <button class="general-menu-item" type="button" on:click={handleExportToFileClick}>
               Save
             </button>
-            <div class="general-menu-divider" />
+            <div class="general-menu-divider"></div>
 
             <button
               class="general-menu-item"
@@ -189,7 +195,7 @@
             </button>
           </div>
 
-          <div class="general-menu-divider" />
+          <div class="general-menu-divider"></div>
 
           <div class="general-menu-group">
             <label class="general-toggle-row" for="convert-first-subtitle">

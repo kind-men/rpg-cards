@@ -25,7 +25,7 @@
       type="button"
       aria-label="Resize right sidebar"
       on:mousedown={startResize}
-    />
+    ></button>
   {/if}
 
   <div class="sidebar-container-content">
@@ -38,7 +38,7 @@
       type="button"
       aria-label="Resize left sidebar"
       on:mousedown={startResize}
-    />
+    ></button>
   {/if}
 </aside>
 

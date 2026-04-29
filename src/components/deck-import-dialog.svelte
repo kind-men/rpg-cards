@@ -63,7 +63,7 @@
 <Modal isOpen={open} {toggle} size="xl" backdrop="static">
   <ModalHeader {toggle}>Import JSON</ModalHeader>
   <ModalBody>
-    <div use:shortcut={{ code: 'Escape', callback: toggle }} />
+    <div use:shortcut={{ code: 'Escape', callback: toggle }}></div>
     {#if error}
       <Alert color="danger">
         <Icon name="exclamation-triangle-fill" />

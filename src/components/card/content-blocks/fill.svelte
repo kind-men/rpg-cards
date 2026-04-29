@@ -7,7 +7,7 @@
   $: height = Number.parseFloat(getContentText(content)) || undefined;
 </script>
 
-<div class="fill" class:flex={height === undefined} style="height: {height}mm" />
+<div class="fill" class:flex={height === undefined} style="height: {height}mm"></div>
 
 <style lang="scss">
   .fill {

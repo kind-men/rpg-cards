@@ -5,7 +5,7 @@
   $: void content;
 </script>
 
-<div class="rule" />
+<div class="rule"></div>
 
 <style>
   .rule {

@@ -1,12 +1,11 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 import { currentCard } from '.';
 
 function createMultiSelect() {
   let defaultValue = new Set<number>();
   if (browser) {
-    defaultValue =
-      new Set(JSON.parse(localStorage.getItem('multiSelect')) as Array<number>) ?? defaultValue;
+    defaultValue = new Set(JSON.parse(localStorage.getItem('multiSelect') ?? '[]') as Array<number>);
   }
 
   const { subscribe, set, update } = writable<Set<number>>(defaultValue);
@@ -48,7 +47,7 @@ multiSelect.subscribe((current) => {
   }
 
   if (current.size === 1) {
-    currentCard.set(current.values().next().value);
+    currentCard.set(Array.from(current.values())[0]);
   } else if (current.size === 0) {
     currentCard.set(-1);
   }

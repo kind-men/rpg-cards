@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { getIcon, Icon as IconModel } from '../lib/icons';
-  import type ColorResolvable from '../model/color-resolvable';
+  import { getIcon } from '../lib/icons';
+  import type { Icon as IconModel } from '../lib/icons';
+  import type { ColorResolvable } from '../model/color-resolvable';
 
   export let name: string;
 
-  let icon: IconModel;
+  let icon: IconModel | undefined;
   $: icon = getIcon(name);
 
   export let color: ColorResolvable = 'var(--color-surface-base)';

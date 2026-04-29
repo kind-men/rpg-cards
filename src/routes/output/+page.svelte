@@ -1,8 +1,8 @@
 <script lang="ts">
   import split from 'just-split';
-  import CardBack from '../components/card/card-back.svelte';
-  import Card from '../components/card/card.svelte';
-  import { deck, pageLayout } from '../stores';
+  import CardBack from '../../components/card/card-back.svelte';
+  import Card from '../../components/card/card.svelte';
+  import { deck, pageLayout } from '../../stores';
 
   const GAP_BETWEEN = 2;
   const PAGE_PADDING = 5;
@@ -62,7 +62,7 @@
         </div>
       {/each}
     </div>
-    <div style="break-after:page" />
+    <div style="break-after:page"></div>
   {/each}
 </div>
 

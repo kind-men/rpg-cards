@@ -14,17 +14,11 @@ export interface BaseCardContent {
   id?: string;
 }
 
-export interface FlatCardContent extends BaseCardContent {
-  type: Exclude<CardContentTypeV2, 'row'>;
-  content: string;
+export interface CardContent extends BaseCardContent {
+  type: CardContentTypeV2;
+  content?: string;
+  children?: CardContent[][];
 }
-
-export interface RowCardContent extends BaseCardContent {
-  type: 'row';
-  columns: CardContent[][];
-}
-
-export type CardContent = FlatCardContent | RowCardContent;
 
 export default interface Card {
   count: number;

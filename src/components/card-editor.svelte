@@ -1,6 +1,6 @@
 <script lang="ts">
   import { DEFAULT_LAYOUT } from '$lib/defaults';
-  import { isFlatCardContent } from '$lib/card-content';
+  import { isContainerContent } from '$lib/card-content';
   import extend from 'just-extend';
   import { tick } from 'svelte';
   import {
@@ -50,7 +50,7 @@
   $: cardbackMode = card?.cardback_mode ?? 'icon';
   $: cardbackImages = card?.cardback_images ?? [];
   $: hasTitleContent =
-    card?.contents?.some((content) => isFlatCardContent(content) && content.type === 'cardtitle') ?? false;
+    card?.contents?.some((content) => !isContainerContent(content) && content.type === 'cardtitle') ?? false;
   $: isTitleVisible = hasTitleContent || card?.layout?.show_title !== false;
   $: selectedDeckCard = $currentCard > -1 ? $deck[$currentCard] : undefined;
   $: isWizardVisible =
@@ -387,8 +387,8 @@
                       color="link"
                       class="editor-icon-button"
                       aria-label={hasExpandedContentItems
-                        ? 'Collapse all content items'
-                        : 'Expand all content items'}
+                        ? 'Collapse all content blocks'
+                        : 'Expand all content blocks'}
                       on:click={toggleAllContentItems}
                     >
                       <Icon name={hasExpandedContentItems ? 'arrows-collapse' : 'arrows-expand'} />

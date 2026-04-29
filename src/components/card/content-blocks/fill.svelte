@@ -1,9 +1,12 @@
 <script lang="ts">
-  import type { FlatCardContent } from '$model/card';
+  import { getContentText } from '$lib/card-content';
+  import type Card from '$model/card';
+  import type { CardContent } from '$model/card';
 
-  export let content: FlatCardContent;
+  export let card: Card;
+  export let content: CardContent;
 
-  $: height = Number.parseFloat(content.content) || undefined;
+  $: height = Number.parseFloat(getContentText(content)) || undefined;
 </script>
 
 <div class="fill" class:flex={height === undefined} style="height: {height}mm" />

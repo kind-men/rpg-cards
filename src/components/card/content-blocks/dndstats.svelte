@@ -1,8 +1,11 @@
 <script lang="ts">
+  import { getContentText } from '$lib/card-content';
   import { SPLIT_REGEX } from '$lib/constants';
-  import type { FlatCardContent } from '$model/card';
+  import type Card from '$model/card';
+  import type { CardContent } from '$model/card';
 
-  export let content: FlatCardContent;
+  export let card: Card;
+  export let content: CardContent;
 
   let str = 0,
     dex = 0,
@@ -12,12 +15,12 @@
     cha = 0;
 
   $: {
-    str = Number.parseInt(content.content.split(SPLIT_REGEX)[0]) || 0;
-    dex = Number.parseInt(content.content.split(SPLIT_REGEX)[1]) || 0;
-    con = Number.parseInt(content.content.split(SPLIT_REGEX)[2]) || 0;
-    int = Number.parseInt(content.content.split(SPLIT_REGEX)[3]) || 0;
-    wis = Number.parseInt(content.content.split(SPLIT_REGEX)[4]) || 0;
-    cha = Number.parseInt(content.content.split(SPLIT_REGEX)[5]) || 0;
+    str = Number.parseInt(getContentText(content).split(SPLIT_REGEX)[0]) || 0;
+    dex = Number.parseInt(getContentText(content).split(SPLIT_REGEX)[1]) || 0;
+    con = Number.parseInt(getContentText(content).split(SPLIT_REGEX)[2]) || 0;
+    int = Number.parseInt(getContentText(content).split(SPLIT_REGEX)[3]) || 0;
+    wis = Number.parseInt(getContentText(content).split(SPLIT_REGEX)[4]) || 0;
+    cha = Number.parseInt(getContentText(content).split(SPLIT_REGEX)[5]) || 0;
   }
 
   const displayNumberWithSign = (number: number): string => {

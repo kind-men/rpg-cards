@@ -1,12 +1,15 @@
 <script lang="ts">
+  import { getContentText } from '$lib/card-content';
   import { renderText } from '$lib/card-render-util';
 
   import { SPLIT_REGEX } from '$lib/constants';
-  import type { FlatCardContent } from '$model/card';
+  import type Card from '$model/card';
+  import type { CardContent } from '$model/card';
 
-  export let content: FlatCardContent;
+  export let card: Card;
+  export let content: CardContent;
 
-  $: [title, rightTitle] = content.content.split(SPLIT_REGEX);
+  $: [title, rightTitle] = getContentText(content).split(SPLIT_REGEX);
   $: hasLeftTitle = Boolean(title?.trim());
   $: hasRightTitle = Boolean(rightTitle?.trim());
 </script>

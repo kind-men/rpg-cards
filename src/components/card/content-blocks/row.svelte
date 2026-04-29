@@ -1,17 +1,19 @@
 <script lang="ts">
+  import { getContentChildren } from '$lib/card-content';
   import type Card from '$model/card';
-  import type { RowCardContent } from '$model/card';
-  import CardContent from '../card-content.svelte';
+  import type { CardContent } from '$model/card';
+  import CardContentBlock from '../card-content.svelte';
 
   export let card: Card;
-  export let content: RowCardContent;
+  export let content: CardContent;
+  $: columns = getContentChildren(content);
 </script>
 
-<div class="card-row" style={`--card-row-columns: ${Math.max(content.columns?.length ?? 0, 1)};`}>
-  {#each content.columns as column}
+<div class="card-row" style={`--card-row-columns: ${Math.max(columns?.length ?? 0, 1)};`}>
+  {#each columns as column}
     <div class="card-row-column">
       {#each column as columnContent}
-        <CardContent content={columnContent} {card} />
+        <CardContentBlock content={columnContent} {card} />
       {/each}
     </div>
   {/each}

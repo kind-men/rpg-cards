@@ -1,19 +1,36 @@
-import type { CardContent, FlatCardContent, RowCardContent } from '$model/card';
+import type { CardContent } from '$model/card';
 import { uuid4 } from './uuid';
 
-export function isRowCardContent(content: CardContent): content is RowCardContent {
-  return content.type === 'row';
+export function hasChildCollections(content: CardContent): boolean {
+  return Array.isArray(content.children);
 }
 
-export function isFlatCardContent(content: CardContent): content is FlatCardContent {
-  return content.type !== 'row';
+export function isContainerContent(content: CardContent): boolean {
+  return content.type === 'row' || hasChildCollections(content);
+}
+
+export function getContentText(content: CardContent): string {
+  return content.content ?? '';
+}
+
+export function setContentText(content: CardContent, value: string): CardContent {
+  return {
+    ...content,
+    content: value
+  };
+}
+
+export function getContentChildren(content: CardContent): CardContent[][] {
+  return content.children ?? [];
 }
 
 export function cloneCardContent(content: CardContent): CardContent {
-  if (isRowCardContent(content)) {
+  if (hasChildCollections(content)) {
     return {
       ...content,
-      columns: content.columns.map((column) => column.map((columnContent) => cloneCardContent(columnContent)))
+      children: getContentChildren(content).map((column) =>
+        column.map((columnContent) => cloneCardContent(columnContent))
+      )
     };
   }
 
@@ -25,11 +42,11 @@ export function cloneCardContents(contents: CardContent[]): CardContent[] {
 }
 
 export function cloneCardContentWithNewIds(content: CardContent): CardContent {
-  if (isRowCardContent(content)) {
+  if (hasChildCollections(content)) {
     return {
       ...content,
       id: uuid4(),
-      columns: content.columns.map((column) =>
+      children: getContentChildren(content).map((column) =>
         column.map((columnContent) => cloneCardContentWithNewIds(columnContent))
       )
     };
@@ -45,21 +62,21 @@ export function cloneCardContentsWithNewIds(contents: CardContent[]): CardConten
   return contents.map((content) => cloneCardContentWithNewIds(content));
 }
 
-export function createEmptyRowCardContent(): RowCardContent {
+export function createEmptyRowCardContent(): CardContent {
   return {
     id: uuid4(),
     type: 'row',
-    columns: [[], []]
+    children: [[], []]
   };
 }
 
 export function withContentIds(contents: CardContent[]): CardContent[] {
   return contents.map((content) => {
-    if (isRowCardContent(content)) {
+    if (hasChildCollections(content)) {
       return {
         ...content,
         id: content.id ?? uuid4(),
-        columns: content.columns.map((column) => withContentIds(column))
+        children: getContentChildren(content).map((column) => withContentIds(column))
       };
     }
 

@@ -133,7 +133,7 @@
         {
           "type": "row",
           "id": "04ea19f0-2655-44d4-9de5-595c9b554b75",
-          "columns": [
+          "children": [
             [
               {
                 "type": "text",
@@ -172,7 +172,7 @@
     <li><code>cardback_border_style</code> (string, optional): cardback border style. Possible values: <code>"none"</code>, <code>"normal"</code></li>
     <li><code>tags</code> (array): list of tags</li>
     <li><code>layout</code> (object): per-card layout settings</li>
-    <li><code>contents</code> (array): list of content blocks using object entries with <code>type</code> and optional <code>id</code>. Most blocks store <code>content</code>; <code>row</code> stores <code>columns</code>. See <a href="#contents">Contents JSON data</a>.</li>
+    <li><code>contents</code> (array): list of content blocks using object entries with <code>type</code> and optional <code>id</code>. Most blocks store <code>content</code>; <code>row</code> stores <code>children</code>. See <a href="#contents">Contents JSON data</a>.</li>
   </ul>
   <p>Example:</p>
   <pre><code>{`{
@@ -198,7 +198,7 @@
     {
       "type": "row",
       "id": "04ea19f0-2655-44d4-9de5-595c9b554b75",
-      "columns": [
+      "children": [
         [
           {
             "type": "text",
@@ -253,7 +253,7 @@
   <ul>
     <li><code>type</code> (string): content type used by the renderer. See <a href="#content-types">the table below</a>.</li>
     <li><code>content</code> (string): content parameters separated by a pipe <code>|</code> for non-row blocks</li>
-    <li><code>columns</code> (array): nested column lists for <code>row</code> blocks only</li>
+    <li><code>children</code> (array): nested column lists for <code>row</code> blocks only</li>
     <li><code>id</code> (string, optional): unique id used by the editor</li>
   </ul>
   <p>
@@ -270,7 +270,7 @@
   {
     "type": "row",
     "id": "0d50737a-8fb3-4fc8-a21a-66211c447bab",
-    "columns": [
+    "children": [
       [
         {
           "type": "text",

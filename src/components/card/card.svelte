@@ -1,6 +1,6 @@
 <script lang="ts">
   import { DEFAULT_LAYOUT } from '$lib/defaults';
-  import { isFlatCardContent } from '$lib/card-content';
+  import { isContainerContent } from '$lib/card-content';
 
   import type Card from '$model/card';
   import { pageLayout } from '../../stores';
@@ -9,12 +9,12 @@
   export let card: Card;
 
   $: hasTitleContent =
-    card.contents?.some((content) => isFlatCardContent(content) && content.type === 'cardtitle') ?? false;
+    card.contents?.some((content) => !isContainerContent(content) && content.type === 'cardtitle') ?? false;
   $: showTitle = card.layout?.show_title !== false && !hasTitleContent;
   $: mainContents =
-    card.contents?.filter((content) => !isFlatCardContent(content) || content.type !== 'footer') ?? [];
+    card.contents?.filter((content) => isContainerContent(content) || content.type !== 'footer') ?? [];
   $: footerContents =
-    card.contents?.filter((content) => isFlatCardContent(content) && content.type === 'footer') ?? [];
+    card.contents?.filter((content) => !isContainerContent(content) && content.type === 'footer') ?? [];
 </script>
 
 <div

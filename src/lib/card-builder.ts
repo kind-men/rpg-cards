@@ -26,11 +26,11 @@ export function createNewCardContent(type: CardContentTypeV2): CardContent {
     return createEmptyRowCardContent();
   }
 
-  const content = {
+  const content: CardContent = {
     id: uuid4(),
     type,
     content: ''
-  } as CardContent;
+  };
 
   return content;
 }

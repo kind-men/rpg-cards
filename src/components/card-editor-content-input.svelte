@@ -1,31 +1,66 @@
 <script lang="ts">
   import { getContentTypeDescriptor } from '$lib/card-content-types';
-  import { isFlatCardContent, isRowCardContent } from '$lib/card-content';
+  import type { CardContentTypeV2 } from '$lib/card-content-types';
+  import { getContentText, isContainerContent, setContentText } from '$lib/card-content';
   import { createEventDispatcher } from 'svelte';
+  import type { SvelteComponent } from 'svelte';
   import { dragHandle } from 'svelte-dnd-action';
-  import { Button, ButtonGroup, Icon, Input, InputGroup } from 'sveltestrap';
+  import { Button, ButtonGroup, Icon } from 'sveltestrap';
   import { SPLIT_REGEX } from '../lib/constants';
   import type { CardContent } from '../model/card';
-  import ImageUploadInput from './image-upload-input.svelte';
-  import MarkdownEditor from './markdown-editor.svelte';
+  import BoxesContentBlockEditor from './content-block-editors/boxes-content-block-editor.svelte';
+  import BulletContentBlockEditor from './content-block-editors/bullet-content-block-editor.svelte';
+  import CardtitleContentBlockEditor from './content-block-editors/cardtitle-content-block-editor.svelte';
+  import DescriptionContentBlockEditor from './content-block-editors/description-content-block-editor.svelte';
+  import DndspellblockContentBlockEditor from './content-block-editors/dndspellblock-content-block-editor.svelte';
+  import DndstatsContentBlockEditor from './content-block-editors/dndstats-content-block-editor.svelte';
+  import FillContentBlockEditor from './content-block-editors/fill-content-block-editor.svelte';
+  import FooterContentBlockEditor from './content-block-editors/footer-content-block-editor.svelte';
+  import PictureContentBlockEditor from './content-block-editors/picture-content-block-editor.svelte';
+  import PropertyContentBlockEditor from './content-block-editors/property-content-block-editor.svelte';
+  import RowContentBlockEditor from './content-block-editors/row-content-block-editor.svelte';
+  import RuleContentBlockEditor from './content-block-editors/rule-content-block-editor.svelte';
+  import SectionContentBlockEditor from './content-block-editors/section-content-block-editor.svelte';
+  import SubtitleContentBlockEditor from './content-block-editors/subtitle-content-block-editor.svelte';
+  import TextContentBlockEditor from './content-block-editors/text-content-block-editor.svelte';
 
-  export let canRemoveColumn = false;
   export let collapsed = true;
-  export let columnCount = 0;
   export let content: CardContent;
+  export let depth = 0;
+  export let setCollapsedVersion = 0;
+  export let setCollapsed = true;
 
   const dispatch = createEventDispatcher();
   let splitContent: string[] = [];
   let lastSyncedContentId: string | undefined;
   let lastSyncedSerializedContent = '';
 
+  const contentEditorComponentMap: Record<CardContentTypeV2, typeof SvelteComponent> = {
+    bullet: BulletContentBlockEditor,
+    boxes: BoxesContentBlockEditor,
+    cardtitle: CardtitleContentBlockEditor,
+    description: DescriptionContentBlockEditor,
+    dndspellblock: DndspellblockContentBlockEditor,
+    dndstats: DndstatsContentBlockEditor,
+    fill: FillContentBlockEditor,
+    footer: FooterContentBlockEditor,
+    picture: PictureContentBlockEditor,
+    property: PropertyContentBlockEditor,
+    row: RowContentBlockEditor,
+    rule: RuleContentBlockEditor,
+    section: SectionContentBlockEditor,
+    subtitle: SubtitleContentBlockEditor,
+    text: TextContentBlockEditor
+  };
+
   $: typeDescriptor = getContentTypeDescriptor(content.type);
+  $: contentEditorComponent = contentEditorComponentMap[content.type];
 
   const getSplitContentFromValue = (value: string) =>
-    value?.split(SPLIT_REGEX) ?? typeDescriptor.params.map(() => '');
+    value?.split(SPLIT_REGEX) ?? typeDescriptor?.params?.map(() => '') ?? [];
 
-  $: if (isFlatCardContent(content)) {
-    const serializedContent = content.content ?? '';
+  $: if (!isContainerContent(content)) {
+    const serializedContent = getContentText(content);
     const shouldResync =
       content.id !== lastSyncedContentId || serializedContent !== lastSyncedSerializedContent;
 
@@ -41,7 +76,7 @@
   }
 
   const updateContent = () => {
-    if (!isFlatCardContent(content)) {
+    if (isContainerContent(content)) {
       return;
     }
 
@@ -56,19 +91,16 @@
         })
         .join(' | ') ?? '';
 
-    if (content.content === nextContent) {
+    if (getContentText(content) === nextContent) {
       return;
     }
 
-    content = {
-      ...content,
-      content: nextContent
-    };
+    content = setContentText(content, nextContent);
     lastSyncedContentId = content.id;
     lastSyncedSerializedContent = nextContent;
   };
 
-  $: if (isFlatCardContent(content) && splitContent) {
+  $: if (!isContainerContent(content) && splitContent) {
     updateContent();
   }
 </script>
@@ -80,7 +112,7 @@
         type="button"
         class="editor-content-drag-handle"
         use:dragHandle
-        aria-label={`Drag ${typeDescriptor.label ?? typeDescriptor.name} content item`}
+        aria-label={`Drag ${typeDescriptor?.label ?? typeDescriptor?.name ?? content.type} content block`}
       >
         <Icon name="grip-vertical" />
       </button>
@@ -91,10 +123,7 @@
         on:click={() => dispatch('togglecollapse')}
       >
         <Icon name={collapsed ? 'chevron-right' : 'chevron-down'} />
-        <span>{typeDescriptor.label ?? typeDescriptor.name}</span>
-        {#if isRowCardContent(content)}
-          <span class="editor-content-card-meta">{columnCount} columns</span>
-        {/if}
+        <span>{typeDescriptor?.label ?? typeDescriptor?.name ?? content.type}</span>
       </button>
     </div>
     <ButtonGroup class="editor-content-actions">
@@ -126,125 +155,16 @@
       class="editor-content-card-body"
       class:editor-content-card-body-text={content.type === 'text'}
     >
-      {#if content.type === 'text'}
-        <MarkdownEditor bind:value={splitContent[0]} height="280px" />
-      {:else if content.type === 'footer'}
-        <div class="editor-content-labeled-fields">
-          {#each typeDescriptor.params as param, index}
-            <div class="editor-content-embedded-input">
-              <span class="editor-content-input-icon">
-                <Icon name={index === 0 ? 'justify-left' : 'justify-right'} />
-              </span>
-              <Input
-                class="editor-content-input editor-content-input-with-icon"
-                type={param.type ?? 'text'}
-                bind:value={splitContent[index]}
-                placeholder={param.name}
-              />
-            </div>
-          {/each}
-        </div>
-      {:else if content.type === 'section'}
-        <div class="editor-content-labeled-fields">
-          {#each typeDescriptor.params as param, index}
-            <div class="editor-content-embedded-input">
-              <span class="editor-content-input-icon">
-                <Icon
-                  name={index === 0
-                    ? splitContent[1]?.trim()
-                      ? 'justify-left'
-                      : 'justify'
-                    : 'justify-right'}
-                />
-              </span>
-              <Input
-                class="editor-content-input editor-content-input-with-icon"
-                type={param.type ?? 'text'}
-                bind:value={splitContent[index]}
-                placeholder={param.name}
-              />
-            </div>
-          {/each}
-        </div>
-      {:else if content.type === 'dndspellblock'}
-        <div class="editor-content-labeled-fields">
-          {#each typeDescriptor.params as param, index}
-            <div class="editor-content-field-row">
-              <span class="editor-content-field-label">{param.name}</span>
-              <Input
-                class="editor-content-input"
-                type={param.type ?? 'text'}
-                bind:value={splitContent[index]}
-                placeholder={param.name}
-              />
-            </div>
-          {/each}
-        </div>
-      {:else if content.type === 'picture'}
-        <ImageUploadInput
-          src={splitContent[0]}
-          alt="Picture content preview"
-          emptyLabel="No image"
-          on:change={(event) => (splitContent[0] = event.detail.src)}
-        >
-          <Input type="text" bind:value={splitContent[0]} placeholder="URL" />
-          <Input
-            type="text"
-            bind:value={splitContent[1]}
-            placeholder="Size (for example 120px, 60%, auto)"
-          />
-        </ImageUploadInput>
-      {:else if content.type === 'row'}
-        <div class="editor-row-summary">
-          <div class="editor-row-summary-header">
-            <div class="editor-row-summary-label">Nested layout</div>
-          </div>
-          <p class="editor-row-summary-text">
-            Columns are stacked below in the sidebar and rendered evenly across the card.
-          </p>
-          <div class="editor-row-summary-actions">
-            <Button
-              color="link"
-              class="editor-row-action"
-              aria-label="Add row column"
-              on:click={(e) => {
-                  e.preventDefault();
-                  dispatch('addcolumn');
-                }}
-            >
-              <Icon name="plus-lg" />
-              <span>Add column</span>
-            </Button>
-            <Button
-              color="link"
-              class="editor-row-action"
-              aria-label="Remove row column"
-              disabled={!canRemoveColumn}
-              on:click={(e) => {
-                  e.preventDefault();
-                  dispatch('removecolumn');
-                }}
-            >
-              <Icon name="dash-lg" />
-              <span>Remove column</span>
-            </Button>
-          </div>
-        </div>
-      {:else}
-        <InputGroup class="editor-content-input-group">
-          {#if typeDescriptor.params.length === 0}
-            <Input disabled />
-          {:else}
-            {#each typeDescriptor.params as param, index}
-              <Input
-                class="editor-content-input"
-                type={param.type ?? 'text'}
-                bind:value={splitContent[index]}
-                placeholder={param.name}
-              />
-            {/each}
-          {/if}
-        </InputGroup>
+      {#if isContainerContent(content) && content.type === 'row'}
+        <RowContentBlockEditor
+          bind:content
+          {depth}
+          {setCollapsed}
+          {setCollapsedVersion}
+          on:collapsechange={(event) => dispatch('collapsechange', event.detail)}
+        />
+      {:else if contentEditorComponent && typeDescriptor}
+        <svelte:component this={contentEditorComponent} bind:splitContent {typeDescriptor} />
       {/if}
     </div>
   {/if}
@@ -313,14 +233,6 @@
     color: var(--editor-content-card-text-hover);
   }
 
-  .editor-content-card-meta {
-    margin-left: auto;
-    color: var(--editor-content-card-text-muted);
-    font-size: 0.68rem;
-    font-weight: 500;
-    text-transform: none;
-  }
-
   .editor-content-drag-handle {
     width: 1.6rem;
     height: 1.6rem;
@@ -353,17 +265,17 @@
     padding: 0;
   }
 
-  .editor-content-labeled-fields {
+  :global(.editor-content-labeled-fields) {
     display: grid;
     gap: 0.5rem;
   }
 
-  .editor-content-field-row {
+  :global(.editor-content-field-row) {
     display: grid;
     gap: 0.2rem;
   }
 
-  .editor-content-field-label {
+  :global(.editor-content-field-label) {
     color: var(--editor-content-card-label);
     font-size: 0.7rem;
     font-weight: 600;
@@ -371,12 +283,12 @@
     text-transform: uppercase;
   }
 
-  .editor-row-summary {
+  :global(.editor-row-summary) {
     display: grid;
     gap: 0.25rem;
   }
 
-  .editor-row-summary-header {
+  :global(.editor-row-summary-header) {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -384,7 +296,7 @@
     flex-wrap: wrap;
   }
 
-  .editor-row-summary-label {
+  :global(.editor-row-summary-label) {
     color: var(--editor-content-card-label);
     font-size: 0.7rem;
     font-weight: 700;
@@ -392,7 +304,7 @@
     text-transform: uppercase;
   }
 
-  .editor-row-summary-actions {
+  :global(.editor-row-summary-actions) {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
@@ -422,7 +334,7 @@
     color: var(--editor-content-card-text-subtle);
   }
 
-  .editor-row-summary-text {
+  :global(.editor-row-summary-text) {
     margin: 0;
     color: var(--editor-content-card-text-muted);
     font-size: 0.76rem;
@@ -439,7 +351,7 @@
     margin-bottom: 0;
   }
 
-  .editor-content-embedded-input {
+  :global(.editor-content-embedded-input) {
     position: relative;
   }
 
@@ -452,11 +364,23 @@
     border-radius: var(--bs-border-radius);
   }
 
-  .editor-content-embedded-input :global(input.form-control) {
+  :global(.editor-content-grid-fields) {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  }
+
+  :global(.editor-content-grid-fields-compact) {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  }
+
+  :global(.editor-content-embedded-input input.form-control) {
     padding-left: 2.1rem;
   }
 
-  .editor-content-input-icon {
+  :global(.editor-content-input-icon) {
     position: absolute;
     top: 50%;
     left: 0.7rem;
@@ -468,12 +392,20 @@
     color: var(--editor-content-card-text-muted);
   }
 
-  :global(input.form-control.editor-content-input-with-icon) {
+  :global(.editor-content-embedded-input .editor-content-input-with-icon),
+  :global(.editor-content-embedded-input input.form-control.editor-content-input-with-icon) {
     padding-left: 2.1rem;
   }
 
   :global(.input-property-title) {
     max-width: 10em;
+  }
+
+  :global(.editor-content-note) {
+    margin: 0;
+    color: var(--editor-content-card-text-muted);
+    font-size: 0.76rem;
+    line-height: 1.45;
   }
 
   :global(.editor-content-actions .btn) {

@@ -1,13 +1,16 @@
 <script lang="ts">
+  import { getContentText } from '$lib/card-content';
   import { renderText } from '$lib/card-render-util';
-  import type { FlatCardContent } from '$model/card';
+  import type Card from '$model/card';
+  import type { CardContent } from '$model/card';
 
-  export let content: FlatCardContent;
+  export let card: Card;
+  export let content: CardContent;
 </script>
 
 <ul class="bullet">
   <li>
-    {@html renderText(content.content)}
+    {@html renderText(getContentText(content))}
   </li>
 </ul>
 

@@ -1,10 +1,13 @@
 <script lang="ts">
+  import { getContentText } from '$lib/card-content';
   import { SPLIT_REGEX } from '$lib/constants';
-  import type { FlatCardContent } from '$model/card';
+  import type Card from '$model/card';
+  import type { CardContent } from '$model/card';
 
-  export let content: FlatCardContent;
+  export let card: Card;
+  export let content: CardContent;
 
-  $: [src, size] = content.content.split(SPLIT_REGEX);
+  $: [src, size] = getContentText(content).split(SPLIT_REGEX);
 </script>
 
 <!-- svelte-ignore a11y-img-redundant-alt -->

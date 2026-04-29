@@ -3,9 +3,9 @@
   import type Card from '../model/card';
   import type { CardFormat } from '../model/page-layout';
   import { createNewCard } from '../lib/card-builder';
+  import { cloneCardContentsWithNewIds } from '../lib/card-content';
   import { CARD_SIZE_PRESETS, currentCard, deck, multiSelect, pageLayout } from '../stores';
   import ConfirmationDialog from './confirmation-dialog.svelte';
-  import { uuid4 } from '$lib/uuid';
 
   const cardFormatOptions: { value: CardFormat; label: string }[] = [
     { value: 'poker', label: 'Poker' },
@@ -73,7 +73,7 @@
   const handleDuplicateCard = (card: Card): void => {
     const newCard = {
       ...card,
-      contents: card.contents.map((c) => ({ ...c, id: uuid4() }))
+      contents: cloneCardContentsWithNewIds(card.contents)
     } as Card;
 
     deck.addCards(newCard);

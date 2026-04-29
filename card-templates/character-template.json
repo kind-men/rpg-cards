@@ -1,0 +1,27 @@
+[
+  {
+    "count": 1,
+    "color": "#6b4f8d",
+    "title": "Character Template",
+    "icon": "hood",
+    "icon_back": "hood",
+    "contents": [
+      "subtitle | Class or role",
+      "rule",
+      "dndstats | 10 | 14 | 12 | 8 | 13 | 16",
+      "property | Level | 1",
+      "property | HP | 10",
+      "property | Armor | 12",
+      "rule",
+      "text | Add a short description of the character here.",
+      "section | Ability",
+      "text | Describe a signature ability, power, or attack.",
+      "section | Notes",
+      "text | Add gear, traits, or roleplaying notes here."
+    ],
+    "tags": ["template", "character"],
+    "layout": {
+      "show_title": true
+    }
+  }
+]

@@ -29,12 +29,12 @@
   import CardContentBlocksEditor from './card-content-blocks-editor.svelte';
   import CardSetupWizard from './card-setup-wizard.svelte';
   import ColorInput from '../form/color.svelte';
-  import CssEditor from '../form/css-editor.svelte';
+  import CssEditor from '../form/code-editor/css.svelte';
   import IconInput from '../form/game-icon.svelte';
   import Hint from '../hint.svelte';
   import ImageUploadInput from '../form/image-upload.svelte';
   import SidebarSection from '../sidebar-section.svelte';
-  import TextEditor from '../form/text-editor.svelte';
+  import TextEditor from '../form/code-editor/text.svelte';
 
   let card: Card = $deck[$currentCard];
   let cardIndex = $currentCard;
@@ -616,7 +616,7 @@
                             on some properties)
                           </Hint>
                         </Label>
-                        <CssEditor id="custom-css" bind:css={card.layout.custom_css} />
+                        <CssEditor id="custom-css" bind:value={card.layout.custom_css} />
                       </div>
                     {/if}
             </SidebarSection>

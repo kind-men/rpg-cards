@@ -1,5 +1,5 @@
 <script lang="ts">
-  import JsonEditor from '$components/form/json-editor.svelte';
+  import JsonEditor from '$components/form/code-editor/json.svelte';
   import { shortcut } from '$lib/shortcut';
   import debounce from 'just-debounce-it';
   import { Icon, Toast, ToastHeader } from 'sveltestrap';

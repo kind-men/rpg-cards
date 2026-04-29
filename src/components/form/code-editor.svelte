@@ -1,12 +1,16 @@
 <script lang="ts">
-  import { basicSetup, EditorState, EditorView } from '@codemirror/basic-setup';
-  import type { ViewUpdate } from '@codemirror/view';
+  import { basicSetup, EditorState } from '@codemirror/basic-setup';
+  import { EditorView, type ViewUpdate } from '@codemirror/view';
   import { onMount } from 'svelte';
 
   export let value = '';
+  export let changed = false;
   export let id = '';
-  let clazz = '';
-  export { clazz as class };
+  export let extensions = [];
+  export let transformExternalValue: (value: string) => string = (nextValue) => nextValue ?? '';
+  export let transformInternalValue: (value: string) => string = (nextValue) => nextValue;
+  let className = '';
+  export { className as class };
 
   let parent: HTMLDivElement;
   let editor: EditorView;
@@ -19,14 +23,24 @@
       return;
     }
 
-    value = update.state.doc.toString();
+    value = transformInternalValue(update.state.doc.toString());
+    changed = true;
   };
+
+  export const getValue = () => getDocValue();
+  export const focus = () => editor?.focus();
+  export const getEditor = () => editor;
 
   onMount(() => {
     editor = new EditorView({
       state: EditorState.create({
-        extensions: [basicSetup, EditorView.lineWrapping, EditorView.updateListener.of(onEditorUpdate)],
-        doc: value ?? ''
+        extensions: [
+          basicSetup,
+          EditorView.lineWrapping,
+          EditorView.updateListener.of(onEditorUpdate),
+          ...extensions
+        ],
+        doc: transformExternalValue(value ?? '')
       }),
       parent
     });
@@ -37,7 +51,7 @@
   });
 
   $: if (editor) {
-    const nextValue = value ?? '';
+    const nextValue = transformExternalValue(value ?? '');
     const currentValue = getDocValue();
 
     if (nextValue !== currentValue) {
@@ -54,7 +68,7 @@
   }
 </script>
 
-<div {id} class={`wrapper form-control input ${clazz}`.trim()} bind:this={parent} />
+<div {id} class={`wrapper form-control input ${className}`.trim()} bind:this={parent} />
 
 <style lang="scss">
   .wrapper {
@@ -65,11 +79,10 @@
     overflow: hidden;
 
     :global(.cm-editor) {
-      --text-editor-surface: var(--color-surface-muted);
       min-height: 0;
       height: 100%;
       flex: 1 1 auto;
-      background: var(--text-editor-surface);
+      background: var(--color-surface-muted);
     }
 
     :global(.cm-scroller) {

@@ -29,12 +29,12 @@
   import CardContentEditor from './card-content-editor.svelte';
   import CardSetupWizard from './card-setup-wizard.svelte';
   import ColorInput from '../form/color.svelte';
-  import CssEditor from './css-editor.svelte';
+  import CssEditor from '../form/css-editor.svelte';
   import IconInput from '../form/game-icon.svelte';
   import Hint from '../hint.svelte';
   import ImageUploadInput from '../form/image-upload.svelte';
   import SidebarSection from '../sidebar-section.svelte';
-  import TextEditor from './text-editor.svelte';
+  import TextEditor from '../form/text-editor.svelte';
 
   let card: Card = $deck[$currentCard];
   let cardIndex = $currentCard;

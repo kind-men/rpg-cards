@@ -1,6 +1,6 @@
 <script lang="ts">
   import type CardContentTypeDescriptor from '$model/card-content-type';
-  import MarkdownEditor from '../markdown-editor.svelte';
+  import MarkdownEditor from '../../form/markdown-editor.svelte';
 
   export let splitContent: string[] = [];
   export let typeDescriptor: CardContentTypeDescriptor;

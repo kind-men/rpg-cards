@@ -11,8 +11,7 @@
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
     "update-icons": "node --loader ts-node/esm ./tools/pull-icons.ts",
-    "postinstall": "node ./tools/patch-sveltestrap.js",
-    "prepare": "node ./tools/patch-sveltestrap.js && svelte-kit sync"
+    "prepare": "svelte-kit sync"
   },
   "devDependencies": {
     "@sveltejs/kit": "^2.58.0",
@@ -44,6 +43,7 @@
     "@codemirror/lint": "^0.19.3",
     "@codemirror/text": "^0.19.6",
     "@codemirror/view": "^0.19.45",
+    "@sveltestrap/sveltestrap": "^7.1.0",
     "@sveltejs/adapter-static": "^3.0.10",
     "@toast-ui/editor": "^3.2.2",
     "@types/markdown-it": "^12.2.3",
@@ -63,7 +63,6 @@
     "sanitize-html": "^2.7.0",
     "sass": "^1.99.0",
     "svelte-dnd-action": "^0.9.15",
-    "sveltestrap": "^5.9.0",
     "yauzl": "^2.10.0"
   }
 }

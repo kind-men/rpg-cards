@@ -1,6 +1,6 @@
 <script lang="ts">
   import { base } from '$app/paths';
-  import { Accordion, AccordionItem, Icon } from 'sveltestrap';
+  import { Accordion, AccordionItem, Icon } from '@sveltestrap/sveltestrap';
   import WorkspaceContentView from '$components/workspace-content-view.svelte';
   import WorkspaceShell from '$components/workspace-shell.svelte';
   import InfoContent from '../../content/info.svx';
@@ -37,3 +37,4 @@
     </section>
   </WorkspaceContentView>
 </WorkspaceShell>
+

@@ -17,7 +17,7 @@
     ModalBody,
     ModalFooter,
     ModalHeader
-  } from 'sveltestrap';
+  } from '@sveltestrap/sveltestrap';
   import { settings } from '../stores';
   import { shortcut } from '$lib/shortcut';
 
@@ -90,3 +90,4 @@
     }
   }
 </style>
+

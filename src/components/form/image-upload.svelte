@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { Input } from 'sveltestrap';
+  import { Input } from '@sveltestrap/sveltestrap';
 
   export let src = '';
   export let alt = 'Uploaded image preview';
@@ -84,3 +84,4 @@
     gap: 0.25rem;
   }
 </style>
+

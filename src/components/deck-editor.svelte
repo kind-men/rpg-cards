@@ -2,7 +2,7 @@
   import JsonEditor from '$components/form/code-editor/json.svelte';
   import { shortcut } from '$lib/shortcut';
   import debounce from 'just-debounce-it';
-  import { Icon, Toast, ToastHeader } from 'sveltestrap';
+  import { Icon, Toast, ToastHeader } from '@sveltestrap/sveltestrap';
 
   type T = $$Generic;
 
@@ -87,3 +87,4 @@
     justify-content: center;
   }
 </style>
+

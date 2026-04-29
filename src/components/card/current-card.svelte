@@ -1,7 +1,7 @@
 <script lang="ts">
   import { afterUpdate, tick } from 'svelte';
   import { settings } from '../../stores/settings';
-  import { Button, Icon, Input, InputGroup, InputGroupText, Tooltip } from 'sveltestrap';
+  import { Button, Icon, Input, InputGroup, InputGroupText, Tooltip } from '@sveltestrap/sveltestrap';
   import { currentCard, deck, pageLayout } from '../../stores';
   import CardComponent from './card.svelte';
   import CardBack from './card-back.svelte';
@@ -173,3 +173,4 @@
     }
   }
 </style>
+

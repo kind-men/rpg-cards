@@ -10,7 +10,7 @@
     Icon,
     Input,
     Label
-  } from 'sveltestrap';
+  } from '@sveltestrap/sveltestrap';
   import { createMultiCard, removeEmpty } from '$lib/card-builder';
   import {
     CardContentError,
@@ -459,7 +459,7 @@
                 </div>
               </div>
               <div class="sidebar-field">
-                <Label class="col-form-label" for="color-text" disabled>Color</Label>
+                <Label class="col-form-label" for="color-text">Color</Label>
                 <ColorInput bind:value={card.color} idPrefix="color" name="color" />
               </div>
             </SidebarSection>
@@ -914,3 +914,4 @@
     min-width: fit-content;
   }
 </style>
+

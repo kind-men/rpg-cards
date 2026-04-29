@@ -2,7 +2,7 @@
   import { flip } from 'svelte/animate';
   import { createEventDispatcher } from 'svelte';
   import { dragHandleZone } from 'svelte-dnd-action';
-  import { Button, Icon, Input, InputGroup } from 'sveltestrap';
+  import { Button, Icon, Input, InputGroup } from '@sveltestrap/sveltestrap';
   import { createNewCardContent } from '$lib/card-builder';
   import {
     cloneCardContentWithNewIds,
@@ -204,3 +204,4 @@
     margin-top: 0.35rem;
   }
 </style>
+

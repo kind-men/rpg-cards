@@ -1,6 +1,6 @@
 <script lang="ts">
   import { uuid4 } from '$lib/uuid';
-  import { Icon, Tooltip } from 'sveltestrap';
+  import { Icon, Tooltip } from '@sveltestrap/sveltestrap';
 
   export let id: string = uuid4();
 </script>
@@ -40,3 +40,4 @@
     }
   }
 </style>
+

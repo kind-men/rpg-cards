@@ -2,7 +2,7 @@
   import { getContentChildren } from '$lib/card-content';
   import type { CardContent } from '$model/card';
   import { createEventDispatcher } from 'svelte';
-  import { Button, Icon } from 'sveltestrap';
+  import { Button, Icon } from '@sveltestrap/sveltestrap';
   import CardContentBlocksEditor from '../card-content-blocks-editor.svelte';
 
   export let content: CardContent;
@@ -132,3 +132,4 @@
     font-size: 0.72rem;
   }
 </style>
+

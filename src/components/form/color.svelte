@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Input, InputGroup, InputGroupText } from 'sveltestrap';
+  import { Input, InputGroup, InputGroupText } from '@sveltestrap/sveltestrap';
   import { recentColors } from '../../stores';
   import ColorSelecter from './color-selecter.svelte';
 
@@ -295,3 +295,4 @@
     box-shadow: 0 1px 3px var(--color-input-thumb-shadow);
   }
 </style>
+

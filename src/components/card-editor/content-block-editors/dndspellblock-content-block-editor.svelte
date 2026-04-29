@@ -1,6 +1,6 @@
 <script lang="ts">
   import type CardContentTypeDescriptor from '$model/card-content-type';
-  import { Input } from 'sveltestrap';
+  import { Input } from '@sveltestrap/sveltestrap';
 
   export let splitContent: string[] = [];
   export let typeDescriptor: CardContentTypeDescriptor;
@@ -19,3 +19,4 @@
     </div>
   {/each}
 </div>
+

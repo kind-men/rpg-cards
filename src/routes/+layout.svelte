@@ -1,6 +1,6 @@
 <script lang="ts">
   import { assets } from '$app/paths';
-  import { Styles } from 'sveltestrap';
+  import { Styles } from '@sveltestrap/sveltestrap';
 </script>
 
 <svelte:head>
@@ -14,3 +14,4 @@
 <style lang="scss">
   @use '../styles/global.scss';
 </style>
+

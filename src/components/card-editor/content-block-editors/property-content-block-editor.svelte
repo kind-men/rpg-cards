@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Input } from 'sveltestrap';
+  import { Input } from '@sveltestrap/sveltestrap';
 
   export let splitContent: string[] = [];
 </script>
@@ -19,3 +19,4 @@
     />
   </div>
 </div>
+

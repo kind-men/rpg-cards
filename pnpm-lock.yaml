@@ -29,6 +29,9 @@ importers:
       '@sveltejs/adapter-static':
         specifier: ^3.0.10
         version: 3.0.10(@sveltejs/kit@2.58.0(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.5)(vite@8.0.10(@types/node@25.6.0)(sass@1.99.0)))(svelte@5.55.5)(typescript@6.0.3)(vite@8.0.10(@types/node@25.6.0)(sass@1.99.0)))
+      '@sveltestrap/sveltestrap':
+        specifier: ^7.1.0
+        version: 7.1.0(svelte@5.55.5)
       '@toast-ui/editor':
         specifier: ^3.2.2
         version: 3.2.2
@@ -83,9 +86,6 @@ importers:
       svelte-dnd-action:
         specifier: ^0.9.15
         version: 0.9.69(svelte@5.55.5)
-      sveltestrap:
-        specifier: ^5.9.0
-        version: 5.11.3(svelte@5.55.5)
       yauzl:
         specifier: ^2.10.0
         version: 2.10.0
@@ -555,6 +555,11 @@ packages:
     peerDependencies:
       svelte: ^5.46.4
       vite: ^8.0.0-beta.7 || ^8.0.0
+
+  '@sveltestrap/sveltestrap@7.1.0':
+    resolution: {integrity: sha512-TpIx25kqLV+z+VD3yfqYayOI1IaCeWFbT0uqM6NfA4vQgDs9PjFwmjkU4YEAlV/ngs9e7xPmaRWE7lkrg4Miow==}
+    peerDependencies:
+      svelte: ^4.0.0 || ^5.0.0 || ^5.0.0-next.0
 
   '@toast-ui/editor@3.2.2':
     resolution: {integrity: sha512-ASX7LFjN2ZYQJrwmkUajPs7DRr9FsM1+RQ82CfTO0Y5ZXorBk1VZS4C2Dpxinx9kl55V4F8/A2h2QF4QMDtRbA==}
@@ -1650,11 +1655,6 @@ packages:
     resolution: {integrity: sha512-2uCs/LZ9us+AktdzYJM8OcxQ8qnPS1kpaO7syGT/MgO+6Qr1Ybl+TqPq+97u7PHqmmMlye5ZkoyXONy5mjjAbw==}
     engines: {node: '>=18'}
 
-  sveltestrap@5.11.3:
-    resolution: {integrity: sha512-R7vIyzqaXT8dKUytZRrU1sPdhinglRXJb43LKfGcR9Tc+71icg3onhniJARbokCkICiGxpgbgKNQRS3gGyQNXw==}
-    peerDependencies:
-      svelte: ^3.53.1
-
   text-table@0.2.0:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}
 
@@ -2306,6 +2306,11 @@ snapshots:
       svelte: 5.55.5
       vite: 8.0.10(@types/node@25.6.0)(sass@1.99.0)
       vitefu: 1.1.3(vite@8.0.10(@types/node@25.6.0)(sass@1.99.0))
+
+  '@sveltestrap/sveltestrap@7.1.0(svelte@5.55.5)':
+    dependencies:
+      '@popperjs/core': 2.11.8
+      svelte: 5.55.5
 
   '@toast-ui/editor@3.2.2':
     dependencies:
@@ -3430,11 +3435,6 @@ snapshots:
       zimmerframe: 1.1.4
     transitivePeerDependencies:
       - '@typescript-eslint/types'
-
-  sveltestrap@5.11.3(svelte@5.55.5):
-    dependencies:
-      '@popperjs/core': 2.11.8
-      svelte: 5.55.5
 
   text-table@0.2.0: {}
 

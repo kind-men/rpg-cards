@@ -7,7 +7,7 @@
     InputGroup,
     InputGroupText,
     Label
-  } from 'sveltestrap';
+  } from '@sveltestrap/sveltestrap';
   import { generateExportObject, parseCards } from '../lib/card-json-parser';
   import type Card from '../model/card';
   import { currentCard, deck, pageLayout } from '../stores';
@@ -614,3 +614,4 @@
     }
   }
 </style>
+

@@ -7,7 +7,7 @@
   import { getContentText, isContainerContent, setContentText } from '$lib/card-content';
   import { createEventDispatcher } from 'svelte';
   import { dragHandle } from 'svelte-dnd-action';
-  import { Button, ButtonGroup, Icon } from 'sveltestrap';
+  import { Button, ButtonGroup, Icon } from '@sveltestrap/sveltestrap';
   import { SPLIT_REGEX } from '$lib/constants';
   import type { CardContent } from '$model/card';
 
@@ -402,3 +402,4 @@
     color: var(--editor-content-card-text);
   }
 </style>
+

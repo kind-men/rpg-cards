@@ -1,7 +1,8 @@
 <script lang="ts">
   import { tick } from 'svelte';
-  import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'sveltestrap';
-  import type { ButtonColor } from 'sveltestrap/src/Button';
+  import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from '@sveltestrap/sveltestrap';
+
+  type ButtonColor = string;
 
   export let open = false;
   export const toggle = async () => {
@@ -92,3 +93,4 @@
     white-space: pre;
   }
 </style>
+

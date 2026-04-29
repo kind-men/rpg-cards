@@ -6,7 +6,7 @@
   import type Card from '$model/card';
   import { settings } from '../../stores/settings';
   import { createEventDispatcher } from 'svelte';
-  import { Button, Input, Label } from 'sveltestrap';
+  import { Button, Input, Label } from '@sveltestrap/sveltestrap';
   import SidebarSection from '../sidebar-section.svelte';
 
   const dispatch = createEventDispatcher<{
@@ -280,3 +280,4 @@
     justify-content: flex-end;
   }
 </style>
+

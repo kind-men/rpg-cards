@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Input } from 'sveltestrap';
+  import { Input } from '@sveltestrap/sveltestrap';
   import ImageUploadInput from '../../form/image-upload.svelte';
 
   export let splitContent: string[] = [];
@@ -18,3 +18,4 @@
     placeholder="Size (for example 120px, 60%, auto)"
   />
 </ImageUploadInput>
+

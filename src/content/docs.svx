@@ -1,6 +1,6 @@
 <script lang="ts">
   import { base } from '$app/paths';
-  import { Icon } from 'sveltestrap';
+  import { Icon } from '@sveltestrap/sveltestrap';
   import ContentTypeTable from "$components/docs/content-type-table.svelte";
 </script>
 
@@ -326,3 +326,4 @@ footer | left | right`}</code></pre>
     <a href="https://game-icons.net/">Game-icons.net</a>.
   </p>
 </section>
+

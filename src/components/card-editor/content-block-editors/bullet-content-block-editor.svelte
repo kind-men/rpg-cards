@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Icon, Input } from 'sveltestrap';
+  import { Icon, Input } from '@sveltestrap/sveltestrap';
 
   export let splitContent: string[] = [];
 </script>
@@ -15,3 +15,4 @@
     placeholder="Bullet text"
   />
 </div>
+

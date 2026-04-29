@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Alert, Button, Icon, Modal, ModalBody, ModalFooter, ModalHeader } from 'sveltestrap';
+  import { Alert, Button, Icon, Modal, ModalBody, ModalFooter, ModalHeader } from '@sveltestrap/sveltestrap';
   import { deck } from '../stores';
   import DeckEditor from './deck-editor.svelte';
 
@@ -31,3 +31,4 @@
     <Button color="secondary" on:click={toggle}>Cancel</Button>
   </ModalFooter>
 </Modal>
+

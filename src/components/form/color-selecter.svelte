@@ -1,7 +1,7 @@
 <script lang="ts">
   import { uuid4 } from '$lib/uuid';
   import { recentColors } from '../../stores';
-  import { Icon, Popover, TabContent, TabPane, Tooltip } from 'sveltestrap';
+  import { Icon, Popover, TabContent, TabPane, Tooltip } from '@sveltestrap/sveltestrap';
   import colorSets from '../../../static/colors.json';
 
   let isOpen = false;
@@ -48,7 +48,7 @@
     on:click|preventDefault|stopPropagation
     on:keydown|stopPropagation
   >
-    <TabContent vertical pills>
+    <TabContent>
       {#each [...colorSets, recentsSet] as set, setIndex}
         <TabPane tabId={setIndex} tab={set.set} active={setIndex === 0}>
           <div class="color-set">
@@ -128,3 +128,4 @@
     }
   }
 </style>
+

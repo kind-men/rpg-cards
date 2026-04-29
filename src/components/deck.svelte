@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Icon, Input, InputGroup, InputGroupText, Label, Tooltip } from 'sveltestrap';
+  import { Button, Icon, Input, InputGroup, InputGroupText, Label, Tooltip } from '@sveltestrap/sveltestrap';
   import type Card from '../model/card';
   import type { CardFormat } from '../model/page-layout';
   import { createNewCard } from '../lib/card-builder';
@@ -518,3 +518,4 @@
     text-align: center;
   }
 </style>
+

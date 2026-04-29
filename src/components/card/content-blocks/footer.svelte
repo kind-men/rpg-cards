@@ -37,7 +37,7 @@
     min-height: 1.2em;
     padding: 0 0.5em;
     background: transparent;
-    font-size: 0.7em;
+    font-size: 0.5em;
     line-height: 1.1;
   }
 

@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { getContentTypeDescriptor } from '$lib/card-content-types';
+  import {
+    getContentTypeDescriptor,
+    resolveContentBlockEditorBinding,
+    resolveContentBlockEditorProps
+  } from '$lib/card-content-types';
   import { getContentText, isContainerContent, setContentText } from '$lib/card-content';
   import { createEventDispatcher } from 'svelte';
   import { dragHandle } from 'svelte-dnd-action';
@@ -20,6 +24,12 @@
 
   $: typeDescriptor = getContentTypeDescriptor(content.type);
   $: contentEditorComponent = typeDescriptor?.editorComponent;
+  $: contentEditorBinding = resolveContentBlockEditorBinding(content);
+  $: contentEditorProps = resolveContentBlockEditorProps(content, typeDescriptor, {
+    depth,
+    setCollapsed,
+    setCollapsedVersion
+  });
 
   const getSplitContentFromValue = (value: string) =>
     value?.split(SPLIT_REGEX) ?? typeDescriptor?.params?.map(() => '') ?? [];
@@ -120,17 +130,17 @@
       class="editor-content-card-body"
       class:editor-content-card-body-text={content.type === 'text'}
     >
-      {#if isContainerContent(content) && content.type === 'row'}
+      {#if contentEditorComponent && contentEditorBinding === 'content'}
         <svelte:component
           this={contentEditorComponent}
           bind:content
-          {depth}
-          {setCollapsed}
-          {setCollapsedVersion}
+          {...contentEditorProps}
           on:collapsechange={(event) => dispatch('collapsechange', event.detail)}
         />
-      {:else if contentEditorComponent && typeDescriptor}
-        <svelte:component this={contentEditorComponent} bind:splitContent {typeDescriptor} />
+      {:else if contentEditorComponent && contentEditorBinding === 'splitContent'}
+        <svelte:component this={contentEditorComponent} bind:splitContent {...contentEditorProps} />
+      {:else if contentEditorComponent}
+        <svelte:component this={contentEditorComponent} {...contentEditorProps} />
       {/if}
     </div>
   {/if}

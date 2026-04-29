@@ -1,10 +1,8 @@
 <script lang="ts">
-  import type CardContentTypeDescriptor from '$model/card-content-type';
   import { Input } from 'sveltestrap';
   import ImageUploadInput from '../../form/image-upload.svelte';
 
   export let splitContent: string[] = [];
-  export let typeDescriptor: CardContentTypeDescriptor;
 </script>
 
 <ImageUploadInput

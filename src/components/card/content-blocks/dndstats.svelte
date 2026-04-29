@@ -1,10 +1,8 @@
 <script lang="ts">
   import { getContentText } from '$lib/card-content';
   import { SPLIT_REGEX } from '$lib/constants';
-  import type Card from '$model/card';
   import type { CardContent } from '$model/card';
 
-  export let card: Card;
   export let content: CardContent;
 
   let str = 0,

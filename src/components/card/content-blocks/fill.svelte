@@ -1,9 +1,7 @@
 <script lang="ts">
   import { getContentText } from '$lib/card-content';
-  import type Card from '$model/card';
   import type { CardContent } from '$model/card';
 
-  export let card: Card;
   export let content: CardContent;
 
   $: height = Number.parseFloat(getContentText(content)) || undefined;

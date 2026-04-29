@@ -1,11 +1,8 @@
 <script lang="ts">
-  import type Card from '$model/card';
   import type { CardContent } from '$model/card';
 
   export let content: CardContent;
-  export let card: Card;
   $: void content;
-  $: void card;
 </script>
 
 <div class="rule" />

@@ -1,15 +1,14 @@
 <script lang="ts">
-  import type Card from '$model/card';
   import type { CardContent } from '$model/card';
 
   export let content: CardContent;
-  export let card: Card;
+  export let title = '';
   $: void content;
 </script>
 
-{#if card?.title}
+{#if title}
   <div class="title-wrapper">
-    <h1>{card.title}</h1>
+    <h1>{title}</h1>
   </div>
 {/if}
 

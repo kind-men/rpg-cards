@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContentTypeDescriptor } from '$lib/card-content-types';
+  import { getContentTypeDescriptor, resolveContentBlockRenderProps } from '$lib/card-content-types';
   import type Card from '$model/card';
   import type { CardContent } from '$model/card';
   import { hoveredContentId } from '../../stores';
@@ -7,11 +7,12 @@
   export let content: CardContent;
   export let card: Card;
   $: typeDescriptor = getContentTypeDescriptor(content.type);
+  $: renderProps = resolveContentBlockRenderProps(content, card);
   $: isHighlighted = Boolean(content.id) && $hoveredContentId === content.id;
 </script>
 
 <div class:card-content-highlighted={isHighlighted} class="card-content-block">
-  <svelte:component this={typeDescriptor.renderComponent} {content} {card} />
+  <svelte:component this={typeDescriptor.renderComponent} {...renderProps} />
 </div>
 
 <style lang="scss">

@@ -1,5 +1,7 @@
 import 'svelte';
 import type CardContentTypeDescriptor from '$model/card-content-type';
+import type Card from '$model/card';
+import type { CardContent } from '$model/card';
 import Dndspellblock from '$components/card/content-blocks/dndspellblock.svelte';
 import Dndstats from '$components/card/content-blocks/dndstats.svelte';
 import CardTitle from '$components/card/content-blocks/card-title.svelte';
@@ -214,4 +216,58 @@ export function getContentTypeDescriptor(type: CardContentType): CardContentType
 
 export function isCardContentType(x: string): x is CardContentType {
   return CARD_CONTENT_TYPES.some((t) => t.name === x);
+}
+
+export function resolveContentBlockRenderProps(content: CardContent, card: Card) {
+  const props: Record<string, unknown> = { content };
+
+  if (content.type === 'cardtitle') {
+    props.title = card?.title;
+  }
+
+  if (content.type === 'row') {
+    props.card = card;
+  }
+
+  return props;
+}
+
+export function resolveContentBlockEditorBinding(content: CardContent) {
+  if (content.type === 'row') {
+    return 'content' as const;
+  }
+
+  if (content.type === 'cardtitle' || content.type === 'rule') {
+    return 'none' as const;
+  }
+
+  return 'splitContent' as const;
+}
+
+export function resolveContentBlockEditorProps(
+  content: CardContent,
+  typeDescriptor: CardContentTypeDescriptor,
+  {
+    depth,
+    setCollapsed,
+    setCollapsedVersion
+  }: {
+    depth: number;
+    setCollapsed: boolean;
+    setCollapsedVersion: number;
+  }
+) {
+  const props: Record<string, unknown> = {};
+
+  if (content.type === 'row') {
+    props.depth = depth;
+    props.setCollapsed = setCollapsed;
+    props.setCollapsedVersion = setCollapsedVersion;
+  }
+
+  if (content.type === 'dndspellblock' || content.type === 'footer' || content.type === 'section') {
+    props.typeDescriptor = typeDescriptor;
+  }
+
+  return props;
 }

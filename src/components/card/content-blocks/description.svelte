@@ -2,10 +2,8 @@
   import { getContentText } from '$lib/card-content';
   import { renderText } from '$lib/card-render-util';
   import { SPLIT_REGEX } from '$lib/constants';
-  import type Card from '$model/card';
   import type { CardContent } from '$model/card';
 
-  export let card: Card;
   export let content: CardContent;
 
   $: [name, description] = getContentText(content).split(SPLIT_REGEX);

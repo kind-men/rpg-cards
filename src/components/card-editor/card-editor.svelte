@@ -46,6 +46,8 @@
   let isEditingName = false;
   let rawContentError = '';
   let textFieldContent = getContentAsString(card?.contents);
+  let lastLoadedCurrentCard = $currentCard;
+  let lastLoadedDeckCard = $currentCard > -1 ? $deck[$currentCard] : undefined;
   $: isMultiEditing = $multiSelect.size > 1;
   $: cardbackMode = card?.cardback_mode ?? 'icon';
   $: cardbackImages = card?.cardback_images ?? [];
@@ -168,7 +170,16 @@
 
   $: void textFieldContent, updateCardContents();
   $: {
-    $currentCard, $deck, onCurrentCardChanged();
+    const nextSelectedDeckCard = $currentCard > -1 ? $deck[$currentCard] : undefined;
+    const shouldReloadSelectedCard =
+      !isMultiEditing &&
+      ($currentCard !== lastLoadedCurrentCard || nextSelectedDeckCard !== lastLoadedDeckCard);
+
+    if (shouldReloadSelectedCard) {
+      lastLoadedCurrentCard = $currentCard;
+      lastLoadedDeckCard = nextSelectedDeckCard;
+      onCurrentCardChanged();
+    }
   }
   $: card && updateDeck();
 
@@ -180,6 +191,8 @@
     }
     card = $deck[$currentCard];
     cardIndex = $currentCard;
+    lastLoadedCurrentCard = $currentCard;
+    lastLoadedDeckCard = card;
     ensureCardbackState(card);
   };
   $: $multiSelect, isMultiEditing !== undefined && handleMultiEditingChanging();

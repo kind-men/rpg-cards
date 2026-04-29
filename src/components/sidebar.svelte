@@ -16,7 +16,7 @@
   import Deck from './deck.svelte';
   import Hint from './hint.svelte';
   import DeckEditorDialog from './deck-editor-dialog.svelte';
-  import JsonImportModal, { ImportEventPayload } from './json-import-modal.svelte';
+  import DeckImportDialog, { ImportEventPayload } from './deck-import-dialog.svelte';
   import SidebarSection from './sidebar-section.svelte';
   import type { PaperFormat } from '../model/page-layout';
 
@@ -27,7 +27,7 @@
   let downloadName = 'cards.json';
 
   let toggleDeckEditor: () => void;
-  let toggleJsonImportModal: () => void;
+  let toggleDeckImportDialog: () => void;
   let generalMenuOpen = false;
   let printOptionsOpen = false;
   const paperFormatOptions: { value: PaperFormat; label: string }[] = [
@@ -83,7 +83,7 @@
 
   const handleImportFromJSONClick = () => {
     generalMenuOpen = false;
-    toggleJsonImportModal();
+    toggleDeckImportDialog();
   };
 
   const handleImportFromJSON = (event: CustomEvent<ImportEventPayload>) => {
@@ -359,7 +359,7 @@
     </a>
   </footer>
       <DeckEditorDialog bind:toggle={toggleDeckEditor} />
-  <JsonImportModal bind:toggle={toggleJsonImportModal} on:import={handleImportFromJSON} />
+  <DeckImportDialog bind:toggle={toggleDeckImportDialog} on:import={handleImportFromJSON} />
 </div>
 
 <style lang="scss">

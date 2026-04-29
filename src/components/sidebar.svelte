@@ -15,7 +15,7 @@
   import { settings } from '../stores/settings';
   import Deck from './deck.svelte';
   import Hint from './hint.svelte';
-  import JsonEditorModal from './json-editor-modal.svelte';
+  import DeckEditorDialog from './deck-editor-dialog.svelte';
   import JsonImportModal, { ImportEventPayload } from './json-import-modal.svelte';
   import SidebarSection from './sidebar-section.svelte';
   import type { PaperFormat } from '../model/page-layout';
@@ -26,7 +26,7 @@
   let downloadUrl = undefined;
   let downloadName = 'cards.json';
 
-  let toggleJsonEditor: () => void;
+  let toggleDeckEditor: () => void;
   let toggleJsonImportModal: () => void;
   let generalMenuOpen = false;
   let printOptionsOpen = false;
@@ -92,7 +92,7 @@
 
   const handleEditJson = () => {
     generalMenuOpen = false;
-    toggleJsonEditor();
+    toggleDeckEditor();
   };
 
   const closeGeneralMenu = () => {
@@ -358,7 +358,7 @@
       <Icon name="info-circle-fill" />
     </a>
   </footer>
-  <JsonEditorModal bind:toggle={toggleJsonEditor} />
+      <DeckEditorDialog bind:toggle={toggleDeckEditor} />
   <JsonImportModal bind:toggle={toggleJsonImportModal} on:import={handleImportFromJSON} />
 </div>
 

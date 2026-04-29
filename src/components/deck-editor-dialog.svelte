@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Alert, Button, Icon, Modal, ModalBody, ModalFooter, ModalHeader } from 'sveltestrap';
   import { deck } from '../stores';
-  import JsonEditor from './json-editor.svelte';
+  import DeckEditor from './deck-editor.svelte';
 
   let open = false;
   let changed: boolean;
@@ -24,7 +24,7 @@
       <Icon name="exclamation-triangle-fill" />
       &nbsp; Be careful, if you don't know what you are doing, you can break the deck
     </Alert>
-    <JsonEditor bind:object={$deck} bind:changed bind:save />
+    <DeckEditor bind:deckData={$deck} bind:changed bind:save />
   </ModalBody>
   <ModalFooter>
     <Button color="primary" on:click={() => save(toggle)}>Save changes</Button>

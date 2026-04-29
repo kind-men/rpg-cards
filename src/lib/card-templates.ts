@@ -1,16 +1,22 @@
+import type Card from '$model/card';
+import defaultCardTemplate from '$lib/card-templates/default-card-template.json';
+
 export interface CardTemplateDefinition {
   id: string;
   label: string;
   description: string;
-  path: string;
+  path?: string;
+  card?: Card;
 }
+
+export const DEFAULT_CARD_TEMPLATE: Card = defaultCardTemplate as Card;
 
 export const CARD_TEMPLATES: CardTemplateDefinition[] = [
   {
     id: 'scratch',
     label: 'Start from scratch',
     description: 'Begin with a simple starter card containing one text block.',
-    path: '/card-templates/scratch-template.json'
+    card: DEFAULT_CARD_TEMPLATE
   },
   {
     id: 'spell',

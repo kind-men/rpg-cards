@@ -2,24 +2,10 @@ import type { CardContent } from '../model/card';
 import type Card from '../model/card';
 import type { CardContentType } from './card-content-types';
 import { createEmptyRowCardContent } from './card-content';
+import { createCardFromDefaultTemplate } from './card-template-builder';
 import { uuid4 } from './uuid';
 
-export const createNewCard = (): Card => ({
-  color: '#4a6898',
-  contents: [],
-  count: 1,
-  cardback_background_color: '#ffffff',
-  cardback_border_style: 'normal',
-  cardback_images: [],
-  cardback_mode: 'icon',
-  icon: 'magic-swirl',
-  icon_back: 'magic-swirl',
-  tags: [],
-  title: '',
-  layout: {
-    show_title: true
-  }
-});
+export const createNewCard = (): Card => createCardFromDefaultTemplate();
 
 export function createNewCardContent(type: CardContentType): CardContent {
   if (type === 'row') {

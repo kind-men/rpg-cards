@@ -1,8 +1,8 @@
 <script lang="ts">
   import { base } from '$app/paths';
-  import { cloneCardContentsWithNewIds } from '$lib/card-content';
+  import { cloneTemplateCard, loadCardTemplate } from '$lib/card-template-builder';
   import { CARD_TEMPLATES } from '$lib/card-templates';
-  import { getContentAsString, parseCards } from '../lib/card-json-parser';
+  import { getContentAsString } from '../lib/card-json-parser';
   import type Card from '../model/card';
   import { settings } from '../stores/settings';
   import { createEventDispatcher } from 'svelte';
@@ -20,15 +20,6 @@
   let selectedTemplateId = '';
   let wizardError = '';
   let isApplyingTemplate = false;
-
-  const cloneTemplateCard = (templateCard: Card, title: string): Card => ({
-    ...templateCard,
-    title,
-    tags: [...(templateCard.tags ?? [])],
-    contents: cloneCardContentsWithNewIds(templateCard.contents ?? []),
-    layout: { ...(templateCard.layout ?? {}) },
-    cardback_images: (templateCard.cardback_images ?? []).map((image) => ({ ...image }))
-  });
 
   const handleCompleteWizard = async () => {
     const nextTitle = wizardName.trim();
@@ -55,18 +46,11 @@
         return;
       }
 
-      const jsonText = await fetch(`${base}${templateDefinition.path}`).then((res) => {
-        if (!res.ok) {
-          throw new Error(`Template request failed with ${res.status}`);
-        }
-
-        return res.text();
+      const templateCard = await loadCardTemplate(templateDefinition, {
+        base,
+        convertFirstSubtitle: $settings.convertFirstSubtitle,
+        convertDndSpellblock: $settings.convertDndSpellblock
       });
-      const [templateCard] = parseCards(
-        jsonText,
-        $settings.convertFirstSubtitle,
-        $settings.convertDndSpellblock
-      );
 
       if (!templateCard) {
         wizardError = 'This template did not contain a usable card.';

@@ -150,7 +150,6 @@
         <input
           class="color-input rounded"
           type="color"
-          alpha
           name={name}
           id={`${idPrefix}-box`}
           bind:value={colorHex}

@@ -7,3 +7,9 @@ declare namespace svelte.JSX {
         onfinalize?: (event: CustomEvent<DndEvent> & {target: EventTarget & T}) => void;
     }
 }
+
+declare module '*.svx' {
+    import type { SvelteComponentTyped } from 'svelte';
+
+    export default class SvxComponent extends SvelteComponentTyped<Record<string, never>> {}
+}

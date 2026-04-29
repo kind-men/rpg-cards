@@ -8,7 +8,7 @@
 <button {id} class="hint-trigger" type="button" aria-label="Show hint">
   <Icon name="question-circle" />
 </button>
-<Tooltip target={id} autohide={false}>
+<Tooltip target={id}>
   <slot />
 </Tooltip>
 

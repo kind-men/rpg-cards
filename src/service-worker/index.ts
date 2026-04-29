@@ -1,11 +1,22 @@
 /// <reference lib="webworker" />
 
-import { build, files, timestamp } from '$service-worker';
+import { build, files } from '$service-worker';
 
 const worker = self as unknown as ServiceWorkerGlobalScope;
 
-const FILES = `cache${timestamp}`;
 const toCache = build.concat(files);
+const createCacheVersion = (assets: string[]) => {
+  let hash = 0;
+
+  for (const char of assets.join('|')) {
+    hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  }
+
+  return hash.toString(16);
+};
+
+const cacheVersion = createCacheVersion(toCache);
+const FILES = `cache-${cacheVersion}`;
 const staticAssets = new Set(toCache);
 
 worker.addEventListener('install', (event) => {
@@ -35,7 +46,7 @@ worker.addEventListener('activate', (event) => {
  * Fall back to the cache if the user is offline.
  */
 async function fetchAndCache(request: Request) {
-  const cache = await caches.open(`offline${timestamp}`);
+  const cache = await caches.open(`offline-${cacheVersion}`);
 
   try {
     const response = await fetch(request);

@@ -24,10 +24,15 @@
 </h2>
 
 <style>
-  .subtitle {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.2em;
-    font-family: Draconis;
-  }
+    .subtitle {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.2em;
+        font-family: Inter, sans-serif;
+        padding: 0 0.4rem;
+    }
+
+    h2 {
+        font-size: 1.125rem;
+    }
 </style>

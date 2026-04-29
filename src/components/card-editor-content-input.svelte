@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getContentTypeDescriptor } from '$lib/card-content-types';
-  import type { CardContentTypeV2 } from '$lib/card-content-types';
+  import type { CardContentType } from '$lib/card-content-types';
   import { getContentText, isContainerContent, setContentText } from '$lib/card-content';
   import { createEventDispatcher } from 'svelte';
   import type { SvelteComponent } from 'svelte';
@@ -35,7 +35,7 @@
   let lastSyncedContentId: string | undefined;
   let lastSyncedSerializedContent = '';
 
-  const contentEditorComponentMap: Record<CardContentTypeV2, typeof SvelteComponent> = {
+  const contentEditorComponentMap: Record<CardContentType, typeof SvelteComponent> = {
     bullet: BulletContentBlockEditor,
     boxes: BoxesContentBlockEditor,
     cardtitle: CardtitleContentBlockEditor,

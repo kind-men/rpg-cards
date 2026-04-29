@@ -1,6 +1,6 @@
 import type { CardContent } from '../model/card';
 import type Card from '../model/card';
-import type { CardContentTypeV2 } from './card-content-types';
+import type { CardContentType } from './card-content-types';
 import { createEmptyRowCardContent } from './card-content';
 import { uuid4 } from './uuid';
 
@@ -21,7 +21,7 @@ export const createNewCard = (): Card => ({
   }
 });
 
-export function createNewCardContent(type: CardContentTypeV2): CardContent {
+export function createNewCardContent(type: CardContentType): CardContent {
   if (type === 'row') {
     return createEmptyRowCardContent();
   }

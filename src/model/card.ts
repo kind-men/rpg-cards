@@ -1,4 +1,4 @@
-import type { CardContentTypeV2 } from '$lib/card-content-types';
+import type { CardContentType } from '$lib/card-content-types';
 import type ColorResolvable from './color-resolvable';
 
 export type CardBackMode = 'icon' | 'images';
@@ -15,7 +15,7 @@ export interface BaseCardContent {
 }
 
 export interface CardContent extends BaseCardContent {
-  type: CardContentTypeV2;
+  type: CardContentType;
   content?: string;
   children?: CardContent[][];
 }

@@ -10,7 +10,8 @@
     hasChildCollections,
     withContentIds
   } from '../lib/card-content';
-  import { CardContentTypeV2, CARD_CONTENT_TYPES } from '$lib/card-content-types';
+  import { CARD_CONTENT_TYPES } from '$lib/card-content-types';
+  import type { CardContentType } from '$lib/card-content-types';
   import type { CardContent } from '../model/card';
   import { hoveredContentId } from '../stores';
   import CardEditorContentInput from './card-editor-content-input.svelte';
@@ -23,7 +24,7 @@
 
   const flipDurationMs = 200;
   const dispatch = createEventDispatcher<{ collapsechange: { hasExpandedItems: boolean } }>();
-  let addType: CardContentTypeV2 = 'text';
+  let addType: CardContentType = 'text';
   let collapsedById: Record<string, boolean> = {};
   let hasExpandedItems = false;
   let lastSetCollapsedVersion = 0;

@@ -170,18 +170,18 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
   }
 );
 
-export type CardContentTypeV2 = (typeof CARD_CONTENT_TYPES)[number]['name'];
+export type CardContentType = (typeof CARD_CONTENT_TYPES)[number]['name'];
 
-const CARD_CONTENT_TYPE_DESCRIPTOR_MAP = new Map<CardContentTypeV2, CardContentTypeDescriptor>();
+const CARD_CONTENT_TYPE_DESCRIPTOR_MAP = new Map<CardContentType, CardContentTypeDescriptor>();
 
 CARD_CONTENT_TYPES.forEach((descriptor) => {
   CARD_CONTENT_TYPE_DESCRIPTOR_MAP.set(descriptor.name, descriptor);
 });
 
-export function getContentTypeDescriptor(type: CardContentTypeV2): CardContentTypeDescriptor {
+export function getContentTypeDescriptor(type: CardContentType): CardContentTypeDescriptor {
   return CARD_CONTENT_TYPE_DESCRIPTOR_MAP.get(type);
 }
 
-export function isCardContentType(x: string): x is CardContentTypeV2 {
+export function isCardContentType(x: string): x is CardContentType {
   return CARD_CONTENT_TYPES.some((t) => t.name === x);
 }

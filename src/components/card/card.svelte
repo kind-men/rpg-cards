@@ -4,7 +4,7 @@
 
   import type Card from '$model/card';
   import { pageLayout } from '../../stores';
-  import CardContent from './card-content.svelte';
+  import CardContentBlocks from './card-content-blocks.svelte';
 
   export let card: Card;
 
@@ -34,15 +34,11 @@
       </div>
     {/if}
     <div class="card-content">
-      {#each mainContents as content}
-        <CardContent {content} {card} />
-      {/each}
+      <CardContentBlocks contents={mainContents} {card} />
     </div>
     {#if footerContents.length}
       <div class="card-footer">
-        {#each footerContents as content}
-          <CardContent {content} {card} />
-        {/each}
+        <CardContentBlocks contents={footerContents} {card} />
       </div>
     {/if}
   </div>

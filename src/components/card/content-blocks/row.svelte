@@ -2,7 +2,7 @@
   import { getContentChildren } from '$lib/card-content';
   import type Card from '$model/card';
   import type { CardContent } from '$model/card';
-  import CardContentBlock from '../card-content.svelte';
+  import CardContentBlock from '../card-content-block.svelte';
 
   export let card: Card;
   export let content: CardContent;

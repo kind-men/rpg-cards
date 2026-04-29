@@ -3,7 +3,7 @@
   import type { CardContent } from '$model/card';
   import { createEventDispatcher } from 'svelte';
   import { Button, Icon } from 'sveltestrap';
-  import CardContentEditor from '../card-content-editor.svelte';
+  import CardContentBlocksEditor from '../card-content-blocks-editor.svelte';
 
   export let content: CardContent;
   export let depth = 0;
@@ -78,7 +78,7 @@
         <span class="row-editor-column-title">Column {columnIndex + 1}</span>
         <span class="row-editor-column-meta">{column.length} items</span>
       </div>
-      <CardContentEditor
+      <CardContentBlocksEditor
         bind:contents={content.children[columnIndex]}
         allowFooter={false}
         depth={depth + 1}

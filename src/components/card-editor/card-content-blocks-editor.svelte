@@ -14,7 +14,7 @@
   import type { CardContentType } from '$lib/card-content-types';
   import type { CardContent } from '$model/card';
   import { hoveredContentId } from '../../stores';
-  import CardEditorContentInput from './card-editor-content-input.svelte';
+  import CardContentBlockEditor from './card-content-block-editor.svelte';
 
   export let allowFooter = true;
   export let contents: CardContent[];
@@ -138,7 +138,7 @@
           on:mouseleave={() => hoveredContentId.set(null)}
         >
           <div class="input-stack">
-            <CardEditorContentInput
+      <CardContentBlockEditor
               bind:content
               collapsed={content.id ? (collapsedById[content.id] ?? true) : true}
               on:delete={() => handleDelete(index)}

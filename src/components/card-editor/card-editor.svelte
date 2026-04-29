@@ -26,7 +26,7 @@
     CardBackMode
   } from '$model/card';
   import { currentCard, deck, multiSelect } from '../../stores';
-  import CardContentEditor from './card-content-editor.svelte';
+  import CardContentBlocksEditor from './card-content-blocks-editor.svelte';
   import CardSetupWizard from './card-setup-wizard.svelte';
   import ColorInput from '../form/color.svelte';
   import CssEditor from '../form/css-editor.svelte';
@@ -408,7 +408,7 @@
                 {#if !isMultiEditing && card.contents}
                   <div class="sidebar-field" class:sidebar-field-grow={contentEditorMode === 'textfield'}>
                     {#if contentEditorMode === 'individual'}
-                      <CardContentEditor
+                  <CardContentBlocksEditor
                         bind:contents={card.contents}
                         {setCollapsedVersion}
                         {setCollapsed}

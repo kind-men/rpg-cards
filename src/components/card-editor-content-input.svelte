@@ -1,28 +1,11 @@
 <script lang="ts">
   import { getContentTypeDescriptor } from '$lib/card-content-types';
-  import type { CardContentType } from '$lib/card-content-types';
   import { getContentText, isContainerContent, setContentText } from '$lib/card-content';
   import { createEventDispatcher } from 'svelte';
-  import type { SvelteComponent } from 'svelte';
   import { dragHandle } from 'svelte-dnd-action';
   import { Button, ButtonGroup, Icon } from 'sveltestrap';
   import { SPLIT_REGEX } from '../lib/constants';
   import type { CardContent } from '../model/card';
-  import BoxesContentBlockEditor from './content-block-editors/boxes-content-block-editor.svelte';
-  import BulletContentBlockEditor from './content-block-editors/bullet-content-block-editor.svelte';
-  import CardtitleContentBlockEditor from './content-block-editors/cardtitle-content-block-editor.svelte';
-  import DescriptionContentBlockEditor from './content-block-editors/description-content-block-editor.svelte';
-  import DndspellblockContentBlockEditor from './content-block-editors/dndspellblock-content-block-editor.svelte';
-  import DndstatsContentBlockEditor from './content-block-editors/dndstats-content-block-editor.svelte';
-  import FillContentBlockEditor from './content-block-editors/fill-content-block-editor.svelte';
-  import FooterContentBlockEditor from './content-block-editors/footer-content-block-editor.svelte';
-  import PictureContentBlockEditor from './content-block-editors/picture-content-block-editor.svelte';
-  import PropertyContentBlockEditor from './content-block-editors/property-content-block-editor.svelte';
-  import RowContentBlockEditor from './content-block-editors/row-content-block-editor.svelte';
-  import RuleContentBlockEditor from './content-block-editors/rule-content-block-editor.svelte';
-  import SectionContentBlockEditor from './content-block-editors/section-content-block-editor.svelte';
-  import SubtitleContentBlockEditor from './content-block-editors/subtitle-content-block-editor.svelte';
-  import TextContentBlockEditor from './content-block-editors/text-content-block-editor.svelte';
 
   export let collapsed = true;
   export let content: CardContent;
@@ -35,26 +18,8 @@
   let lastSyncedContentId: string | undefined;
   let lastSyncedSerializedContent = '';
 
-  const contentEditorComponentMap: Record<CardContentType, typeof SvelteComponent> = {
-    bullet: BulletContentBlockEditor,
-    boxes: BoxesContentBlockEditor,
-    cardtitle: CardtitleContentBlockEditor,
-    description: DescriptionContentBlockEditor,
-    dndspellblock: DndspellblockContentBlockEditor,
-    dndstats: DndstatsContentBlockEditor,
-    fill: FillContentBlockEditor,
-    footer: FooterContentBlockEditor,
-    picture: PictureContentBlockEditor,
-    property: PropertyContentBlockEditor,
-    row: RowContentBlockEditor,
-    rule: RuleContentBlockEditor,
-    section: SectionContentBlockEditor,
-    subtitle: SubtitleContentBlockEditor,
-    text: TextContentBlockEditor
-  };
-
   $: typeDescriptor = getContentTypeDescriptor(content.type);
-  $: contentEditorComponent = contentEditorComponentMap[content.type];
+  $: contentEditorComponent = typeDescriptor?.editorComponent;
 
   const getSplitContentFromValue = (value: string) =>
     value?.split(SPLIT_REGEX) ?? typeDescriptor?.params?.map(() => '') ?? [];
@@ -156,7 +121,8 @@
       class:editor-content-card-body-text={content.type === 'text'}
     >
       {#if isContainerContent(content) && content.type === 'row'}
-        <RowContentBlockEditor
+        <svelte:component
+          this={contentEditorComponent}
           bind:content
           {depth}
           {setCollapsed}

@@ -15,6 +15,21 @@ import Bullet from '$components/card/content-blocks/bullet.svelte';
 import Picture from '$components/card/content-blocks/picture.svelte';
 import Footer from '$components/card/content-blocks/footer.svelte';
 import Row from '$components/card/content-blocks/row.svelte';
+import BoxesContentBlockEditor from '$components/content-block-editors/boxes-content-block-editor.svelte';
+import BulletContentBlockEditor from '$components/content-block-editors/bullet-content-block-editor.svelte';
+import CardtitleContentBlockEditor from '$components/content-block-editors/cardtitle-content-block-editor.svelte';
+import DescriptionContentBlockEditor from '$components/content-block-editors/description-content-block-editor.svelte';
+import DndspellblockContentBlockEditor from '$components/content-block-editors/dndspellblock-content-block-editor.svelte';
+import DndstatsContentBlockEditor from '$components/content-block-editors/dndstats-content-block-editor.svelte';
+import FillContentBlockEditor from '$components/content-block-editors/fill-content-block-editor.svelte';
+import FooterContentBlockEditor from '$components/content-block-editors/footer-content-block-editor.svelte';
+import PictureContentBlockEditor from '$components/content-block-editors/picture-content-block-editor.svelte';
+import PropertyContentBlockEditor from '$components/content-block-editors/property-content-block-editor.svelte';
+import RowContentBlockEditor from '$components/content-block-editors/row-content-block-editor.svelte';
+import RuleContentBlockEditor from '$components/content-block-editors/rule-content-block-editor.svelte';
+import SectionContentBlockEditor from '$components/content-block-editors/section-content-block-editor.svelte';
+import SubtitleContentBlockEditor from '$components/content-block-editors/subtitle-content-block-editor.svelte';
+import TextContentBlockEditor from '$components/content-block-editors/text-content-block-editor.svelte';
 
 const createCardContentTypes = <
   T extends readonly CardContentTypeDescriptor[] & Array<{ name: V }>,
@@ -29,14 +44,16 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
     label: 'Card Title',
     description: 'Displays the card title using the card header style.',
     params: [],
-    renderComponent: CardTitle
+    renderComponent: CardTitle,
+    editorComponent: CardtitleContentBlockEditor
   },
   {
     name: 'text',
     label: 'Text',
     description: 'Simple paragraph',
     params: [{ name: 'Text', description: 'Text', type: 'textarea' }],
-    renderComponent: Text
+    renderComponent: Text,
+    editorComponent: TextContentBlockEditor
   },
   {
     name: 'subtitle',
@@ -46,14 +63,16 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
       { name: 'Subtitle', description: 'Subtitle text' },
       { name: 'Right-aligned', description: 'Additional right-aligned text', optional: true }
     ],
-    renderComponent: Subtitle
+    renderComponent: Subtitle,
+    editorComponent: SubtitleContentBlockEditor
   },
   {
     name: 'rule',
     label: 'Divider',
     description: 'A horizontal line taking up full width',
     params: [],
-    renderComponent: Rule
+    renderComponent: Rule,
+    editorComponent: RuleContentBlockEditor
   },
   {
     name: 'property',
@@ -64,7 +83,8 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
       { name: 'Name', description: 'Propety name (bolded)' },
       { name: 'Description', description: 'Propety description' }
     ],
-    renderComponent: Property
+    renderComponent: Property,
+    editorComponent: PropertyContentBlockEditor
   },
   {
     name: 'description',
@@ -74,7 +94,8 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
       { name: 'Name', description: 'Description name (bolded, italicized)' },
       { name: 'Description', description: 'Description description' }
     ],
-    renderComponent: Description
+    renderComponent: Description,
+    editorComponent: DescriptionContentBlockEditor
   },
   {
     name: 'section',
@@ -84,7 +105,8 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
       { name: 'Section name', description: 'Section name' },
       { name: 'Right-aligned', description: 'Additional right-aligned text', optional: true }
     ],
-    renderComponent: Section
+    renderComponent: Section,
+    editorComponent: SectionContentBlockEditor
   },
   {
     name: 'boxes',
@@ -94,21 +116,24 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
       { name: 'Amount', description: 'Amount of boxes', type: 'number' },
       { name: 'Size', description: 'Size of the boxes', optional: true }
     ],
-    renderComponent: Boxes
+    renderComponent: Boxes,
+    editorComponent: BoxesContentBlockEditor
   },
   {
     name: 'fill',
     label: 'Fill',
     description: 'Empty area taking up available space',
     params: [{ name: 'Height', description: 'Height in mm', type: 'number', optional: true }],
-    renderComponent: Fill
+    renderComponent: Fill,
+    editorComponent: FillContentBlockEditor
   },
   {
     name: 'bullet',
     label: 'Bullet',
     description: 'Bulleted text',
     params: [{ name: 'Text', description: 'Text' }],
-    renderComponent: Bullet
+    renderComponent: Bullet,
+    editorComponent: BulletContentBlockEditor
   },
   {
     name: 'picture',
@@ -122,7 +147,8 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
         optional: true
       }
     ],
-    renderComponent: Picture
+    renderComponent: Picture,
+    editorComponent: PictureContentBlockEditor
   },
   {
     name: 'footer',
@@ -133,14 +159,16 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
       { name: 'Left text', description: 'Left-aligned footer text', optional: true },
       { name: 'Right text', description: 'Right-aligned footer text', optional: true }
     ],
-    renderComponent: Footer
+    renderComponent: Footer,
+    editorComponent: FooterContentBlockEditor
   },
   {
     name: 'row',
     label: 'Row',
     description: 'A horizontal row with evenly sized columns that can contain nested content.',
     params: [],
-    renderComponent: Row
+    renderComponent: Row,
+    editorComponent: RowContentBlockEditor
   },
   {
     name: 'dndstats',
@@ -154,7 +182,8 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
       { name: 'Wis', description: 'Wisdom score', type: 'number' },
       { name: 'Cha', description: 'Charisma score', type: 'number' }
     ],
-    renderComponent: Dndstats
+    renderComponent: Dndstats,
+    editorComponent: DndstatsContentBlockEditor
   },
   {
     name: 'dndspellblock',
@@ -166,7 +195,8 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
       { name: 'Components', description: 'Components' },
       { name: 'Duration', description: 'Duration' }
     ],
-    renderComponent: Dndspellblock
+    renderComponent: Dndspellblock,
+    editorComponent: DndspellblockContentBlockEditor
   }
 );
 

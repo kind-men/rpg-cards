@@ -6,6 +6,7 @@ export default interface CardContentTypeDescriptor {
   readonly description: string;
   readonly params: readonly CardContentTypeParam[];
   readonly renderComponent: typeof SvelteComponent;
+  readonly editorComponent: typeof SvelteComponent;
 }
 
 export interface CardContentTypeParam {

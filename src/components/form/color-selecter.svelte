@@ -2,7 +2,7 @@
   import { uuid4 } from '$lib/uuid';
   import { recentColors } from '../../stores';
   import { Icon, Popover, TabContent, TabPane, Tooltip } from '@sveltestrap/sveltestrap';
-  import colorSets from '../../../static/colors.json';
+  import colorSets from '$lib/data/colors.json';
 
   let isOpen = false;
   export let value: string;

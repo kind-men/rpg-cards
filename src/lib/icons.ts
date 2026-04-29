@@ -1,4 +1,4 @@
-import icons from '../../static/icons/icons.json';
+import icons from '$lib/data/icons.json';
 
 export type Icon = {
   name: string;

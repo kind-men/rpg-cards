@@ -21,6 +21,7 @@
   let activeResize: 'left' | 'right' | undefined;
   let stopCardTracking = () => {};
   let cardTrackingDelay: ReturnType<typeof setTimeout> | undefined;
+  const menuLogoUrl = `${base}/menu-logo.svg`;
 
   const isEditorView = () => view === 'editor';
   $: isRightSidebarVisible = isEditorView() && $currentCard !== -1;
@@ -107,7 +108,7 @@
 <div
   class:workspace-static-view={!isEditorView()}
   class="workspace"
-  style={`--left-panel-width: ${leftPanelWidth}px; --right-panel-width: ${effectiveRightPanelWidth}px; --content-max-width: ${contentMaxWidth};`}
+  style={`--left-panel-width: ${leftPanelWidth}px; --right-panel-width: ${effectiveRightPanelWidth}px; --content-max-width: ${contentMaxWidth}; --workspace-watermark: url('${menuLogoUrl}');`}
 >
   {#if isEditorView()}
     <div class="canvas-layer">
@@ -140,11 +141,27 @@
   .workspace {
     position: relative;
     min-height: 100vh;
+    isolation: isolate;
+  }
+
+  .workspace::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: var(--workspace-watermark);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: min(80vw, 80vh);
+    opacity: 0.45;
+    filter: saturate(0);
   }
 
   .canvas-layer {
     position: fixed;
     inset: 0 var(--right-panel-width) 0 var(--left-panel-width);
+    z-index: 1;
   }
 
   .content-layer {
@@ -152,6 +169,7 @@
     --workspace-shell-glow: var(--color-white-65);
     position: fixed;
     inset: 0 0 0 var(--left-panel-width);
+    z-index: 1;
     overflow-y: auto;
     background:
       radial-gradient(circle at top, var(--workspace-shell-glow), var(--color-white-0) 35%),
@@ -181,6 +199,10 @@
       padding: 1rem;
       display: grid;
       gap: 1rem;
+    }
+
+    .workspace::before {
+      background-size: min(82vw, 82vh);
     }
 
     .canvas-layer,

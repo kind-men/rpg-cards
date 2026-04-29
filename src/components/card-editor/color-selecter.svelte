@@ -1,8 +1,8 @@
 <script lang="ts">
   import { uuid4 } from '$lib/uuid';
-  import { recentColors } from '../stores';
+  import { recentColors } from '../../stores';
   import { Icon, Popover, TabContent, TabPane, Tooltip } from 'sveltestrap';
-  import colorSets from '../../static/colors.json';
+  import colorSets from '../../../static/colors.json';
 
   let isOpen = false;
   export let value: string;

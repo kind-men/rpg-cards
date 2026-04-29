@@ -15,21 +15,21 @@ import Bullet from '$components/card/content-blocks/bullet.svelte';
 import Picture from '$components/card/content-blocks/picture.svelte';
 import Footer from '$components/card/content-blocks/footer.svelte';
 import Row from '$components/card/content-blocks/row.svelte';
-import BoxesContentBlockEditor from '$components/content-block-editors/boxes-content-block-editor.svelte';
-import BulletContentBlockEditor from '$components/content-block-editors/bullet-content-block-editor.svelte';
-import CardtitleContentBlockEditor from '$components/content-block-editors/cardtitle-content-block-editor.svelte';
-import DescriptionContentBlockEditor from '$components/content-block-editors/description-content-block-editor.svelte';
-import DndspellblockContentBlockEditor from '$components/content-block-editors/dndspellblock-content-block-editor.svelte';
-import DndstatsContentBlockEditor from '$components/content-block-editors/dndstats-content-block-editor.svelte';
-import FillContentBlockEditor from '$components/content-block-editors/fill-content-block-editor.svelte';
-import FooterContentBlockEditor from '$components/content-block-editors/footer-content-block-editor.svelte';
-import PictureContentBlockEditor from '$components/content-block-editors/picture-content-block-editor.svelte';
-import PropertyContentBlockEditor from '$components/content-block-editors/property-content-block-editor.svelte';
-import RowContentBlockEditor from '$components/content-block-editors/row-content-block-editor.svelte';
-import RuleContentBlockEditor from '$components/content-block-editors/rule-content-block-editor.svelte';
-import SectionContentBlockEditor from '$components/content-block-editors/section-content-block-editor.svelte';
-import SubtitleContentBlockEditor from '$components/content-block-editors/subtitle-content-block-editor.svelte';
-import TextContentBlockEditor from '$components/content-block-editors/text-content-block-editor.svelte';
+import BoxesContentBlockEditor from '$components/card-editor/content-block-editors/boxes-content-block-editor.svelte';
+import BulletContentBlockEditor from '$components/card-editor/content-block-editors/bullet-content-block-editor.svelte';
+import CardtitleContentBlockEditor from '$components/card-editor/content-block-editors/cardtitle-content-block-editor.svelte';
+import DescriptionContentBlockEditor from '$components/card-editor/content-block-editors/description-content-block-editor.svelte';
+import DndspellblockContentBlockEditor from '$components/card-editor/content-block-editors/dndspellblock-content-block-editor.svelte';
+import DndstatsContentBlockEditor from '$components/card-editor/content-block-editors/dndstats-content-block-editor.svelte';
+import FillContentBlockEditor from '$components/card-editor/content-block-editors/fill-content-block-editor.svelte';
+import FooterContentBlockEditor from '$components/card-editor/content-block-editors/footer-content-block-editor.svelte';
+import PictureContentBlockEditor from '$components/card-editor/content-block-editors/picture-content-block-editor.svelte';
+import PropertyContentBlockEditor from '$components/card-editor/content-block-editors/property-content-block-editor.svelte';
+import RowContentBlockEditor from '$components/card-editor/content-block-editors/row-content-block-editor.svelte';
+import RuleContentBlockEditor from '$components/card-editor/content-block-editors/rule-content-block-editor.svelte';
+import SectionContentBlockEditor from '$components/card-editor/content-block-editors/section-content-block-editor.svelte';
+import SubtitleContentBlockEditor from '$components/card-editor/content-block-editors/subtitle-content-block-editor.svelte';
+import TextContentBlockEditor from '$components/card-editor/content-block-editors/text-content-block-editor.svelte';
 
 const createCardContentTypes = <
   T extends readonly CardContentTypeDescriptor[] & Array<{ name: V }>,

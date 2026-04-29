@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Input, InputGroup, InputGroupText } from 'sveltestrap';
-  import { recentColors } from '../stores';
+  import { recentColors } from '../../stores';
   import ColorSelecter from './color-selecter.svelte';
 
   export let value: string;

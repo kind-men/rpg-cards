@@ -1,8 +1,8 @@
 <script lang="ts">
   import { InputGroup, InputGroupText, Icon } from 'sveltestrap';
-  import GameIcon from './game-icon.svelte';
+  import GameIcon from '../game-icon.svelte';
   import AutoComplete from 'simple-svelte-autocomplete';
-  import { getAllIconNames } from '../lib/icons';
+  import { getAllIconNames } from '$lib/icons';
 
   export let icon: string;
   export let name: string;

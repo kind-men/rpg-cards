@@ -2,12 +2,12 @@
   import { base } from '$app/paths';
   import { cloneTemplateCard, loadCardTemplate } from '$lib/card-template-builder';
   import { CARD_TEMPLATES } from '$lib/card-templates';
-  import { getContentAsString } from '../lib/card-json-parser';
-  import type Card from '../model/card';
-  import { settings } from '../stores/settings';
+  import { getContentAsString } from '$lib/card-json-parser';
+  import type Card from '$model/card';
+  import { settings } from '../../stores/settings';
   import { createEventDispatcher } from 'svelte';
   import { Button, Input, Label } from 'sveltestrap';
-  import SidebarSection from './sidebar-section.svelte';
+  import SidebarSection from '../sidebar-section.svelte';
 
   const dispatch = createEventDispatcher<{
     complete: { card: Card; textFieldContent: string };

@@ -11,29 +11,29 @@
     Input,
     Label
   } from 'sveltestrap';
-  import { createMultiCard, removeEmpty } from '../lib/card-builder';
+  import { createMultiCard, removeEmpty } from '$lib/card-builder';
   import {
     CardContentError,
     getContentAsString,
     normalizeCardbackImages,
     parseCardContents
-  } from '../lib/card-json-parser';
-  import type Card from '../model/card';
+  } from '$lib/card-json-parser';
+  import type Card from '$model/card';
   import type {
     CardBackBorderStyle,
     CardBackImage,
     CardBackImageSizePreset,
     CardBackMode
-  } from '../model/card';
-  import { currentCard, deck, multiSelect } from '../stores';
+  } from '$model/card';
+  import { currentCard, deck, multiSelect } from '../../stores';
   import CardContentEditor from './card-content-editor.svelte';
   import CardSetupWizard from './card-setup-wizard.svelte';
   import ColorInput from './color-input.svelte';
   import CssEditor from './css-editor.svelte';
   import IconInput from './game-icon-input.svelte';
-  import Hint from './hint.svelte';
+  import Hint from '../hint.svelte';
   import ImageUploadInput from './image-upload-input.svelte';
-  import SidebarSection from './sidebar-section.svelte';
+  import SidebarSection from '../sidebar-section.svelte';
   import TextEditor from './text-editor.svelte';
 
   let card: Card = $deck[$currentCard];

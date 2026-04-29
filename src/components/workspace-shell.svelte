@@ -3,7 +3,7 @@
   import { base } from '$app/paths';
   import { goto } from '$app/navigation';
   import { onDestroy, onMount } from 'svelte';
-  import CardEditor from '$components/card-editor.svelte';
+  import CardEditor from '$components/card-editor/card-editor.svelte';
   import CurrentCard from '$components/card/current-card.svelte';
   import Sidebar from '$components/sidebar.svelte';
   import SidebarContainer from '$components/sidebar-container.svelte';

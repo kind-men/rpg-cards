@@ -3,17 +3,17 @@
   import { createEventDispatcher } from 'svelte';
   import { dragHandleZone } from 'svelte-dnd-action';
   import { Button, Icon, Input, InputGroup } from 'sveltestrap';
-  import { createNewCardContent } from '../lib/card-builder';
+  import { createNewCardContent } from '$lib/card-builder';
   import {
     cloneCardContentWithNewIds,
     getContentChildren,
     hasChildCollections,
     withContentIds
-  } from '../lib/card-content';
+  } from '$lib/card-content';
   import { CARD_CONTENT_TYPES } from '$lib/card-content-types';
   import type { CardContentType } from '$lib/card-content-types';
-  import type { CardContent } from '../model/card';
-  import { hoveredContentId } from '../stores';
+  import type { CardContent } from '$model/card';
+  import { hoveredContentId } from '../../stores';
   import CardEditorContentInput from './card-editor-content-input.svelte';
 
   export let allowFooter = true;

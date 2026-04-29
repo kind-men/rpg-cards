@@ -10,8 +10,8 @@
   } from '@sveltestrap/sveltestrap';
   import { generateExportObject, parseCards } from '../lib/card-json-parser';
   import type Card from '../model/card';
-  import { currentCard, deck, pageLayout } from '../stores';
-  import { PAPER_SIZE_PRESETS } from '../stores/page-layout';
+  import { currentCard, deck, multiSelect, pageLayout } from '../stores';
+  import { CARD_SIZE_PRESETS, PAPER_SIZE_PRESETS } from '../stores/page-layout';
   import { settings } from '../stores/settings';
   import Deck from './deck.svelte';
   import Hint from './hint.svelte';
@@ -85,6 +85,32 @@
   const handleImportFromJSONClick = () => {
     generalMenuOpen = false;
     toggleDeckImportDialog();
+  };
+
+  const handleNewDeckClick = async () => {
+    generalMenuOpen = false;
+
+    const jsonText = await fetch('empty-deck.json').then((res) => res.text());
+    const cards = parseCards(
+      jsonText,
+      $settings.convertFirstSubtitle,
+      $settings.convertDndSpellblock
+    );
+
+    deck.set(cards);
+    multiSelect.clear();
+    currentCard.set(-1);
+    pageLayout.set({
+      paperFormat: 'a4',
+      paperSize: { ...PAPER_SIZE_PRESETS.a4 },
+      cardFormat: 'poker',
+      cardSize: { ...CARD_SIZE_PRESETS.poker },
+      adjust: {
+        x: undefined,
+        y: undefined
+      },
+      cardBackBorder: 0
+    });
   };
 
   const handleImportFromJSON = (event: CustomEvent<ImportEventPayload>) => {
@@ -172,6 +198,9 @@
       {#if generalMenuOpen}
         <div class="general-menu-panel general-menu-panel-top">
           <div class="general-menu-group">
+            <button class="general-menu-item" type="button" on:click={handleNewDeckClick}>
+              New
+            </button>
             <button class="general-menu-item" type="button" on:click={handleImportFileClick}>
               Open
             </button>

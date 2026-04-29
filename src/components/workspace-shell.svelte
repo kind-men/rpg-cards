@@ -23,6 +23,8 @@
   let cardTrackingDelay: ReturnType<typeof setTimeout> | undefined;
 
   const isEditorView = () => view === 'editor';
+  $: isRightSidebarVisible = isEditorView() && $currentCard !== -1;
+  $: effectiveRightPanelWidth = isRightSidebarVisible ? rightPanelWidth : 0;
 
   const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
@@ -105,7 +107,7 @@
 <div
   class:workspace-static-view={!isEditorView()}
   class="workspace"
-  style={`--left-panel-width: ${leftPanelWidth}px; --right-panel-width: ${rightPanelWidth}px; --content-max-width: ${contentMaxWidth};`}
+  style={`--left-panel-width: ${leftPanelWidth}px; --right-panel-width: ${effectiveRightPanelWidth}px; --content-max-width: ${contentMaxWidth};`}
 >
   {#if isEditorView()}
     <div class="canvas-layer">
@@ -125,7 +127,7 @@
     <Sidebar />
   </SidebarContainer>
 
-  {#if isEditorView()}
+  {#if isRightSidebarVisible}
     <SidebarContainer side="right" width={rightPanelWidth} on:resizestart={startResize}>
       {#key $currentCard}
         <CardEditor />

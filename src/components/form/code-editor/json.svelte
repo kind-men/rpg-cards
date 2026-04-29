@@ -10,7 +10,11 @@
   export { className as class };
 
   let codeEditor: CodeEditor;
-  const extensions = [jsonLanguageSupport(), linter(jsonParseLinter()), lintGutter()];
+  const extensions = Object.freeze([
+    jsonLanguageSupport(),
+    linter(jsonParseLinter()),
+    lintGutter()
+  ]);
 
   export const getValue = () => codeEditor?.getValue() ?? value;
   export const focus = () => codeEditor?.focus();

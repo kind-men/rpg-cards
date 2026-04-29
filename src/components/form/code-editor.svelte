@@ -1,12 +1,13 @@
 <script lang="ts">
-  import { basicSetup, EditorState } from '@codemirror/basic-setup';
+  import { basicSetup } from 'codemirror';
+  import { EditorState } from '@codemirror/state';
   import { EditorView, type ViewUpdate } from '@codemirror/view';
   import { onMount } from 'svelte';
 
   export let value = '';
   export let changed = false;
   export let id = '';
-  export let extensions = [];
+  export let extensions: readonly unknown[] = [];
   export let transformExternalValue: (value: string) => string = (nextValue) => nextValue ?? '';
   export let transformInternalValue: (value: string) => string = (nextValue) => nextValue;
   let className = '';
@@ -15,6 +16,8 @@
   let parent: HTMLDivElement;
   let editor: EditorView;
   let isApplyingExternalValue = false;
+
+  const getExtensions = () => (Array.isArray(extensions) ? [...extensions] : []);
 
   const getDocValue = () => editor?.state.doc.toString() ?? '';
 
@@ -38,7 +41,7 @@
           basicSetup,
           EditorView.lineWrapping,
           EditorView.updateListener.of(onEditorUpdate),
-          ...extensions
+          ...getExtensions()
         ],
         doc: transformExternalValue(value ?? '')
       }),

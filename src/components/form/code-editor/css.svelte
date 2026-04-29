@@ -1,6 +1,6 @@
 <script lang="ts">
   import CodeEditor from '../code-editor.svelte';
-  import { css as cssLanguageSupport, cssCompletion } from '@codemirror/lang-css';
+  import { css as cssLanguageSupport } from '@codemirror/lang-css';
   import { lintGutter } from '@codemirror/lint';
 
   export let value = '';
@@ -20,7 +20,7 @@
   };
 
   const trimTrailingWhitespace = (value: string) => value.trimEnd();
-  const extensions = [lintGutter(), cssLanguageSupport(), cssCompletion];
+  const extensions = Object.freeze([lintGutter(), cssLanguageSupport()]);
 </script>
 
 <CodeEditor

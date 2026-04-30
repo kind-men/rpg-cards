@@ -12,6 +12,7 @@ export interface CardBackImage {
 
 export interface BaseCardContent {
   id?: string;
+  paddingY?: number;
 }
 
 export interface CardContent extends BaseCardContent {

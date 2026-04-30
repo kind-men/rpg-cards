@@ -1,6 +1,27 @@
 import type { CardContent } from '$model/card';
 import { uuid4 } from './uuid';
 
+export const CONTENT_PADDING_MIN_STEP = 0;
+export const CONTENT_PADDING_MAX_STEP = 7;
+export const CONTENT_PADDING_REM_STEP = 0.25;
+
+export function normalizeContentPaddingStep(value: unknown): number {
+  const numericValue = Number(value);
+
+  if (!Number.isFinite(numericValue)) {
+    return CONTENT_PADDING_MIN_STEP;
+  }
+
+  return Math.min(
+    CONTENT_PADDING_MAX_STEP,
+    Math.max(CONTENT_PADDING_MIN_STEP, Math.round(numericValue))
+  );
+}
+
+export function getContentPaddingRemValue(content: CardContent): number {
+  return normalizeContentPaddingStep(content.paddingY) * CONTENT_PADDING_REM_STEP;
+}
+
 export function hasChildCollections(content: CardContent): boolean {
   return Array.isArray(content.children);
 }

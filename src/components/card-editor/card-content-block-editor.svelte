@@ -1,13 +1,22 @@
 <script lang="ts">
   import {
+    CONTENT_PADDING_MAX_STEP,
+    CONTENT_PADDING_MIN_STEP,
+    CONTENT_PADDING_REM_STEP,
+    getContentText,
+    isContainerContent,
+    normalizeContentPaddingStep,
+    setContentText
+  } from '$lib/card-content';
+  import {
     getContentTypeDescriptor,
     resolveContentBlockEditorBinding,
     resolveContentBlockEditorProps
   } from '$lib/card-content-types';
-  import { getContentText, isContainerContent, setContentText } from '$lib/card-content';
   import { createEventDispatcher } from 'svelte';
   import { dragHandle } from 'svelte-dnd-action';
   import { Button, ButtonGroup, Icon } from '@sveltestrap/sveltestrap';
+  import SegmentedSlider from '$components/form/segmented-slider.svelte';
   import { SPLIT_REGEX } from '$lib/constants';
   import type { CardContent } from '$model/card';
 
@@ -30,9 +39,24 @@
     setCollapsed,
     setCollapsedVersion
   });
+  $: paddingStep = normalizeContentPaddingStep(content.paddingY);
+  $: paddingLabel = `${(paddingStep * CONTENT_PADDING_REM_STEP).toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1')}rem`;
 
   const getSplitContentFromValue = (value: string) =>
     value?.split(SPLIT_REGEX) ?? typeDescriptor?.params?.map(() => '') ?? [];
+
+  const updatePadding = (value: number) => {
+    const nextPaddingStep = normalizeContentPaddingStep(value);
+
+    if (nextPaddingStep === normalizeContentPaddingStep(content.paddingY)) {
+      return;
+    }
+
+    content = {
+      ...content,
+      paddingY: nextPaddingStep
+    };
+  };
 
   $: if (!isContainerContent(content)) {
     const serializedContent = getContentText(content);
@@ -142,6 +166,21 @@
       {:else if contentEditorComponent}
         <svelte:component this={contentEditorComponent} {...contentEditorProps} />
       {/if}
+
+      <div class="editor-content-field-row editor-content-secondary-control">
+        <hr class="editor-content-divider" />
+        <SegmentedSlider
+          id={`content-padding-${content.id ?? content.type}`}
+          iconName="view-list"
+          min={CONTENT_PADDING_MIN_STEP}
+          max={CONTENT_PADDING_MAX_STEP}
+          step={1}
+          value={paddingStep}
+          ariaLabel="Vertical padding"
+          title={`Vertical padding: ${paddingLabel}`}
+          on:input={(event) => updatePadding(event.detail.value)}
+        />
+      </div>
     </div>
   {/if}
 </div>
@@ -384,6 +423,19 @@
     line-height: 1.45;
   }
 
+  .editor-content-secondary-control {
+    margin-top: 0.5rem;
+    gap: 0.45rem;
+  }
+
+  .editor-content-divider {
+    width: 100%;
+    height: 0;
+    margin: 0;
+    border: 0;
+    border-top: 1px solid var(--editor-content-card-border);
+  }
+
   :global(.editor-content-actions .btn) {
     padding: 0.125rem 0.25rem;
     color: var(--editor-content-card-text-muted);
@@ -402,4 +454,3 @@
     color: var(--editor-content-card-text);
   }
 </style>
-

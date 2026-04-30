@@ -3,6 +3,7 @@
   import { base } from '$app/paths';
   import { goto } from '$app/navigation';
   import { onDestroy, onMount } from 'svelte';
+  import { setPrintSelection } from '$lib/print-selection';
   import CardEditor from '$components/card-editor/card-editor.svelte';
   import CurrentCard from '$components/card/current-card.svelte';
   import Sidebar from '$components/sidebar.svelte';
@@ -71,6 +72,7 @@
       }
 
       event.preventDefault();
+      setPrintSelection(null);
       await goto(`${base}/print`);
     }
   };

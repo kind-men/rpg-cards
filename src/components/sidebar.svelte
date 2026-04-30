@@ -6,6 +6,7 @@
     Input
   } from '@sveltestrap/sveltestrap';
   import { generateExportObject, parseCards } from '../lib/card-json-parser';
+  import { setPrintSelection } from '../lib/print-selection';
   import type Card from '../model/card';
   import { currentCard, deck, multiSelect, pageLayout } from '../stores';
   import { CARD_SIZE_PRESETS, PAPER_SIZE_PRESETS } from '../stores/page-layout';
@@ -109,6 +110,7 @@
 
   const handleOpenPrintView = async () => {
     generalMenuOpen = false;
+    setPrintSelection(null);
     await goto(`${base}/print`);
   };
 

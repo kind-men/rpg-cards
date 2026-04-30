@@ -2,6 +2,7 @@
   import { browser } from '$app/environment';
   import { onMount, tick } from 'svelte';
   import split from 'just-split';
+  import { getPrintableCards } from '../../lib/print-selection';
   import CardBack from '../../components/card/card-back.svelte';
   import Card from '../../components/card/card.svelte';
   import { deck, pageLayout } from '../../stores';
@@ -26,7 +27,8 @@
   };
 
   const cardsPerPages = calculateCardsPerPages();
-  const cardGroups = split($deck, cardsPerPages);
+  const printableCards = browser ? getPrintableCards($deck) : $deck;
+  const cardGroups = split(printableCards, cardsPerPages);
 
   onMount(async () => {
     await tick();

@@ -15,7 +15,7 @@ export const CARD_TEMPLATES: CardTemplateDefinition[] = [
   {
     id: 'scratch',
     label: 'Start from scratch',
-    description: 'Begin with a simple starter card containing one text block.',
+    description: 'Begin with an empty starter card and add only the blocks you need.',
     card: DEFAULT_CARD_TEMPLATE
   },
   {

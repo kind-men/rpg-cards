@@ -56,7 +56,10 @@
   $: isTitleVisible = hasTitleContent || card?.layout?.show_title !== false;
   $: selectedDeckCard = $currentCard > -1 ? $deck[$currentCard] : undefined;
   $: isWizardVisible =
-    !isMultiEditing && Boolean(selectedDeckCard) && (selectedDeckCard.contents?.length ?? 0) === 0;
+    !isMultiEditing &&
+    Boolean(selectedDeckCard) &&
+    !selectedDeckCard.title?.trim() &&
+    (selectedDeckCard.contents?.length ?? 0) === 0;
   const cardbackSizeOptions: { value: CardBackImageSizePreset; label: string }[] = [
     { value: 'cover', label: 'Cover' },
     { value: 'contain', label: 'Contain' },

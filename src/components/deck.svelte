@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { base } from '$app/paths';
+  import { goto } from '$app/navigation';
   import { Button, Icon, Input, InputGroup, InputGroupText, Label, Tooltip } from '@sveltestrap/sveltestrap';
+  import { setPrintSelection } from '../lib/print-selection';
   import type Card from '../model/card';
   import type { CardFormat } from '../model/page-layout';
   import { createNewCard } from '../lib/card-builder';
@@ -44,6 +47,11 @@
   const handleDeleteSelected = () => {
     deck.removeCards(...$multiSelect.values());
     multiSelect.clear();
+  };
+
+  const handlePrintSelected = async () => {
+    setPrintSelection(Array.from($multiSelect.values()));
+    await goto(`${base}/print`);
   };
 
   const handleSelectAll = () => {
@@ -168,21 +176,33 @@
               <span class="deck-count">{$multiSelect.size}</span>
             {/if}
           </label>
-          {#if $multiSelect.size > 1}
-            <button
-              class="deck-header-action"
-              type="button"
-              disabled={$multiSelect.size < 2}
-              on:click={() =>
-                confirmThis({
-                  func: handleDeleteSelected,
-                  title: `Delete ${$multiSelect.size} cards?`,
-                  body: `Are you sure you want to delete ${$multiSelect.size} cards?`
-                })}
-            >
-              <Icon name="trash" />
-            </button>
-          {/if}
+          <div class="deck-header-actions">
+            {#if $multiSelect.size > 0}
+              <button
+                class="deck-header-action"
+                type="button"
+                aria-label={`Print ${$multiSelect.size} selected ${$multiSelect.size === 1 ? 'card' : 'cards'}`}
+                on:click={handlePrintSelected}
+              >
+                <Icon name="printer" />
+              </button>
+            {/if}
+            {#if $multiSelect.size > 1}
+              <button
+                class="deck-header-action"
+                type="button"
+                disabled={$multiSelect.size < 2}
+                on:click={() =>
+                  confirmThis({
+                    func: handleDeleteSelected,
+                    title: `Delete ${$multiSelect.size} cards?`,
+                    body: `Are you sure you want to delete ${$multiSelect.size} cards?`
+                  })}
+              >
+                <Icon name="trash" />
+              </button>
+            {/if}
+          </div>
         </div>
 
         {#each cards as card, index}
@@ -426,6 +446,12 @@
     padding: 0 0.15rem;
     color: var(--deck-text-faint);
     font-size: 0.8rem;
+  }
+
+  .deck-header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15rem;
   }
 
   .deck-select-all {

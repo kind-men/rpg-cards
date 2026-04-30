@@ -323,7 +323,7 @@
 {:else}
   <div class="output-loading" aria-live="polite">
     <div class="output-loading-spinner" aria-hidden="true"></div>
-    <p class="output-loading-text">Preparing pagesâ€¦</p>
+    <p class="output-loading-text">Preparing pages</p>
   </div>
 {/if}
 
@@ -407,6 +407,7 @@
 
     &.backside {
       justify-content: end;
+      justify-items: end;
       padding-left: $paper-padding;
       padding-right: calc(0.5cm - var(--adjust-x));
       padding-top: calc(0.5cm - var(--adjust-y));
@@ -426,18 +427,20 @@
   }
 
   .joined-slot {
-    width: calc((var(--card-width) + (var(--back-border-width) * 2)) * 2 + 2mm);
+    width: calc((var(--card-width) * 2 + (var(--back-border-width) * 2)));
   }
 
   .joined-card-shell {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    width: 100%;
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    gap: 0;
+    width: auto;
     height: 100%;
   }
 
   .joined-card-shell-backside {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-columns: max-content;
   }
 
   .joined-card-panel {
@@ -445,6 +448,31 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .card-slot.backside.joined-slot {
+    justify-content: flex-end;
+  }
+
+  .card-slot.backside.with-border.joined-slot {
+    background-color: transparent;
+  }
+
+  .card-slot.backside.with-border.joined-slot .joined-card-panel {
+    box-sizing: border-box;
+    padding-top: var(--back-border-width);
+    padding-bottom: var(--back-border-width);
+    background-color: var(--card-color);
+  }
+
+  .card-slot.backside.with-border.joined-slot .joined-card-panel:first-child {
+    padding-left: var(--back-border-width);
+    padding-right: 0;
+  }
+
+  .card-slot.backside.with-border.joined-slot .joined-card-panel:last-child {
+    padding-left: 0;
+    padding-right: var(--back-border-width);
   }
 
   .joined-card-fold {

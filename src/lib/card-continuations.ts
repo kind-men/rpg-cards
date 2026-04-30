@@ -1,6 +1,6 @@
 import type Card from '$model/card';
 import type { CardContent } from '$model/card';
-import { cloneCardContentWithNewIds } from './card-content';
+import { cloneCardContent } from './card-content';
 
 export interface PrintableCardEntry {
   key: string;
@@ -49,8 +49,8 @@ function buildCandidateCard(
     candidate.layout.show_title = false;
   }
   candidate.contents = [
-    ...mainContents.map((content) => cloneCardContentWithNewIds(content)),
-    ...footerContents.map((content) => cloneCardContentWithNewIds(content))
+    ...mainContents.map((content) => cloneCardContent(content)),
+    ...footerContents.map((content) => cloneCardContent(content))
   ];
   return candidate;
 }

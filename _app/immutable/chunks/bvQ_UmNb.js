@@ -1,1 +1,0 @@
-import{K as e,L as t,Nt as n,W as r,dt as i}from"./BLaozyYe.js";import"./Cfug8aQt.js";import"./Dkb1PTSG.js";var a=e(`<div class="workspace-content-view svelte-csqhbf"><!></div>`);function o(e,o){var s=a();t(i(s),o,`default`,{},null),n(s),r(e,s)}export{o as t};

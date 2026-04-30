@@ -35,14 +35,12 @@
     grid-template-columns: 1fr 1fr;
     background-color: var(--card-color);
     grid-gap: 0.5mm;
-    margin-top: -0.2em;
   }
 
   .block {
     background-color: white;
     padding: 0.15em 0 0;
     font-size: var(--card-text-size);
-
 
     p,
     h2 {

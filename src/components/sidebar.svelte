@@ -15,8 +15,10 @@
   import Hint from './hint.svelte';
   import DeckEditorDialog from './deck-editor-dialog.svelte';
   import DeckImportDialog from './deck-import-dialog.svelte';
+  import CardImportDialog from './card-import-dialog.svelte';
   import SidebarSection from './sidebar-section.svelte';
   import type { ImportEventPayload } from './deck-import-dialog.svelte';
+  import type { CardImportEventPayload } from './card-import-dialog.svelte';
 
   let importFileSelector: HTMLInputElement;
   let importFiles: FileList;
@@ -25,6 +27,7 @@
   let downloadName = 'cards.json';
   let toggleDeckEditor: () => void;
   let toggleDeckImportDialog: () => void;
+  let toggleCardImportDialog: () => void;
   let generalMenuOpen = false;
   const addCardsToDeck = (cards: Card[]) => {
     const i = deck.addCards(...cards);
@@ -100,6 +103,10 @@
   };
 
   const handleImportFromJSON = (event: CustomEvent<ImportEventPayload>) => {
+    addCardsToDeck(event.detail.cards);
+  };
+
+  const handleImportFromSource = (event: CustomEvent<CardImportEventPayload>) => {
     addCardsToDeck(event.detail.cards);
   };
 
@@ -241,7 +248,12 @@
   </div>
 
   <SidebarSection grow={true}>
-      <Deck />
+      <Deck
+        on:import={() => {
+          closeGeneralMenu();
+          toggleCardImportDialog();
+        }}
+      />
   </SidebarSection>
   <footer class="sidebar-footer">
     <a
@@ -270,6 +282,7 @@
   </footer>
       <DeckEditorDialog bind:toggle={toggleDeckEditor} />
   <DeckImportDialog bind:toggle={toggleDeckImportDialog} on:import={handleImportFromJSON} />
+  <CardImportDialog bind:toggle={toggleCardImportDialog} on:import={handleImportFromSource} />
 </div>
 
 <style lang="scss">

@@ -6,7 +6,6 @@
     "icon": "magic-swirl",
     "icon_back": "magic-swirl",
     "contents": [
-      "subtitle | Level and school",
       "rule",
       "property | Casting Time | 1 action",
       "property | Range | 60 feet",
@@ -15,7 +14,8 @@
       "rule",
       "text | Describe what the spell does here.",
       "section | At higher levels",
-      "text | Add scaling or upgrade details here."
+      "text | Add scaling or upgrade details here.",
+      "footer | Wizard | Necromancy 3"
     ],
     "tags": ["template", "spell"],
     "layout": {

@@ -9,6 +9,9 @@
   import { cloneCardContentsWithNewIds } from '../lib/card-content';
   import { CARD_SIZE_PRESETS, currentCard, deck, multiSelect, pageLayout } from '../stores';
   import ConfirmationDialog from './confirmation-dialog.svelte';
+  import { createEventDispatcher } from 'svelte';
+
+  const dispatch = createEventDispatcher<{ import: void }>();
 
   const cardFormatOptions: { value: CardFormat; label: string }[] = [
     { value: 'poker', label: 'Poker' },
@@ -35,6 +38,10 @@
   const handleAddCard = () => {
     const index = deck.addCards(createNewCard());
     currentCard.set(index);
+  };
+
+  const handleImportCards = () => {
+    dispatch('import');
   };
 
   const handleDeleteCard = (index: number) => {
@@ -113,6 +120,9 @@
     <div class="deck-header">
       <h2 class="deck-title">Deck</h2>
       <div class="deck-toolbar">
+        <button class="deck-toolbar-button" type="button" aria-label="Import cards" on:click={handleImportCards}>
+          <Icon name="download" />
+        </button>
         <button class="deck-toolbar-button" type="button" on:click={handleAddCard}>
           <Icon name="plus-lg" />
         </button>

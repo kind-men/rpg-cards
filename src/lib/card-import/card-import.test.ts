@@ -4,7 +4,6 @@ import {
   adaptDnd2014SpellToDraft,
   buildDnd2014SpellFooterLeft,
   buildDnd2014SpellFooterRight,
-  buildDnd2014SpellSubtitle,
   formatDnd2014SpellComponents,
   parseDnd2014SpellListItems
 } from './sources/dnd-2014-spells';
@@ -31,7 +30,7 @@ describe('D&D 2014 spell importer', () => {
     expect(items[0]?.detailUrl).toBe('https://www.dnd5eapi.co/api/2014/spells/acid-arrow');
   });
 
-  it('formats spell metadata for subtitle and components', () => {
+  it('formats spell metadata for footer and components', () => {
     const spell = {
       index: 'message',
       name: 'Message',
@@ -44,7 +43,6 @@ describe('D&D 2014 spell importer', () => {
       material: 'a tiny bell and a piece of fine silver wire'
     };
 
-    expect(buildDnd2014SpellSubtitle(spell)).toBe('Ritual / Concentration');
     expect(buildDnd2014SpellFooterLeft(spell)).toBe('Wizard');
     expect(buildDnd2014SpellFooterRight(spell)).toBe('Evocation Cantrip');
     expect(formatDnd2014SpellComponents(spell)).toBe(
@@ -129,5 +127,6 @@ describe('D&D 2014 spell importer', () => {
     expect(
       card.contents.every((content) => typeof content.id === 'string' && content.id.length > 0)
     ).toBe(true);
+    expect(card.contents.some((content) => content.type === 'subtitle')).toBe(false);
   });
 });

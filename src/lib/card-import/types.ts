@@ -1,5 +1,6 @@
 import type { CardContentType } from '$lib/card-content-types';
 import type Card from '$model/card';
+import type { CardBackBorderStyle, CardBackImage, CardBackMode } from '$model/card';
 
 export interface CardImportError {
   code: 'network' | 'parse' | 'empty' | 'unknown';
@@ -36,11 +37,15 @@ export interface ImportedCardDraft {
   externalId: string;
   title: string;
   tags: string[];
-  template?: 'default' | 'spell';
+  template?: 'default' | 'spell' | 'item';
   icon?: string;
   iconBack?: string;
   color?: string;
   layout?: Partial<Card['layout']>;
+  cardbackMode?: CardBackMode;
+  cardbackImages?: CardBackImage[];
+  cardbackBackgroundColor?: string;
+  cardbackBorderStyle?: CardBackBorderStyle;
   blocks: ImportedCardDraftBlock[];
 }
 

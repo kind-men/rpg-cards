@@ -108,20 +108,6 @@ export function formatDnd2014SpellComponents(spell: Dnd2014SpellDetailResponse):
   return parts.join(', ');
 }
 
-export function buildDnd2014SpellSubtitle(spell: Dnd2014SpellDetailResponse): string {
-  const markers = [];
-
-  if (spell.ritual) {
-    markers.push('Ritual');
-  }
-
-  if (spell.concentration) {
-    markers.push('Concentration');
-  }
-
-  return markers.join(' / ');
-}
-
 export function buildDnd2014SpellFooterLeft(spell: Dnd2014SpellDetailResponse): string {
   return (spell.classes ?? [])
     .map((characterClass) => characterClass?.name?.trim())
@@ -174,15 +160,6 @@ export function adaptDnd2014SpellToDraft(spell: Dnd2014SpellDetailResponse): Imp
       content: paragraph
     }))
   ];
-
-  const subtitle = buildDnd2014SpellSubtitle(spell);
-
-  if (subtitle) {
-    blocks.unshift({
-      type: 'subtitle',
-      content: subtitle
-    });
-  }
 
   if (Array.isArray(spell.higher_level) && spell.higher_level.length > 0) {
     blocks.push({

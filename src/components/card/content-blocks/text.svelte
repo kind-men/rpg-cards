@@ -6,10 +6,18 @@
   export let content: CardContent;
 </script>
 
-<p class="text">{@html renderText(getContentText(content), { markdown: { inline: false } })}</p>
+<div class="text">{@html renderText(getContentText(content), { markdown: { inline: false } })}</div>
 
 <style lang="scss">
   .text {
     font-size: var(--card-text-size);
+
+    > :global(*) {
+      margin-bottom: 0.25rem !important;
+
+      &:last-child {
+        margin-bottom: 0 !important;
+      }
+    }
   }
 </style>

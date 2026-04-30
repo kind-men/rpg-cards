@@ -3,6 +3,7 @@
     CONTENT_PADDING_MAX_STEP,
     CONTENT_PADDING_MIN_STEP,
     CONTENT_PADDING_REM_STEP,
+    getContentVerticalSpacing,
     getContentText,
     isContainerContent,
     normalizeContentPaddingStep,
@@ -39,7 +40,7 @@
     setCollapsed,
     setCollapsedVersion
   });
-  $: paddingStep = normalizeContentPaddingStep(content.paddingY);
+  $: paddingStep = getContentVerticalSpacing(content);
   $: paddingLabel = `${(paddingStep * CONTENT_PADDING_REM_STEP).toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1')}rem`;
 
   const getSplitContentFromValue = (value: string) =>
@@ -48,13 +49,13 @@
   const updatePadding = (value: number) => {
     const nextPaddingStep = normalizeContentPaddingStep(value);
 
-    if (nextPaddingStep === normalizeContentPaddingStep(content.paddingY)) {
+    if (nextPaddingStep === normalizeContentPaddingStep(content.verticalSpacing)) {
       return;
     }
 
     content = {
       ...content,
-      paddingY: nextPaddingStep
+      verticalSpacing: nextPaddingStep
     };
   };
 
@@ -278,6 +279,10 @@
 
   .editor-content-card-body-text {
     padding: 0;
+
+    .editor-content-secondary-control {
+      padding: 0 0.6rem 0.6rem;
+    }
   }
 
   :global(.editor-content-labeled-fields) {
@@ -433,6 +438,7 @@
     height: 0;
     margin: 0;
     border: 0;
+    opacity: 1;
     border-top: 1px solid var(--editor-content-card-border);
   }
 

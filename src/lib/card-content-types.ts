@@ -50,14 +50,6 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
     editorComponent: CardtitleContentBlockEditor
   },
   {
-    name: 'text',
-    label: 'Text',
-    description: 'Simple paragraph',
-    params: [{ name: 'Text', description: 'Text', type: 'textarea' }],
-    renderComponent: Text,
-    editorComponent: TextContentBlockEditor
-  },
-  {
     name: 'subtitle',
     label: 'Subtitle',
     description: 'Sligtly larger italics text',
@@ -67,6 +59,15 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
     ],
     renderComponent: Subtitle,
     editorComponent: SubtitleContentBlockEditor
+  },
+  {
+    name: 'text',
+    label: 'Text',
+    description: 'Simple paragraph',
+    params: [{ name: 'Text', description: 'Text', type: 'textarea' }],
+    verticalSpacing: 2,
+    renderComponent: Text,
+    editorComponent: TextContentBlockEditor
   },
   {
     name: 'rule',
@@ -82,8 +83,8 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
     description:
       'A property with a bold name and normal description - if spanning more than one line, description is indented.',
     params: [
-      { name: 'Name', description: 'Propety name (bolded)' },
-      { name: 'Description', description: 'Propety description' }
+      { name: 'Name', description: 'Property name (bolded)' },
+      { name: 'Description', description: 'Property description' }
     ],
     renderComponent: Property,
     editorComponent: PropertyContentBlockEditor
@@ -98,6 +99,14 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
     ],
     renderComponent: Description,
     editorComponent: DescriptionContentBlockEditor
+  },
+  {
+    name: 'row',
+    label: 'Row',
+    description: 'A horizontal row with evenly sized columns that can contain nested content.',
+    params: [],
+    renderComponent: Row,
+    editorComponent: RowContentBlockEditor
   },
   {
     name: 'section',
@@ -123,7 +132,7 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
   },
   {
     name: 'fill',
-    label: 'Fill',
+    label: 'Spacing',
     description: 'Empty area taking up available space',
     params: [{ name: 'Height', description: 'Height in mm', type: 'number', optional: true }],
     renderComponent: Fill,
@@ -163,14 +172,6 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
     ],
     renderComponent: Footer,
     editorComponent: FooterContentBlockEditor
-  },
-  {
-    name: 'row',
-    label: 'Row',
-    description: 'A horizontal row with evenly sized columns that can contain nested content.',
-    params: [],
-    renderComponent: Row,
-    editorComponent: RowContentBlockEditor
   },
   {
     name: 'dndstats',
@@ -216,6 +217,10 @@ export function getContentTypeDescriptor(type: CardContentType): CardContentType
 
 export function isCardContentType(x: string): x is CardContentType {
   return CARD_CONTENT_TYPES.some((t) => t.name === x);
+}
+
+export function getContentBlockDefaultVerticalSpacing(type: CardContentType): number {
+  return getContentTypeDescriptor(type)?.verticalSpacing ?? 0;
 }
 
 export function resolveContentBlockRenderProps(content: CardContent, card: Card) {

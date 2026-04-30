@@ -4,6 +4,7 @@ export default interface CardContentTypeDescriptor {
   readonly name: string;
   readonly label?: string;
   readonly description: string;
+  readonly verticalSpacing?: number;
   readonly params: readonly CardContentTypeParam[];
   readonly renderComponent: ComponentType;
   readonly editorComponent: ComponentType;

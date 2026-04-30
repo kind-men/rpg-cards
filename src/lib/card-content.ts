@@ -1,9 +1,10 @@
 import type { CardContent } from '$model/card';
+import { getContentBlockDefaultVerticalSpacing } from '$lib/card-content-types';
 import { uuid4 } from './uuid';
 
 export const CONTENT_PADDING_MIN_STEP = 0;
 export const CONTENT_PADDING_MAX_STEP = 7;
-export const CONTENT_PADDING_REM_STEP = 0.25;
+export const CONTENT_PADDING_REM_STEP = 0.125;
 
 export function normalizeContentPaddingStep(value: unknown): number {
   const numericValue = Number(value);
@@ -18,8 +19,16 @@ export function normalizeContentPaddingStep(value: unknown): number {
   );
 }
 
-export function getContentPaddingRemValue(content: CardContent): number {
-  return normalizeContentPaddingStep(content.paddingY) * CONTENT_PADDING_REM_STEP;
+export function getContentVerticalSpacing(content: CardContent): number {
+  if (content.verticalSpacing == null) {
+    return getContentBlockDefaultVerticalSpacing(content.type);
+  }
+
+  return normalizeContentPaddingStep(content.verticalSpacing);
+}
+
+export function getContentVerticalSpacingRemValue(content: CardContent): number {
+  return getContentVerticalSpacing(content) * CONTENT_PADDING_REM_STEP;
 }
 
 export function hasChildCollections(content: CardContent): boolean {

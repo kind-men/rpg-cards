@@ -75,7 +75,6 @@
   .rpg-card {
     display: flex;
     flex-direction: column;
-    // gap: 0.2rem;
     height: 100%;
     min-height: 0;
 
@@ -97,7 +96,8 @@
       font-weight: 800;
       font-family: "Overpass",sans-serif;
       letter-spacing: -0.025em;
-      padding: .25rem 0;
+      padding: .45rem 0 .25rem;
+      margin: 0  0.5rem;
     }
 
     .card-content {
@@ -108,14 +108,8 @@
       overflow: hidden;
 
       :global(p) {
-        padding: 0 0.5em;
-        margin-bottom: 0.2em;
+        margin: 0 0.5em;
         line-height: 1em;
-        font-weight: bold;
-      }
-
-      :global(li) {
-        font-weight: bold;
       }
 
       :global(strong),
@@ -125,15 +119,23 @@
       }
 
       :global(ul) {
-        margin-bottom: 0;
+        margin: 0 0.5em;
+      }
+
+      :global(li) {
+        padding-top: .25rem;
+        line-height: 1.0em;
+      }
+      :global(li:first-child) {
+        padding-top: 0;
       }
 
       > :global(h2) {
-        padding: 0 0.5em;
+        margin: 0 0.5em;
         font-size: 1.2em;
         font-style: italic;
         color: var(--card-color);
-        font-family: Draconis;
+        font-family: 'Overpass', Arial, sans-serif;
       }
     }
 

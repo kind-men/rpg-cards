@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContentPaddingRemValue } from '$lib/card-content';
+  import { getContentVerticalSpacingRemValue } from '$lib/card-content';
   import { getContentTypeDescriptor, resolveContentBlockRenderProps } from '$lib/card-content-types';
   import type Card from '$model/card';
   import type { CardContent } from '$model/card';
@@ -10,7 +10,7 @@
   $: typeDescriptor = getContentTypeDescriptor(content.type);
   $: renderProps = resolveContentBlockRenderProps(content, card);
   $: isHighlighted = Boolean(content.id) && $hoveredContentId === content.id;
-  $: paddingRem = getContentPaddingRemValue(content);
+  $: paddingRem = getContentVerticalSpacingRemValue(content);
 </script>
 
 <div

@@ -20,8 +20,8 @@
     display: block;
     text-indent: -1em;
     margin-left: 1em;
-    margin-bottom: 0.2em;
-    padding: 0 0.5em;
+    margin-bottom: 0;
+    padding: 0 0.375em;
     line-height: 1em;
 
     p {

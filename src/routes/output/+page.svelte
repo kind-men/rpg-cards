@@ -406,7 +406,9 @@
     }
 
     &.backside {
-      padding-left: calc(0.5cm + var(--adjust-x));
+      justify-content: end;
+      padding-left: $paper-padding;
+      padding-right: calc(0.5cm - var(--adjust-x));
       padding-top: calc(0.5cm - var(--adjust-y));
     }
   }

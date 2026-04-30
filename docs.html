@@ -6,23 +6,23 @@
     <link rel="icon" href="./favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="manifest" crossorigin="use-credentials" href="./manifest.json" />
-    <link href="./_app/immutable/entry/start.Db33lurd.js" rel="modulepreload">
-		<link href="./_app/immutable/chunks/Cc7G0sdz.js" rel="modulepreload">
+    <link href="./_app/immutable/entry/start.D9TQIVje.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/ClUPMgPF.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/BLaozyYe.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/rbX8BK00.js" rel="modulepreload">
-		<link href="./_app/immutable/entry/app.BZ5TTdEY.js" rel="modulepreload">
+		<link href="./_app/immutable/entry/app.CKu1-VKA.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/B0BvW1x3.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/Cfug8aQt.js" rel="modulepreload">
 		<link href="./_app/immutable/nodes/0.zqf2Ftig.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/Dkb1PTSG.js" rel="modulepreload">
-		<link href="./_app/immutable/nodes/3.B2oHGXV7.js" rel="modulepreload">
-		<link href="./_app/immutable/chunks/CZs186Z2.js" rel="modulepreload">
-		<link href="./_app/immutable/chunks/C8iu5j4J.js" rel="modulepreload">
+		<link href="./_app/immutable/nodes/3.D1Qu3kYP.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/Dnn1MbYE.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/BRVRJ4aw.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/bvQ_UmNb.js" rel="modulepreload">
 		<!--12qhfyh--><!----><!--jk4d64--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/> <!--[0--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css"/><!--]--><!----><title>RPG Card Generator</title>
 		<link href="./_app/immutable/assets/dist.DhaulA-e.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/0.DNe1FIK-.css" rel="stylesheet">
-		<link href="./_app/immutable/assets/card-back.Cxrd23uB.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/card-back.CZfeRjQj.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/workspace-shell.BvpH28Hk.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/workspace-content-view.CoZe15Ls.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/3.B-gACyXg.css" rel="stylesheet">
@@ -125,24 +125,24 @@
 }</code></pre> <h4>Cardback images</h4> <p>Each cardback image entry can contain:</p> <ul><li><code>src</code> (string): image source, typically a data URL after uploading an image in the editor</li> <li><code>size</code> (string, optional): image sizing mode or custom CSS background-size value</li></ul> <p>For compatibility, imported image arrays may also contain plain strings. Those are normalized to
     objects with <code>src</code> set to the string value and <code>size</code> defaulting to <code>"contain"</code>.</p> <hr/> <h3 id="layout-data">Layout</h3> <p>The <code>layout</code> object can contain:</p> <ul><li><code>show_title</code> (boolean, optional): show or hide the built-in card title row</li> <li><code>base_font_size</code> (string, optional)</li> <li><code>text_font_size</code> (string, optional)</li> <li><code>title_font_size</code> (string, optional)</li> <li><code>custom_css</code> (string, optional)</li></ul> <p>The editor currently exposes title visibility, title size, text size, and custom CSS. The
     exported layout object may still include <code>base_font_size</code> for compatibility.</p> <hr/> <h3 id="contents">Contents</h3> <p>Content objects have the following fields:</p> <ul><li><code>type</code> (string): content type used by the renderer. See <a href="#content-types">the table below</a>.</li> <li><code>content</code> (string): content parameters separated by a pipe <code>|</code> for non-row blocks</li> <li><code>children</code> (array): nested column lists for <code>row</code> blocks only</li> <li><code>id</code> (string, optional): unique id used by the editor</li></ul> <p><code>footer</code> remains a top-level block and is not valid inside a <code>row</code> column. The plain-text editor uses the same content encoding, one block per line. Newlines
-    inside a block are stored as escaped <code>\\n</code> sequences in that mode.</p> <h4 id="content-types">Content types</h4> <table class="table table-striped content-type-table"><thead><tr><th scope="col" class="name">Name</th><th scope="col" class="description svelte-svpi39">Description</th><th scope="col" class="parameters">Parameters</th></tr></thead><tbody><!--[--><tr><td>Card Title <br/> <code>cardtitle</code></td><td>Displays the card title using the card header style.</td><td><ul class="param-list svelte-svpi39"><!--[--><!--]--></ul></td></tr><tr><td>Text <br/> <code>text</code></td><td>Simple paragraph</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Text</i><!--[0--> (textarea)<!--]-->:
-                Text</li><!--]--></ul></td></tr><tr><td>Subtitle <br/> <code>subtitle</code></td><td>Sligtly larger italics text</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Subtitle</i><!--[-1--><!--]-->:
+    inside a block are stored as escaped <code>\\n</code> sequences in that mode.</p> <h4 id="content-types">Content types</h4> <table class="table table-striped content-type-table"><thead><tr><th scope="col" class="name">Name</th><th scope="col" class="description svelte-svpi39">Description</th><th scope="col" class="parameters">Parameters</th></tr></thead><tbody><!--[--><tr><td>Card Title <br/> <code>cardtitle</code></td><td>Displays the card title using the card header style.</td><td><ul class="param-list svelte-svpi39"><!--[--><!--]--></ul></td></tr><tr><td>Subtitle <br/> <code>subtitle</code></td><td>Sligtly larger italics text</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Subtitle</i><!--[-1--><!--]-->:
                 Subtitle text</li><li><i>Right-aligned</i><!--[-1--><!--]-->:
-                Additional right-aligned text</li><!--]--></ul></td></tr><tr><td>Divider <br/> <code>rule</code></td><td>A horizontal line taking up full width</td><td><ul class="param-list svelte-svpi39"><!--[--><!--]--></ul></td></tr><tr><td>Property <br/> <code>property</code></td><td>A property with a bold name and normal description - if spanning more than one line, description is indented.</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Name</i><!--[-1--><!--]-->:
-                Propety name (bolded)</li><li><i>Description</i><!--[-1--><!--]-->:
-                Propety description</li><!--]--></ul></td></tr><tr><td>Description <br/> <code>description</code></td><td>Same as `property` but with no indentation and name is italicized.</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Name</i><!--[-1--><!--]-->:
+                Additional right-aligned text</li><!--]--></ul></td></tr><tr><td>Text <br/> <code>text</code></td><td>Simple paragraph</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Text</i><!--[0--> (textarea)<!--]-->:
+                Text</li><!--]--></ul></td></tr><tr><td>Divider <br/> <code>rule</code></td><td>A horizontal line taking up full width</td><td><ul class="param-list svelte-svpi39"><!--[--><!--]--></ul></td></tr><tr><td>Property <br/> <code>property</code></td><td>A property with a bold name and normal description - if spanning more than one line, description is indented.</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Name</i><!--[-1--><!--]-->:
+                Property name (bolded)</li><li><i>Description</i><!--[-1--><!--]-->:
+                Property description</li><!--]--></ul></td></tr><tr><td>Description <br/> <code>description</code></td><td>Same as `property` but with no indentation and name is italicized.</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Name</i><!--[-1--><!--]-->:
                 Description name (bolded, italicized)</li><li><i>Description</i><!--[-1--><!--]-->:
-                Description description</li><!--]--></ul></td></tr><tr><td>Section <br/> <code>section</code></td><td>Section header</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Section name</i><!--[-1--><!--]-->:
+                Description description</li><!--]--></ul></td></tr><tr><td>Row <br/> <code>row</code></td><td>A horizontal row with evenly sized columns that can contain nested content.</td><td><ul class="param-list svelte-svpi39"><!--[--><!--]--></ul></td></tr><tr><td>Section <br/> <code>section</code></td><td>Section header</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Section name</i><!--[-1--><!--]-->:
                 Section name</li><li><i>Right-aligned</i><!--[-1--><!--]-->:
                 Additional right-aligned text</li><!--]--></ul></td></tr><tr><td>Boxes <br/> <code>boxes</code></td><td>Empty boxes</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Amount</i><!--[0--> (number)<!--]-->:
                 Amount of boxes</li><li><i>Size</i><!--[-1--><!--]-->:
-                Size of the boxes</li><!--]--></ul></td></tr><tr><td>Fill <br/> <code>fill</code></td><td>Empty area taking up available space</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Height</i><!--[0--> (number)<!--]-->:
+                Size of the boxes</li><!--]--></ul></td></tr><tr><td>Spacing <br/> <code>fill</code></td><td>Empty area taking up available space</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Height</i><!--[0--> (number)<!--]-->:
                 Height in mm</li><!--]--></ul></td></tr><tr><td>Bullet <br/> <code>bullet</code></td><td>Bulleted text</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Text</i><!--[-1--><!--]-->:
                 Text</li><!--]--></ul></td></tr><tr><td>Picture <br/> <code>picture</code></td><td>A picture from an url</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>URL</i><!--[-1--><!--]-->:
                 URL of the picture</li><li><i>Size</i><!--[-1--><!--]-->:
                 CSS height value such as 120px, 60%, auto, or 12rem</li><!--]--></ul></td></tr><tr><td>Footer <br/> <code>footer</code></td><td>Transparent footer row with left and right aligned text at the bottom of the card.</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Left text</i><!--[-1--><!--]-->:
                 Left-aligned footer text</li><li><i>Right text</i><!--[-1--><!--]-->:
-                Right-aligned footer text</li><!--]--></ul></td></tr><tr><td>Row <br/> <code>row</code></td><td>A horizontal row with evenly sized columns that can contain nested content.</td><td><ul class="param-list svelte-svpi39"><!--[--><!--]--></ul></td></tr><tr><td>D&amp;D Stats <br/> <code>dndstats</code></td><td>A Dungeons &amp; Dragons stat block</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Str</i><!--[0--> (number)<!--]-->:
+                Right-aligned footer text</li><!--]--></ul></td></tr><tr><td>D&amp;D Stats <br/> <code>dndstats</code></td><td>A Dungeons &amp; Dragons stat block</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Str</i><!--[0--> (number)<!--]-->:
                 Strength score</li><li><i>Dex</i><!--[0--> (number)<!--]-->:
                 Dexterity score</li><li><i>Con</i><!--[0--> (number)<!--]-->:
                 Constitution score</li><li><i>Int</i><!--[0--> (number)<!--]-->:
@@ -203,7 +203,7 @@ footer | left | right</code></pre></section> <section class="docs-section" id="i
 			
 			<script>
 				{
-					__sveltekit_122hf7i = {
+					__sveltekit_r13184 = {
 						base: new URL(".", location).pathname.slice(0, -1),
 						assets: "/rpg-cards"
 					};
@@ -211,8 +211,8 @@ footer | left | right</code></pre></section> <section class="docs-section" id="i
 					const element = document.currentScript.parentElement;
 
 					Promise.all([
-						import("./_app/immutable/entry/start.Db33lurd.js"),
-						import("./_app/immutable/entry/app.BZ5TTdEY.js")
+						import("./_app/immutable/entry/start.D9TQIVje.js"),
+						import("./_app/immutable/entry/app.CKu1-VKA.js")
 					]).then(([kit, app]) => {
 						kit.start(app, element, {
 							node_ids: [0, 3],

@@ -478,6 +478,23 @@
                 <Label class="col-form-label" for="color-text">Color</Label>
                 <ColorInput bind:value={card.color} idPrefix="color" name="color" />
               </div>
+              <div class="sidebar-field">
+                <label class="style-toggle-row" for="pair-continuations">
+                  <Input
+                    id="pair-continuations"
+                    class="style-toggle-switch"
+                    type="switch"
+                    bind:checked={card.layout.pair_continuations}
+                  />
+                  <span class="style-toggle-copy">
+                    <span class="style-toggle-label">Pair continuation cards</span>
+                    <Hint id="pair-continuations-hint">
+                      Overflow continuation cards are paired two at a time and stay connected along
+                      the long edge in preview and print so they can be folded together.
+                    </Hint>
+                  </span>
+                </label>
+              </div>
             </SidebarSection>
 
             <SidebarSection>
@@ -831,6 +848,46 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.6rem;
+  }
+
+  .style-toggle-row {
+    min-height: 2.25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    cursor: pointer;
+  }
+
+  .style-toggle-copy {
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--card-editor-text-primary);
+    line-height: 1.35;
+  }
+
+  .style-toggle-label {
+    font-size: 0.9rem;
+  }
+
+  .card-editor-content :global(.style-toggle-switch.form-switch) {
+    margin: 0;
+    padding: 0 0 0 0.25em;
+    flex: none;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+  }
+
+  .card-editor-content :global(.style-toggle-switch.form-switch .form-check-input) {
+    margin: 0;
+    float: none;
+    cursor: pointer;
+    align-self: center;
+    transform: scale(1.25);
+    transform-origin: center;
   }
 
   .card-editor-header {

@@ -144,7 +144,8 @@
       display: flex;
       flex-direction: column;
       gap: 0.15em;
-      padding-bottom: 0.35em;
+      padding-top: 0.25em;
+      padding-bottom: 0.25em;
       flex: 0 0 auto;
     }
   }

@@ -1,37 +1,99 @@
 <script lang="ts">
-  import { afterUpdate, tick } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { settings } from '../../stores/settings';
-  import { Button, Icon, Input, InputGroup, InputGroupText, Tooltip } from '@sveltestrap/sveltestrap';
+  import { Button, Icon, Input, InputGroup, InputGroupText } from '@sveltestrap/sveltestrap';
   import { currentCard, deck, pageLayout } from '../../stores';
+  import type CardModel from '$model/card';
   import CardComponent from './card.svelte';
   import CardBack from './card-back.svelte';
+  import {
+    createPrintableOutputEntries,
+    expandCardToPrintableEntries,
+    type PrintableCardEntry,
+    type PrintableOutputEntry
+  } from '$lib/card-continuations';
 
-  let frontStageElement: HTMLDivElement;
-  let hasContentOverflow = false;
-  const overflowWarningId = 'card-overflow-warning';
+  let measurementStageElement: HTMLDivElement;
+  let measurementCard: CardModel | null = null;
+  let previewEntries: PrintableOutputEntry[] = [];
+  let fontsReady = false;
+  let buildToken = 0;
 
   $: card = $deck[$currentCard];
 
-  const updateOverflowState = async () => {
-    await tick();
-
-    const contentElement = frontStageElement?.querySelector('.card-content') as HTMLElement;
+  const doesMeasuredCardFit = (): boolean => {
+    const contentElement = measurementStageElement?.querySelector('.card-content') as HTMLElement | null;
     if (!contentElement) {
-      hasContentOverflow = false;
+      return false;
+    }
+
+    return contentElement.scrollHeight <= contentElement.clientHeight + 1;
+  };
+
+  const rebuildPreview = async () => {
+    if (!card || !fontsReady) {
+      previewEntries = [];
+      measurementCard = null;
       return;
     }
 
-    const children = Array.from(contentElement.children) as HTMLElement[];
-    const childOverflow = children.some(
-      (child) => child.offsetTop + child.offsetHeight > contentElement.clientHeight + 1
-    );
+    const token = ++buildToken;
 
-    hasContentOverflow = childOverflow;
+    const expandedCards = await expandCardToPrintableEntries(card, $currentCard, async (candidateCard) => {
+      if (token !== buildToken) {
+        return false;
+      }
+
+      measurementCard = candidateCard;
+      await tick();
+
+      if (token !== buildToken) {
+        return false;
+      }
+
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      return doesMeasuredCardFit();
+    });
+
+    if (token !== buildToken) {
+      return;
+    }
+
+    const pairEnabled = card.layout?.pair_continuations === true;
+    const entriesWithPairing: PrintableCardEntry[] = expandedCards.map((entry) => ({ ...entry }));
+
+    if (pairEnabled && entriesWithPairing.length > 1) {
+      entriesWithPairing.forEach((entry, index) => {
+        if (index + 1 >= entriesWithPairing.length && index % 2 === 0) {
+          return;
+        }
+
+        entry.joinPairKey = `${entry.sourceIndex}:${Math.floor(index / 2)}`;
+        entry.joinPairPosition = index % 2 === 0 ? 'start' : 'end';
+      });
+    }
+
+    previewEntries = createPrintableOutputEntries(entriesWithPairing, 2);
+    measurementCard = null;
   };
 
-  afterUpdate(() => {
-    void updateOverflowState();
+  onMount(async () => {
+    if ('fonts' in document) {
+      await document.fonts.ready.catch(() => undefined);
+    }
+
+    fontsReady = true;
   });
+
+  $: if (
+    card &&
+    fontsReady &&
+    $pageLayout.cardSize.width &&
+    $pageLayout.cardSize.height &&
+    $settings.previewZoom
+  ) {
+    void rebuildPreview();
+  }
 </script>
 
 <div class="canvas">
@@ -52,38 +114,100 @@
     </InputGroup>
   </div>
 
+  <div class="measurement-stage" aria-hidden="true" bind:this={measurementStageElement}>
+    {#if measurementCard}
+      <CardComponent card={measurementCard} />
+    {/if}
+  </div>
+
   {#if card}
     <div class="current-card">
-      <div class="card-preview-row">
-        <div
-          class="card-stage"
-          bind:this={frontStageElement}
-          style="
-            width: {$pageLayout.cardSize.width * ($settings.previewZoom / 100)}mm;
-            height: {$pageLayout.cardSize.height * ($settings.previewZoom / 100)}mm;
-          "
-        >
-          <div style="transform: scale({$settings.previewZoom / 100}); transform-origin: top left;">
-            <CardComponent {card} />
+      <div class="card-preview-stack">
+        <div class="card-preview-section">
+          <div class="card-preview-label">Front</div>
+          <div class="card-preview-row">
+            {#each previewEntries as previewEntry}
+              <div class:card-stage-pair={previewEntry.type === 'joined-pair'} class="card-stage-shell">
+                {#if previewEntry.type === 'joined-pair'}
+                  <div class="pair-stage">
+                    {#each previewEntry.cards as printableCard, index}
+                      <div
+                        class="card-stage"
+                        style="
+                          width: {$pageLayout.cardSize.width * ($settings.previewZoom / 100)}mm;
+                          height: {$pageLayout.cardSize.height * ($settings.previewZoom / 100)}mm;
+                        "
+                      >
+                        <div
+                          style="transform: scale({$settings.previewZoom / 100}); transform-origin: top left;"
+                        >
+                          <CardComponent card={printableCard.card} />
+                        </div>
+                        {#if index === 0}
+                          <div class="pair-stage-fold" aria-hidden="true"></div>
+                        {/if}
+                      </div>
+                    {/each}
+                  </div>
+                {:else}
+                  <div
+                    class="card-stage"
+                    style="
+                      width: {$pageLayout.cardSize.width * ($settings.previewZoom / 100)}mm;
+                      height: {$pageLayout.cardSize.height * ($settings.previewZoom / 100)}mm;
+                    "
+                  >
+                    <div style="transform: scale({$settings.previewZoom / 100}); transform-origin: top left;">
+                      <CardComponent card={previewEntry.cards[0].card} />
+                    </div>
+                  </div>
+                {/if}
+              </div>
+            {/each}
           </div>
-          {#if hasContentOverflow}
-            <div class="card-overflow-warning" id={overflowWarningId}>
-              <Icon name="exclamation-triangle-fill" />
-            </div>
-            <Tooltip target={overflowWarningId} placement="left">
-              Some content is clipped and does not fit on this card.
-            </Tooltip>
-          {/if}
         </div>
-        <div
-          class="card-stage"
-          style="
-            width: {$pageLayout.cardSize.width * ($settings.previewZoom / 100)}mm;
-            height: {$pageLayout.cardSize.height * ($settings.previewZoom / 100)}mm;
-          "
-        >
-          <div style="transform: scale({$settings.previewZoom / 100}); transform-origin: top left;">
-            <CardBack {card} />
+
+        <div class="card-preview-section">
+          <div class="card-preview-label">Back</div>
+          <div class="card-preview-row">
+            {#each previewEntries as previewEntry}
+              <div class:card-stage-pair={previewEntry.type === 'joined-pair'} class="card-stage-shell">
+                {#if previewEntry.type === 'joined-pair'}
+                  <div class="pair-stage">
+                    {#each [...previewEntry.cards].reverse() as printableCard, index}
+                      <div
+                        class="card-stage"
+                        style="
+                          width: {$pageLayout.cardSize.width * ($settings.previewZoom / 100)}mm;
+                          height: {$pageLayout.cardSize.height * ($settings.previewZoom / 100)}mm;
+                        "
+                      >
+                        <div
+                          style="transform: scale({$settings.previewZoom / 100}); transform-origin: top left;"
+                        >
+                          <CardBack card={printableCard.card} />
+                        </div>
+                        {#if index === 0}
+                          <div class="pair-stage-fold" aria-hidden="true"></div>
+                        {/if}
+                      </div>
+                    {/each}
+                  </div>
+                {:else}
+                  <div
+                    class="card-stage"
+                    style="
+                      width: {$pageLayout.cardSize.width * ($settings.previewZoom / 100)}mm;
+                      height: {$pageLayout.cardSize.height * ($settings.previewZoom / 100)}mm;
+                    "
+                  >
+                    <div style="transform: scale({$settings.previewZoom / 100}); transform-origin: top left;">
+                      <CardBack card={previewEntry.cards[0].card} />
+                    </div>
+                  </div>
+                {/if}
+              </div>
+            {/each}
           </div>
         </div>
       </div>
@@ -108,6 +232,15 @@
     background-position: 0 0, center center, center center;
   }
 
+  .measurement-stage {
+    position: fixed;
+    left: -200vw;
+    top: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: -1;
+  }
+
   .zoom-input {
     --current-card-zoom-surface: var(--color-white-96);
     position: sticky;
@@ -128,14 +261,26 @@
     justify-content: center;
   }
 
-  .card-stage {
-    --current-card-stage-shadow: rgba(24, 32, 47, 0.18);
-    position: relative;
-    flex: none;
-    filter: drop-shadow(0 1.25rem 2.5rem var(--current-card-stage-shadow));
+  .card-preview-stack {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .card-preview-section {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .card-preview-label {
+    color: var(--color-ink-575);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .card-preview-row {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -143,23 +288,44 @@
     gap: 2rem;
   }
 
-  .card-overflow-warning {
-    --current-card-warning-surface: var(--color-warning-surface);
-    --current-card-warning-text: var(--color-warning);
-    --current-card-warning-shadow: rgba(24, 32, 47, 0.16);
+  .card-stage-shell {
+    display: flex;
+  }
+
+  .card-stage-pair {
+    padding: 0.75rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.36);
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.18);
+  }
+
+  .pair-stage {
+    display: flex;
+    gap: 0;
+  }
+
+  .card-stage {
+    --current-card-stage-shadow: rgba(24, 32, 47, 0.18);
+    position: relative;
+    flex: none;
+    filter: drop-shadow(0 1.25rem 2.5rem var(--current-card-stage-shadow));
+  }
+
+  .pair-stage-fold {
     position: absolute;
-    right: 0.45rem;
-    bottom: 0.45rem;
-    z-index: 2;
-    width: 1.5rem;
-    height: 1.5rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    background: var(--current-card-warning-surface);
-    color: var(--current-card-warning-text);
-    box-shadow: 0 0.25rem 0.8rem var(--current-card-warning-shadow);
+    top: 4%;
+    right: -1px;
+    width: 2px;
+    height: 92%;
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        rgba(71, 85, 105, 0.45),
+        rgba(71, 85, 105, 0.45) 4px,
+        transparent 4px,
+        transparent 8px
+      );
+    pointer-events: none;
   }
 
   @media (max-width: 1100px) {
@@ -173,4 +339,3 @@
     }
   }
 </style>
-

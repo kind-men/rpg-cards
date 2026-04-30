@@ -120,6 +120,7 @@
 
       :global(ul) {
         margin: 0 0.5em;
+        padding-inline-start: 0.9rem;
       }
 
       :global(li) {

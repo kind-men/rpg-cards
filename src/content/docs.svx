@@ -87,7 +87,7 @@
 
 <section class="docs-section" id="print-view">
   <h2>Print view</h2>
-  <p>Use the print button in the left sidebar to open <code>{base}/output</code>.</p>
+  <p>Use the print button in the left sidebar to open the print preview workspace.</p>
   <p>The print settings currently control:</p>
   <ul>
     <li>paper size</li>

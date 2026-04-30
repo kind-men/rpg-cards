@@ -1,12 +1,9 @@
 <script lang="ts">
   import { base } from '$app/paths';
+  import { goto } from '$app/navigation';
   import {
-    Form,
     Icon,
-    Input,
-    InputGroup,
-    InputGroupText,
-    Label
+    Input
   } from '@sveltestrap/sveltestrap';
   import { generateExportObject, parseCards } from '../lib/card-json-parser';
   import type Card from '../model/card';
@@ -18,7 +15,6 @@
   import DeckEditorDialog from './deck-editor-dialog.svelte';
   import DeckImportDialog from './deck-import-dialog.svelte';
   import SidebarSection from './sidebar-section.svelte';
-  import type { PaperFormat } from '../model/page-layout';
   import type { ImportEventPayload } from './deck-import-dialog.svelte';
 
   let importFileSelector: HTMLInputElement;
@@ -26,20 +22,9 @@
   let hiddenDownloadLink: HTMLAnchorElement;
   let downloadUrl = undefined;
   let downloadName = 'cards.json';
-
   let toggleDeckEditor: () => void;
   let toggleDeckImportDialog: () => void;
   let generalMenuOpen = false;
-  let printOptionsOpen = false;
-  const paperFormatOptions: { value: PaperFormat; label: string }[] = [
-    { value: 'a4', label: 'A4' },
-    { value: 'letter', label: 'Letter' },
-    { value: 'legal', label: 'Legal' },
-    { value: 'a3', label: 'A3' },
-    { value: 'a5', label: 'A5' },
-    { value: 'custom', label: 'Custom' }
-  ];
-
   const addCardsToDeck = (cards: Card[]) => {
     const i = deck.addCards(...cards);
     currentCard.set(i);
@@ -122,6 +107,11 @@
     toggleDeckEditor();
   };
 
+  const handleOpenPrintView = async () => {
+    generalMenuOpen = false;
+    await goto(`${base}/print`);
+  };
+
   const closeGeneralMenu = () => {
     generalMenuOpen = false;
   };
@@ -148,21 +138,6 @@
   const handleExportToFileClick = () => {
     generalMenuOpen = false;
     handleExportToFile();
-  };
-
-  const handlePaperFormatChange = (event: Event) => {
-    const paperFormat = (event.currentTarget as HTMLSelectElement).value as PaperFormat;
-
-    pageLayout.update((layout) => ({
-      ...layout,
-      paperFormat,
-      paperSize:
-        paperFormat === 'custom' ? { ...layout.paperSize } : { ...PAPER_SIZE_PRESETS[paperFormat] }
-    }));
-  };
-
-  const togglePrintOptions = () => {
-    printOptionsOpen = !printOptionsOpen;
   };
 
 </script>
@@ -222,6 +197,9 @@
             <button class="general-menu-item" type="button" on:click={handleEditJson}>
               Edit JSON
             </button>
+            <button class="general-menu-item" type="button" on:click={handleOpenPrintView}>
+              Print
+            </button>
           </div>
 
           <div class="general-menu-divider"></div>
@@ -260,111 +238,6 @@
     </div>
   </div>
 
-  <SidebarSection>
-      <svelte:fragment slot="header">
-        <h2 class="sidebar-section-title">Print</h2>
-        <a
-          class="sidebar-section-action"
-          href={`${base}/output`}
-          aria-label="Open print view"
-        >
-          <Icon name="printer" />
-        </a>
-      </svelte:fragment>
-      <Form class="sidebar-form">
-        <div class="sidebar-field">
-          <div class="sidebar-field-inline sidebar-field-inline-top">
-            <Label class="col-form-label" for="paper-size">Paper size</Label>
-            <button
-              class="sidebar-section-action"
-              type="button"
-              aria-label={printOptionsOpen ? 'Hide extra print settings' : 'Show extra print settings'}
-              aria-expanded={printOptionsOpen}
-              on:click={togglePrintOptions}
-            >
-              <Icon name="three-dots" />
-            </button>
-          </div>
-          <Input id="paper-size" type="select" value={$pageLayout.paperFormat} on:change={handlePaperFormatChange}>
-            {#each paperFormatOptions as option}
-              <option value={option.value}>{option.label}</option>
-            {/each}
-          </Input>
-          {#if $pageLayout.paperFormat === 'custom'}
-            <div class="split-dimension-fields">
-              <InputGroup>
-                <Input
-                  id="paper-size-width"
-                  placeholder="Width"
-                  type="number"
-                  bind:value={$pageLayout.paperSize.width}
-                />
-                <InputGroupText>mm</InputGroupText>
-              </InputGroup>
-              <InputGroup>
-                <Input
-                  id="paper-size-height"
-                  placeholder="Height"
-                  type="number"
-                  bind:value={$pageLayout.paperSize.height}
-                />
-                <InputGroupText>mm</InputGroupText>
-              </InputGroup>
-            </div>
-          {/if}
-        </div>
-        {#if printOptionsOpen}
-          <div class="print-options-panel">
-            <div class="sidebar-field">
-              <div class="sidebar-field-label">
-                <Label class="col-form-label" for="page-adjust">Print adjust</Label>
-                <Hint id="page-adjust-help">
-                  Use this to adjust the print in order to make up for difference in printers
-                </Hint>
-              </div>
-              <div class="split-dimension-fields" id="page-adjust">
-                <InputGroup>
-                  <Input
-                    id="page-adjust-x"
-                    placeholder="X"
-                    type="number"
-                    bind:value={$pageLayout.adjust.x}
-                  />
-                  <InputGroupText>mm</InputGroupText>
-                </InputGroup>
-                <InputGroup>
-                  <Input
-                    id="page-adjust-y"
-                    placeholder="Y"
-                    type="number"
-                    bind:value={$pageLayout.adjust.y}
-                  />
-                  <InputGroupText>mm</InputGroupText>
-                </InputGroup>
-              </div>
-            </div>
-            <div class="sidebar-field">
-              <div class="sidebar-field-label">
-                <Label class="col-form-label" for="card-back-border">Cardback border</Label>
-                <Hint id="card-back-border-hint">
-                  Use this add a colored border around the back of the cards when printing to make up
-                  for printing variances.
-                </Hint>
-              </div>
-              <InputGroup id="card-back-border">
-                <Input
-                  id="card-back-border-input"
-                  placeholder="Cardback border"
-                  type="number"
-                  bind:value={$pageLayout.cardBackBorder}
-                />
-                <InputGroupText>mm</InputGroupText>
-              </InputGroup>
-            </div>
-          </div>
-        {/if}
-      </Form>
-  </SidebarSection>
   <SidebarSection grow={true}>
       <Deck />
   </SidebarSection>
@@ -559,29 +432,6 @@
     cursor: pointer;
   }
 
-  .split-dimension-fields {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
-  }
-
-  .sidebar-field-inline-top {
-    align-items: flex-start;
-  }
-
-  .print-options-panel {
-    padding: 0.2rem 0 0;
-    display: grid;
-    gap: 0.6rem;
-    border-top: 1px solid var(--sidebar-divider);
-  }
-
-  @media (max-width: 520px) {
-    .split-dimension-fields {
-      grid-template-columns: 1fr;
-    }
-  }
-
   .sidebar-footer {
     position: sticky;
     bottom: -1.5rem;
@@ -618,29 +468,5 @@
     }
   }
 
-  .sidebar-section-action {
-    width: 1.7rem;
-    height: 1.7rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border: 0;
-    border-radius: 0.35rem;
-    background: transparent;
-    color: var(--sidebar-text-subtle);
-    text-decoration: none;
-    transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;
-
-    &:hover {
-      background: var(--sidebar-hover-overlay);
-      color: var(--sidebar-text-primary);
-    }
-
-    :global(svg) {
-      width: 0.9rem;
-      height: 0.9rem;
-    }
-  }
 </style>
 

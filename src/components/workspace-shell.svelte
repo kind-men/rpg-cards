@@ -9,7 +9,7 @@
   import SidebarContainer from '$components/sidebar-container.svelte';
   import { currentCard } from '../stores';
 
-  export let view: 'editor' | 'docs' | 'info' = 'editor';
+  export let view: 'editor' | 'docs' | 'info' | 'print' = 'editor';
   export let contentMaxWidth = '800px';
   const minPanelWidth = 260;
   const maxPanelWidth = 520;
@@ -60,6 +60,21 @@
     await goto(`${base}/`);
   };
 
+  const handleWindowKeydown = async (event: KeyboardEvent) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.code === 'KeyP') {
+      if (view === 'print') {
+        return;
+      }
+
+      event.preventDefault();
+      await goto(`${base}/print`);
+    }
+  };
+
   const syncCardTracking = () => {
     stopCardTracking();
     if (cardTrackingDelay) {
@@ -67,7 +82,7 @@
       cardTrackingDelay = undefined;
     }
 
-    if (isEditorView()) {
+    if (isEditorView() || view === 'print') {
       return;
     }
 
@@ -101,6 +116,7 @@
 
 <svelte:window
   bind:innerWidth={viewportWidth}
+  on:keydown={handleWindowKeydown}
   on:mousemove={handleWindowMouseMove}
   on:mouseup={stopResize}
 />
@@ -115,7 +131,10 @@
       <CurrentCard />
     </div>
   {:else}
-    <main class="content-layer" aria-label={view === 'docs' ? 'Documentation' : 'Information'}>
+    <main
+      class="content-layer"
+      aria-label={view === 'docs' ? 'Documentation' : view === 'info' ? 'Information' : 'Print preview'}
+    >
       <div class="content-shell">
         <div class="content-shell-body">
           <slot />
@@ -178,7 +197,7 @@
 
   .content-shell {
     min-height: 100%;
-    padding: 1.5rem 1.5rem 3rem;
+    padding: 1.5rem 1.5rem 1.5rem;
     position: relative;
   }
 

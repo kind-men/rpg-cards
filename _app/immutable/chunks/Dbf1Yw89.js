@@ -28,4 +28,4 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     --card-text-size: ${(b(d()),k(()=>d()?.layout?.text_font_size?d()?.layout?.text_font_size:`10px`))??``};
     --card-width: ${(r(),k(()=>r().cardSize.width))??``}mm;
     --card-height: ${(r(),k(()=>r().cardSize.height))??``}mm;
-  `),T=P(C,1,`rpg-card svelte-11t27at`,null,T,{"rpg-card-images":S(s)===`images`})}),y(e,_),m(),a()}export{ca as A,$a as C,ua as D,va as E,_e as M,ge as N,da as O,he as P,ao as S,Sa as T,Il as _,Bu as a,Sl as b,su as c,Jl as d,Vl as f,Rl as g,Ll as h,Ku as i,oa as j,ga as k,ql as l,Bl as m,$u as n,Iu as o,Wl as p,Ju as r,Cu as s,rd as t,Gl as u,Cl as v,wa as w,bl as x,Al as y};
+  `),T=P(C,1,`rpg-card svelte-11t27at`,null,T,{"rpg-card-images":S(s)===`images`})}),y(e,_),m(),a()}export{ga as A,ao as C,va as D,Sa as E,he as F,oa as M,_e as N,ua as O,ge as P,bl as S,wa as T,Rl as _,Bu as a,Al as b,su as c,Jl as d,Vl as f,Ll as g,Bl as h,Ku as i,ca as j,da as k,ql as l,Wl as m,$u as n,Iu as o,Ul as p,Ju as r,Cu as s,rd as t,Gl as u,Il as v,$a as w,Sl as x,Cl as y};

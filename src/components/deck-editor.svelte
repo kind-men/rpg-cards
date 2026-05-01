@@ -9,8 +9,10 @@
   export let deckData: T;
   export let error: string = undefined;
   export let changed = false;
+  export let serialize = (value: T) => JSON.stringify(value, undefined, 2);
+  export let deserialize = (json: string) => JSON.parse(json) as T;
 
-  let jsonText = JSON.stringify(deckData, undefined, 2);
+  let jsonText = serialize(deckData);
   let isSavedToastOpen = false;
   let jsonEditor: JsonEditor;
 
@@ -24,8 +26,8 @@
 
     try {
       const nextJson = jsonEditor?.getValue() ?? jsonText;
-      deckData = JSON.parse(nextJson) as T;
-      jsonText = nextJson;
+      deckData = deserialize(nextJson);
+      jsonText = serialize(deckData);
       changed = false;
 
       isSavedToastOpen = true;
@@ -43,7 +45,7 @@
   };
 
   $: if (!changed) {
-    jsonText = JSON.stringify(deckData, undefined, 2);
+    jsonText = serialize(deckData);
   }
 </script>
 

@@ -21,7 +21,7 @@
   import type { CardImportEventPayload } from './card-import-dialog.svelte';
 
   let importFileSelector: HTMLInputElement;
-  let importFiles: FileList;
+  let importFiles: FileList | undefined;
   let hiddenDownloadLink: HTMLAnchorElement;
   let downloadUrl = undefined;
   let downloadName = 'cards.json';
@@ -35,7 +35,7 @@
   };
 
   const handleImportFiles = async () => {
-    if (importFiles.length === 0) {
+    if (!importFiles || importFiles.length === 0) {
       return;
     }
     const file = importFiles[0];
@@ -136,6 +136,8 @@
 
   const handleImportFileClick = () => {
     generalMenuOpen = false;
+    importFiles = undefined;
+    importFileSelector.value = '';
     importFileSelector.click();
   };
 

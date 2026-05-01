@@ -1,10 +1,9 @@
 import type Card from '../model/card';
 import type { CardBackImage, CardContent } from '../model/card';
 import type { LegacyCard } from '../model/legacy-card';
-import type { CardCollection } from '../model/card-collection';
+import type { CardCollection, ExportedCardBackImage } from '../model/card-collection';
 import { isCardCollection } from '../model/card-collection';
 import { isLegacyCard } from '$model/legacy-card';
-import { isCardContentType } from '$lib/card-content-types';
 import {
   getContentChildren,
   getContentText,
@@ -16,6 +15,23 @@ import { SPLIT_REGEX } from './constants';
 import { uuid4 } from './uuid';
 
 const RAW_CONTENT_INDENT = 2;
+const CARD_CONTENT_TYPE_NAMES = new Set<CardContent['type']>([
+  'cardtitle',
+  'subtitle',
+  'text',
+  'rule',
+  'property',
+  'description',
+  'row',
+  'section',
+  'boxes',
+  'fill',
+  'bullet',
+  'picture',
+  'footer',
+  'dndstats',
+  'dndspellblock'
+]);
 
 type RawContentContext = 'top' | 'column';
 type ParseCardContentOptions = {
@@ -28,16 +44,21 @@ type RawLine = {
   text: string;
 };
 
+function isCardContentType(value: string): value is CardContent['type'] {
+  return CARD_CONTENT_TYPE_NAMES.has(value as CardContent['type']);
+}
+
 export function parseCards(
   json: string,
   shouldConvertSubtitlePlusRuleToSection = false,
   shouldConvertDndSpellcardBlocks = false
 ): Card[] {
   const importObject = JSON.parse(json);
+  const imageLookup = createImageLookup(importObject);
   let cards: Card[];
 
   if (isCardCollection(importObject)) {
-    cards = importObject.cards.map((card) => normalizeCard(card));
+    cards = importObject.cards.map((card) => normalizeCard(card as Card));
   } else if (Array.isArray(importObject)) {
     cards = importObject.map((card) => normalizeCard(card as Card));
   } else if (typeof importObject === 'object' && isLegacyCard(importObject)) {
@@ -56,7 +77,7 @@ export function parseCards(
       card.cardback_mode = 'icon';
     }
 
-    card.cardback_images = normalizeCardbackImages(card.cardback_images);
+    card.cardback_images = normalizeCardbackImages(card.cardback_images, imageLookup);
 
     if (!card.cardback_background_color) {
       card.cardback_background_color = '#ffffff';
@@ -78,7 +99,12 @@ export function parseCards(
   return cards;
 }
 
-export function normalizeCardbackImages(images: unknown): CardBackImage[] {
+export function normalizeCardbackImages(
+  images: unknown,
+  imageLookup?: Map<string, string>
+): CardBackImage[] {
+  const lookup = imageLookup ?? new Map<string, string>();
+
   if (!Array.isArray(images)) {
     return [];
   }
@@ -87,13 +113,16 @@ export function normalizeCardbackImages(images: unknown): CardBackImage[] {
     .map((image) => {
       if (typeof image === 'string') {
         return {
-          src: image,
+          src: lookup.get(image) ?? image,
           size: 'contain'
         } as CardBackImage;
       }
 
       if (image && typeof image === 'object') {
-        const src = 'src' in image && typeof image.src === 'string' ? image.src : '';
+        const imageId =
+          'image_id' in image && typeof image.image_id === 'string' ? image.image_id : undefined;
+        const rawSrc = 'src' in image && typeof image.src === 'string' ? image.src : undefined;
+        const src = imageId ? (lookup.get(imageId) ?? rawSrc ?? '') : (rawSrc ?? '');
         const size = 'size' in image && typeof image.size === 'string' ? image.size : 'contain';
 
         return {
@@ -105,6 +134,32 @@ export function normalizeCardbackImages(images: unknown): CardBackImage[] {
       return null;
     })
     .filter((image): image is CardBackImage => Boolean(image));
+}
+
+function createImageLookup(importObject: unknown): Map<string, string> {
+  const lookup = new Map<string, string>();
+
+  if (!importObject || typeof importObject !== 'object') {
+    return lookup;
+  }
+
+  const images =
+    'images' in importObject && Array.isArray(importObject.images) ? importObject.images : [];
+
+  images.forEach((image) => {
+    if (!image || typeof image !== 'object') {
+      return;
+    }
+
+    const id = 'id' in image && typeof image.id === 'string' ? image.id : undefined;
+    const src = 'src' in image && typeof image.src === 'string' ? image.src : undefined;
+
+    if (id && src) {
+      lookup.set(id, src);
+    }
+  });
+
+  return lookup;
 }
 
 function normalizeLegacyCard(card: LegacyCard): Card {
@@ -465,8 +520,39 @@ export function getContentAsString(contents: CardContent[]): string {
 export class CardContentError extends Error {}
 
 export function generateExportObject(cards: Card[]): CardCollection {
+  const images = new Map<string, string>();
+  const exportedCards = cards.map((card) => ({
+    ...card,
+    cardback_images: normalizeCardbackImages(card.cardback_images).map((image) => {
+      const imageId = getOrCreateImageId(images, image.src);
+      const exportedImage: ExportedCardBackImage = {
+        image_id: imageId
+      };
+
+      if (image.size) {
+        exportedImage.size = image.size;
+      }
+
+      return exportedImage;
+    })
+  }));
+
   return {
-    version: '1',
-    cards
+    version: '2',
+    images: [...images].map(([src, id]) => ({ id, src })),
+    cards: exportedCards
   };
+}
+
+function getOrCreateImageId(images: Map<string, string>, src: string): string {
+  const existingId = images.get(src);
+
+  if (existingId) {
+    return existingId;
+  }
+
+  const id = `image-${images.size + 1}`;
+  images.set(src, id);
+
+  return id;
 }

@@ -9,6 +9,10 @@ export interface LegacyCard {
 }
 
 export function isLegacyCard(object: unknown): object is LegacyCard {
+  if (!object || typeof object !== 'object') {
+    return false;
+  }
+
   const obj = object as LegacyCard;
 
   return (

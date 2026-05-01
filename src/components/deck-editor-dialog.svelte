@@ -1,5 +1,7 @@
 <script lang="ts">
   import { Alert, Button, Icon, Modal, ModalBody, ModalFooter, ModalHeader } from '@sveltestrap/sveltestrap';
+  import { generateExportObject, parseCards } from '$lib/card-json-parser';
+  import type Card from '$model/card';
   import { deck } from '../stores';
   import DeckEditor from './deck-editor.svelte';
 
@@ -10,6 +12,10 @@
   export const toggle = () => {
     open = !open;
   };
+
+  const serializeDeck = (cards: Card[]) => JSON.stringify(generateExportObject(cards), undefined, 2);
+
+  const deserializeDeck = (json: string) => parseCards(json);
 </script>
 
 <Modal isOpen={open} {toggle} size="xl" backdrop="static">
@@ -24,7 +30,13 @@
       <Icon name="exclamation-triangle-fill" />
       &nbsp; Be careful, if you don't know what you are doing, you can break the deck
     </Alert>
-    <DeckEditor bind:deckData={$deck} bind:changed bind:save />
+    <DeckEditor
+      bind:deckData={$deck}
+      bind:changed
+      bind:save
+      serialize={serializeDeck}
+      deserialize={deserializeDeck}
+    />
   </ModalBody>
   <ModalFooter>
     <Button color="primary" on:click={() => save(toggle)}>Save changes</Button>

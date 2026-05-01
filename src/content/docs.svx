@@ -104,12 +104,19 @@
   <h2>JSON Format</h2>
   <p>The current export format is a JSON object with these fields:</p>
   <ul>
-    <li><code>version</code> (string): export format version. Current value: <code>"1"</code></li>
+    <li><code>version</code> (string): export format version. Current value: <code>"2"</code></li>
+    <li><code>images</code> (array, optional): shared image assets referenced by cards</li>
     <li><code>cards</code> (array): list of cards. See <a href="#card-data">Card JSON data</a>.</li>
   </ul>
   <p>Example:</p>
   <pre><code>{`{
-  "version": "1",
+  "version": "2",
+  "images": [
+    {
+      "id": "image-1",
+      "src": "data:image/png;base64,..."
+    }
+  ],
   "cards": [
     {
       "count": 1,
@@ -118,8 +125,13 @@
       "icon": "sparkles",
       "icon_back": "magic-swirl",
       "text_back": "1st Level",
-      "cardback_mode": "icon",
-      "cardback_images": [],
+      "cardback_mode": "images",
+      "cardback_images": [
+        {
+          "image_id": "image-1",
+          "size": "contain"
+        }
+      ],
       "cardback_background_color": "#ffffff",
       "cardback_border_style": "normal",
       "tags": [],
@@ -221,13 +233,15 @@
   <h4>Cardback images</h4>
   <p>Each cardback image entry can contain:</p>
   <ul>
+    <li><code>image_id</code> (string): reference to an entry in the top-level <code>images</code> array</li>
     <li><code>src</code> (string): image source, typically a data URL after uploading an image in the editor</li>
     <li><code>size</code> (string, optional): image sizing mode or custom CSS background-size value</li>
   </ul>
   <p>
-    For compatibility, imported image arrays may also contain plain strings. Those are normalized to
-    objects with <code>src</code> set to the string value and <code>size</code> defaulting to
-    <code>"contain"</code>.
+    Exports use <code>image_id</code> so repeated image data is stored once. For compatibility,
+    imported image arrays may still contain full <code>src</code> values or plain strings. Those are
+    normalized to objects with <code>src</code> set to the imported image and <code>size</code>
+    defaulting to <code>"contain"</code>.
   </p>
 
   <hr>

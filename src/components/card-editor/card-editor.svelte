@@ -28,9 +28,12 @@
   import ImageUploadInput from '../form/image-upload.svelte';
   import SidebarSection from '../sidebar-section.svelte';
   import TextEditor from '../form/code-editor/text.svelte';
+  import CopyStyleDialog from './copy-style-dialog.svelte';
+  import type { CopyStyleApplyEventPayload } from './copy-style-dialog.svelte';
 
   let card: Card = $deck[$currentCard];
   let cardIndex = $currentCard;
+  let toggleCopyStyleDialog: () => void;
   let editorPane: 'content' | 'style' = 'content';
   let contentEditorMode: 'individual' | 'textfield' = 'individual';
   let setCollapsedVersion = 0;
@@ -260,6 +263,49 @@
     card.layout.pair_continuations = (event.currentTarget as HTMLInputElement).checked;
   };
 
+  const cloneCardbackImages = (images: CardBackImage[] | undefined): CardBackImage[] =>
+    (images ?? []).map((image) => ({ ...image }));
+
+  const applyStyleToCards = (event: CustomEvent<CopyStyleApplyEventPayload>) => {
+    if (!card || cardIndex < 0 || event.detail.targetIndexes.length === 0) {
+      return;
+    }
+
+    const source = card;
+    const targetIndexes = new Set(event.detail.targetIndexes);
+
+    deck.set(
+      $deck.map((targetCard, index) => {
+        if (!targetIndexes.has(index) || index === cardIndex) {
+          return targetCard;
+        }
+
+        const nextCard: Card = {
+          ...targetCard,
+          color: source.color,
+          layout: {
+            ...(targetCard.layout ?? {}),
+            show_title: source.layout?.show_title,
+            base_font_size: source.layout?.base_font_size,
+            text_font_size: source.layout?.text_font_size,
+            title_font_size: source.layout?.title_font_size,
+            pair_continuations: source.layout?.pair_continuations,
+            custom_css: source.layout?.custom_css
+          },
+          cardback_mode: source.cardback_mode,
+          cardback_background_color: source.cardback_background_color,
+          cardback_border_style: source.cardback_border_style
+        };
+
+        if (!event.detail.excludeCardbackImages) {
+          nextCard.cardback_images = cloneCardbackImages(source.cardback_images);
+        }
+
+        return nextCard;
+      })
+    );
+  };
+
   const startEditingName = async () => {
     if (!isEditingName) {
       isEditingName = true;
@@ -465,7 +511,20 @@
                 {/if}
               </SidebarSection>
             {:else}
-              <SidebarSection title="Card Style">
+              <SidebarSection>
+                <svelte:fragment slot="header">
+                  <h2 class="sidebar-section-title">Card Style</h2>
+                  <Button
+                    type="button"
+                    color="link"
+                    class="style-copy-button"
+                    disabled={isMultiEditing || cardIndex < 0}
+                    on:click={() => toggleCopyStyleDialog?.()}
+                  >
+                    <Icon name="palette-fill" />
+                    <span>Copy style to...</span>
+                  </Button>
+                </svelte:fragment>
                 <div class="layout-size-fields">
                   <div class="sidebar-field">
                     <Label class="col-form-label" for="title-size">Title size</Label>
@@ -678,6 +737,13 @@
         {/if}
       </div>
     </Form>
+    <CopyStyleDialog
+      bind:toggle={toggleCopyStyleDialog}
+      sourceCard={card}
+      sourceIndex={cardIndex}
+      cards={$deck}
+      on:apply={applyStyleToCards}
+    />
   {:else}
     <div class="empty-editor">No card is selected!</div>
   {/if}
@@ -895,6 +961,36 @@
 
   .style-toggle-label {
     font-size: 0.9rem;
+  }
+
+  .card-editor-content :global(.style-copy-button) {
+    min-height: 1.7rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--card-editor-border-medium);
+    border-radius: 999px;
+    background: var(--card-editor-surface-panel);
+    color: var(--card-editor-text-muted);
+    font-size: 0.72rem;
+    font-weight: 650;
+    line-height: 1;
+    text-decoration: none;
+    transition:
+      background-color 120ms ease,
+      color 120ms ease,
+      opacity 120ms ease;
+  }
+
+  .card-editor-content :global(.style-copy-button:hover) {
+    background: var(--card-editor-surface-panel-strong);
+    color: var(--card-editor-text-primary);
+  }
+
+  .card-editor-content :global(.style-copy-button:disabled) {
+    opacity: 0.45;
+    cursor: default;
   }
 
   .card-editor-content :global(.style-toggle-switch.form-switch) {

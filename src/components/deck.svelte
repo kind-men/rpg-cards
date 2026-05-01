@@ -31,13 +31,17 @@
   }
 
   const handleClick = (index: number) => {
-    currentCard.set(-1);
-    currentCard.set(index);
+    if ($multiSelect.size > 1 && $multiSelect.has(index)) {
+      currentCard.set(index);
+      return;
+    }
+
+    multiSelect.set(new Set([index]));
   };
 
   const handleAddCard = () => {
     const index = deck.addCards(createNewCard());
-    currentCard.set(index);
+    multiSelect.set(new Set([index]));
   };
 
   const handleImportCards = () => {
@@ -76,7 +80,9 @@
     if (value) {
       multiSelect.add(index);
     } else {
-      multiSelect.remove(index);
+      const nextSelection = new Set($multiSelect);
+      nextSelection.delete(index);
+      multiSelect.set(nextSelection);
     }
   };
 
@@ -87,7 +93,7 @@
     } as Card;
 
     deck.addCards(newCard);
-    currentCard.set($deck.length - 1);
+    multiSelect.set(new Set([$deck.length - 1]));
   };
 
   const handleCardFormatChange = (cardFormat: CardFormat) => {
@@ -219,6 +225,7 @@
           <div
             class="deck-row"
             class:is-active={($multiSelect.size === 0 && index === $currentCard) || $multiSelect.has(index)}
+            class:is-previewed-selection={$multiSelect.size > 1 && $multiSelect.has(index) && index === $currentCard}
             role="button"
             tabindex="0"
             on:click={(e) => {
@@ -499,6 +506,11 @@
     background: var(--deck-selected-surface);
   }
 
+  .deck-row.is-previewed-selection {
+    background: color-mix(in srgb, var(--deck-selected-surface) 72%, var(--color-white-98));
+    box-shadow: inset 3px 0 0 var(--deck-chip-border-active), inset 0 0 0 1px var(--deck-chip-border-active);
+  }
+
   .deck-row-main {
     min-width: 0;
     display: flex;
@@ -539,7 +551,10 @@
 
   .deck-row :global(.form-check-input),
   .deck-select-all :global(.form-check-input) {
+    width: 1.25em;
+    height: 1.25em;
     margin: 0;
+    flex: 0 0 auto;
   }
 
   .empty-deck {

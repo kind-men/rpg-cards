@@ -44,6 +44,7 @@
   let textFieldContent = getContentAsString(card?.contents);
   let lastLoadedCurrentCard = $currentCard;
   let lastLoadedDeckCard = $currentCard > -1 ? $deck[$currentCard] : undefined;
+  let skipNextMultiUpdate = false;
   $: isMultiEditing = $multiSelect.size > 1;
   $: cardbackMode = card?.cardback_mode ?? 'icon';
   $: cardbackImages = card?.cardback_images ?? [];
@@ -103,7 +104,12 @@
 
   const updateDeck = () => {
     if (isMultiEditing) {
-      const multi = removeEmpty(card);
+      if (skipNextMultiUpdate) {
+        skipNextMultiUpdate = false;
+        return;
+      }
+
+      const multi = getMultiEditPatch(card);
 
       deck.set(
         $deck.map((c, index) => {
@@ -186,6 +192,7 @@
 
   const handleMultiEditingChanging = () => {
     if (isMultiEditing) {
+      skipNextMultiUpdate = true;
       card = createMultiCard($deck.filter((_, index) => $multiSelect.has(index))) as Card;
       cardIndex = -1;
       return;
@@ -349,6 +356,23 @@
     rawContentError = '';
     textFieldContent = event.detail.textFieldContent;
   };
+
+  const getMultiEditPatch = (source: Card): Partial<Card> =>
+    removeEmpty({
+      color: source.color,
+      icon_back: source.icon_back,
+      text_back: source.text_back,
+      cardback_mode: source.cardback_mode,
+      cardback_images: source.cardback_images,
+      cardback_background_color: source.cardback_background_color,
+      cardback_border_style: source.cardback_border_style,
+      layout: {
+        show_title: source.layout?.show_title,
+        title_font_size: source.layout?.title_font_size,
+        text_font_size: source.layout?.text_font_size,
+        pair_continuations: source.layout?.pair_continuations
+      }
+    }) as Partial<Card>;
 </script>
 
 <div class="card-editor-content">

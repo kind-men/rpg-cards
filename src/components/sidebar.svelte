@@ -31,7 +31,7 @@
   let generalMenuOpen = false;
   const addCardsToDeck = (cards: Card[]) => {
     const i = deck.addCards(...cards);
-    currentCard.set(i);
+    multiSelect.set(new Set([i]));
   };
 
   const handleImportFiles = async () => {

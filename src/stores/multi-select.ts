@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { currentCard } from '.';
 
 function createMultiSelect() {
@@ -37,32 +37,19 @@ function createMultiSelect() {
 }
 
 export const multiSelect = createMultiSelect();
-let isSyncingFromCurrentCard = false;
 
 multiSelect.subscribe((current) => {
   if (browser) {
     localStorage.setItem('multiSelect', JSON.stringify(Array.from(current.values())));
   }
 
-  if (isSyncingFromCurrentCard) {
-    return;
-  }
+  const selectedCards = Array.from(current.values());
 
   if (current.size === 1) {
-    currentCard.set(Array.from(current.values())[0]);
+    currentCard.set(selectedCards[0]);
+  } else if (current.size > 1 && !current.has(get(currentCard))) {
+    currentCard.set(selectedCards[0]);
   } else if (current.size === 0) {
     currentCard.set(-1);
   }
-});
-
-currentCard.subscribe((current) => {
-  isSyncingFromCurrentCard = true;
-
-  if (current > -1) {
-    multiSelect.set(new Set([current]));
-  } else if (current === -1) {
-    multiSelect.set(new Set());
-  }
-
-  isSyncingFromCurrentCard = false;
 });

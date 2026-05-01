@@ -6,18 +6,18 @@
     <link rel="icon" href="./favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="manifest" crossorigin="use-credentials" href="./manifest.json" />
-    <link href="./_app/immutable/entry/start.KSlXuWTv.js" rel="modulepreload">
-		<link href="./_app/immutable/chunks/CA6i9uvQ.js" rel="modulepreload">
+    <link href="./_app/immutable/entry/start.DSKXRiZy.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/D7J5uKYN.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/Cf3p9P98.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/D5OSQFDH.js" rel="modulepreload">
-		<link href="./_app/immutable/entry/app.C7Gpvsr0.js" rel="modulepreload">
+		<link href="./_app/immutable/entry/app.CVS7aVOK.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/DxLN9Q9A.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/v_jBEYI6.js" rel="modulepreload">
 		<link href="./_app/immutable/nodes/0.TK7dyb0v.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/BmqO0oI5.js" rel="modulepreload">
-		<link href="./_app/immutable/nodes/3.BHOMM1iY.js" rel="modulepreload">
-		<link href="./_app/immutable/chunks/LudIIeK0.js" rel="modulepreload">
-		<link href="./_app/immutable/chunks/D_I8u4SN.js" rel="modulepreload">
+		<link href="./_app/immutable/nodes/3.3Y5U-qJR.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/BAvtCybS.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/7fmGGpX8.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/Dh8aeseQ.js" rel="modulepreload">
 		<!--12qhfyh--><!----><!--jk4d64--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/> <!--[0--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css"/><!--]--><!----><title>RPG Card Generator</title>
 		<link href="./_app/immutable/assets/dist.DhaulA-e.css" rel="stylesheet">
@@ -36,8 +36,14 @@
     indentation: a <code>row</code> line contains indented <code>column</code> entries, and each
     column contains more indented content blocks. The same pipe-separated format is also used when
     importing legacy <code>contents</code> arrays.</p></section> <section class="docs-section" id="print-view"><h2>Print view</h2> <p>Use the print button in the left sidebar to open the print preview workspace.</p> <p>The print settings currently control:</p> <ul><li>paper size</li> <li>print adjustment on the X and Y axes</li> <li>cardback border width</li></ul> <p>The print layout uses the selected card size from the deck panel and renders both fronts and
-    backs.</p></section> <section class="docs-section" id="export-data"><h2>JSON Format</h2> <p>The current export format is a JSON object with these fields:</p> <ul><li><code>version</code> (string): export format version. Current value: <code>"1"</code></li> <li><code>cards</code> (array): list of cards. See <a href="#card-data">Card JSON data</a>.</li></ul> <p>Example:</p> <pre><code>{
-  "version": "1",
+    backs.</p></section> <section class="docs-section" id="export-data"><h2>JSON Format</h2> <p>The current export format is a JSON object with these fields:</p> <ul><li><code>version</code> (string): export format version. Current value: <code>"2"</code></li> <li><code>images</code> (array, optional): shared image assets referenced by cards</li> <li><code>cards</code> (array): list of cards. See <a href="#card-data">Card JSON data</a>.</li></ul> <p>Example:</p> <pre><code>{
+  "version": "2",
+  "images": [
+    {
+      "id": "image-1",
+      "src": "data:image/png;base64,..."
+    }
+  ],
   "cards": [
     {
       "count": 1,
@@ -46,8 +52,13 @@
       "icon": "sparkles",
       "icon_back": "magic-swirl",
       "text_back": "1st Level",
-      "cardback_mode": "icon",
-      "cardback_images": [],
+      "cardback_mode": "images",
+      "cardback_images": [
+        {
+          "image_id": "image-1",
+          "size": "contain"
+        }
+      ],
       "cardback_background_color": "#ffffff",
       "cardback_border_style": "normal",
       "tags": [],
@@ -122,8 +133,9 @@
       ]
     }
   ]
-}</code></pre> <h4>Cardback images</h4> <p>Each cardback image entry can contain:</p> <ul><li><code>src</code> (string): image source, typically a data URL after uploading an image in the editor</li> <li><code>size</code> (string, optional): image sizing mode or custom CSS background-size value</li></ul> <p>For compatibility, imported image arrays may also contain plain strings. Those are normalized to
-    objects with <code>src</code> set to the string value and <code>size</code> defaulting to <code>"contain"</code>.</p> <hr/> <h3 id="layout-data">Layout</h3> <p>The <code>layout</code> object can contain:</p> <ul><li><code>show_title</code> (boolean, optional): show or hide the built-in card title row</li> <li><code>base_font_size</code> (string, optional)</li> <li><code>text_font_size</code> (string, optional)</li> <li><code>title_font_size</code> (string, optional)</li> <li><code>custom_css</code> (string, optional)</li></ul> <p>The editor currently exposes title visibility, title size, text size, and custom CSS. The
+}</code></pre> <h4>Cardback images</h4> <p>Each cardback image entry can contain:</p> <ul><li><code>image_id</code> (string): reference to an entry in the top-level <code>images</code> array</li> <li><code>src</code> (string): image source, typically a data URL after uploading an image in the editor</li> <li><code>size</code> (string, optional): image sizing mode or custom CSS background-size value</li></ul> <p>Exports use <code>image_id</code> so repeated image data is stored once. For compatibility,
+    imported image arrays may still contain full <code>src</code> values or plain strings. Those are
+    normalized to objects with <code>src</code> set to the imported image and <code>size</code> defaulting to <code>"contain"</code>.</p> <hr/> <h3 id="layout-data">Layout</h3> <p>The <code>layout</code> object can contain:</p> <ul><li><code>show_title</code> (boolean, optional): show or hide the built-in card title row</li> <li><code>base_font_size</code> (string, optional)</li> <li><code>text_font_size</code> (string, optional)</li> <li><code>title_font_size</code> (string, optional)</li> <li><code>custom_css</code> (string, optional)</li></ul> <p>The editor currently exposes title visibility, title size, text size, and custom CSS. The
     exported layout object may still include <code>base_font_size</code> for compatibility.</p> <hr/> <h3 id="contents">Contents</h3> <p>Content objects have the following fields:</p> <ul><li><code>type</code> (string): content type used by the renderer. See <a href="#content-types">the table below</a>.</li> <li><code>content</code> (string): content parameters separated by a pipe <code>|</code> for non-row blocks</li> <li><code>children</code> (array): nested column lists for <code>row</code> blocks only</li> <li><code>id</code> (string, optional): unique id used by the editor</li></ul> <p><code>footer</code> remains a top-level block and is not valid inside a <code>row</code> column. The plain-text editor uses the same content encoding, one block per line. Newlines
     inside a block are stored as escaped <code>\\n</code> sequences in that mode.</p> <h4 id="content-types">Content types</h4> <table class="table table-striped content-type-table"><thead><tr><th scope="col" class="name">Name</th><th scope="col" class="description svelte-svpi39">Description</th><th scope="col" class="parameters">Parameters</th></tr></thead><tbody><!--[--><tr><td>Card Title <br/> <code>cardtitle</code></td><td>Displays the card title using the card header style.</td><td><ul class="param-list svelte-svpi39"><!--[--><!--]--></ul></td></tr><tr><td>Subtitle <br/> <code>subtitle</code></td><td>Sligtly larger italics text</td><td><ul class="param-list svelte-svpi39"><!--[--><li><i>Subtitle</i><!--[-1--><!--]-->:
                 Subtitle text</li><li><i>Right-aligned</i><!--[-1--><!--]-->:
@@ -203,7 +215,7 @@ footer | left | right</code></pre></section> <section class="docs-section" id="i
 			
 			<script>
 				{
-					__sveltekit_e1brq0 = {
+					__sveltekit_caf4yn = {
 						base: new URL(".", location).pathname.slice(0, -1),
 						assets: "/rpg-cards"
 					};
@@ -211,8 +223,8 @@ footer | left | right</code></pre></section> <section class="docs-section" id="i
 					const element = document.currentScript.parentElement;
 
 					Promise.all([
-						import("./_app/immutable/entry/start.KSlXuWTv.js"),
-						import("./_app/immutable/entry/app.C7Gpvsr0.js")
+						import("./_app/immutable/entry/start.DSKXRiZy.js"),
+						import("./_app/immutable/entry/app.CVS7aVOK.js")
 					]).then(([kit, app]) => {
 						kit.start(app, element, {
 							node_ids: [0, 3],

@@ -5,11 +5,11 @@
   import { currentCard, deck, pageLayout } from '../../stores';
   import type CardModel from '$model/card';
   import CardComponent from './card.svelte';
-  import CardBack from './card-back.svelte';
+  import PrintableOutputEntryCard from './printable-output-entry.svelte';
   import {
+    applyContinuationPairing,
     createPrintableOutputEntries,
     expandCardToPrintableEntries,
-    type PrintableCardEntry,
     type PrintableOutputEntry
   } from '$lib/card-continuations';
 
@@ -59,21 +59,10 @@
       return;
     }
 
-    const pairEnabled = card.layout?.pair_continuations === true;
-    const entriesWithPairing: PrintableCardEntry[] = expandedCards.map((entry) => ({ ...entry }));
-
-    if (pairEnabled && entriesWithPairing.length > 1) {
-      entriesWithPairing.forEach((entry, index) => {
-        if (index + 1 >= entriesWithPairing.length && index % 2 === 0) {
-          return;
-        }
-
-        entry.joinPairKey = `${entry.sourceIndex}:${Math.floor(index / 2)}`;
-        entry.joinPairPosition = index % 2 === 0 ? 'start' : 'end';
-      });
-    }
-
-    previewEntries = createPrintableOutputEntries(entriesWithPairing, 2);
+    previewEntries = createPrintableOutputEntries(
+      applyContinuationPairing(expandedCards, card.layout?.pair_continuations === true),
+      2
+    );
     measurementCard = null;
   };
 
@@ -128,40 +117,19 @@
           <div class="card-preview-row">
             {#each previewEntries as previewEntry}
               <div class:card-stage-pair={previewEntry.type === 'joined-pair'} class="card-stage-shell">
-                {#if previewEntry.type === 'joined-pair'}
-                  <div class="pair-stage">
-                    {#each previewEntry.cards as printableCard, index}
-                      <div
-                        class="card-stage"
-                        style="
-                          width: {$pageLayout.cardSize.width * ($settings.previewZoom / 100)}mm;
-                          height: {$pageLayout.cardSize.height * ($settings.previewZoom / 100)}mm;
-                        "
-                      >
-                        <div
-                          style="transform: scale({$settings.previewZoom / 100}); transform-origin: top left;"
-                        >
-                          <CardComponent card={printableCard.card} />
-                        </div>
-                        {#if index === 0}
-                          <div class="pair-stage-fold" aria-hidden="true"></div>
-                        {/if}
-                      </div>
-                    {/each}
-                  </div>
-                {:else}
-                  <div
-                    class="card-stage"
-                    style="
-                      width: {$pageLayout.cardSize.width * ($settings.previewZoom / 100)}mm;
-                      height: {$pageLayout.cardSize.height * ($settings.previewZoom / 100)}mm;
-                    "
-                  >
-                    <div style="transform: scale({$settings.previewZoom / 100}); transform-origin: top left;">
-                      <CardComponent card={previewEntry.cards[0].card} />
-                    </div>
-                  </div>
-                {/if}
+                <PrintableOutputEntryCard
+                  entry={previewEntry}
+                  side="front"
+                  previewMode={true}
+                  previewScale={$settings.previewZoom / 100}
+                  withBorder={$pageLayout.cardBackBorder > 0}
+                  style={`
+                    --card-width: ${$pageLayout.cardSize.width}mm;
+                    --card-height: ${$pageLayout.cardSize.height}mm;
+                    --back-border-width: ${$pageLayout.cardBackBorder || 0}mm;
+                    --card-color: ${previewEntry.cards[0]?.card.color};
+                  `}
+                />
               </div>
             {/each}
           </div>
@@ -172,40 +140,19 @@
           <div class="card-preview-row">
             {#each previewEntries as previewEntry}
               <div class:card-stage-pair={previewEntry.type === 'joined-pair'} class="card-stage-shell">
-                {#if previewEntry.type === 'joined-pair'}
-                  <div class="pair-stage">
-                    {#each [...previewEntry.cards].reverse() as printableCard, index}
-                      <div
-                        class="card-stage"
-                        style="
-                          width: {$pageLayout.cardSize.width * ($settings.previewZoom / 100)}mm;
-                          height: {$pageLayout.cardSize.height * ($settings.previewZoom / 100)}mm;
-                        "
-                      >
-                        <div
-                          style="transform: scale({$settings.previewZoom / 100}); transform-origin: top left;"
-                        >
-                          <CardBack card={printableCard.card} />
-                        </div>
-                        {#if index === 0}
-                          <div class="pair-stage-fold" aria-hidden="true"></div>
-                        {/if}
-                      </div>
-                    {/each}
-                  </div>
-                {:else}
-                  <div
-                    class="card-stage"
-                    style="
-                      width: {$pageLayout.cardSize.width * ($settings.previewZoom / 100)}mm;
-                      height: {$pageLayout.cardSize.height * ($settings.previewZoom / 100)}mm;
-                    "
-                  >
-                    <div style="transform: scale({$settings.previewZoom / 100}); transform-origin: top left;">
-                      <CardBack card={previewEntry.cards[0].card} />
-                    </div>
-                  </div>
-                {/if}
+                <PrintableOutputEntryCard
+                  entry={previewEntry}
+                  side="back"
+                  previewMode={true}
+                  previewScale={$settings.previewZoom / 100}
+                  withBorder={$pageLayout.cardBackBorder > 0}
+                  style={`
+                    --card-width: ${$pageLayout.cardSize.width}mm;
+                    --card-height: ${$pageLayout.cardSize.height}mm;
+                    --back-border-width: ${$pageLayout.cardBackBorder || 0}mm;
+                    --card-color: ${previewEntry.cards[0]?.card.color};
+                  `}
+                />
               </div>
             {/each}
           </div>
@@ -297,35 +244,6 @@
     border-radius: 1rem;
     background: rgba(255, 255, 255, 0.36);
     box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.18);
-  }
-
-  .pair-stage {
-    display: flex;
-    gap: 0;
-  }
-
-  .card-stage {
-    --current-card-stage-shadow: rgba(24, 32, 47, 0.18);
-    position: relative;
-    flex: none;
-    filter: drop-shadow(0 1.25rem 2.5rem var(--current-card-stage-shadow));
-  }
-
-  .pair-stage-fold {
-    position: absolute;
-    top: 4%;
-    right: -1px;
-    width: 2px;
-    height: 92%;
-    background:
-      repeating-linear-gradient(
-        to bottom,
-        rgba(71, 85, 105, 0.45),
-        rgba(71, 85, 105, 0.45) 4px,
-        transparent 4px,
-        transparent 8px
-      );
-    pointer-events: none;
   }
 
   @media (max-width: 1100px) {

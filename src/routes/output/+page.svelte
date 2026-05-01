@@ -2,8 +2,8 @@
   import { browser } from '$app/environment';
   import { onMount, tick } from 'svelte';
   import { getPrintableCards } from '../../lib/print-selection';
-  import CardBack from '../../components/card/card-back.svelte';
   import Card from '../../components/card/card.svelte';
+  import PrintableOutputEntryCard from '../../components/card/printable-output-entry.svelte';
   import {
     createPrintableOutputEntries,
     expandDeckToPrintableEntries,
@@ -34,6 +34,7 @@
   let pageColumns = 1;
   let pageRows = 1;
   let buildToken = 0;
+  let requestedPreviewKey = '';
 
   const calculateGridCount = (availableSpace: number, cellSize: number) =>
     Math.max(1, Math.floor((availableSpace + GAP_BETWEEN) / (cellSize + GAP_BETWEEN)));
@@ -42,9 +43,6 @@
   const getCardCellHeight = () => $pageLayout.cardSize.height + ($pageLayout.cardBackBorder || 0) * 2;
 
   const getBacksideColumn = (column: number, span: number) => pageColumns - column - span + 2;
-
-  const getBacksideCards = (entry: PrintableOutputEntry) =>
-    entry.type === 'joined-pair' ? [...entry.cards].reverse() : entry.cards;
 
   const findPlacement = (
     occupied: boolean[][],
@@ -147,12 +145,13 @@
     return doesMeasuredCardFit();
   };
 
-  const rebuildPreview = async () => {
+  const rebuildPreview = async (previewKey: string) => {
     if (!browser || !fontsReady) {
       return;
     }
 
     const token = ++buildToken;
+    requestedPreviewKey = previewKey;
     previewReady = false;
     previewVisible = false;
 
@@ -222,7 +221,14 @@
     $pageLayout.cardSize.width &&
     $pageLayout.cardSize.height
   ) {
-    void rebuildPreview();
+    const previewKey = JSON.stringify({
+      deck: $deck,
+      pageLayout: $pageLayout
+    });
+
+    if (previewKey !== requestedPreviewKey) {
+      void rebuildPreview(previewKey);
+    }
   }
 </script>
 
@@ -264,24 +270,12 @@
               grid-column: ${placed.column} / span ${placed.entry.span};
               grid-row: ${placed.row};
             `}
-            class="card-slot"
-            class:with-border={$pageLayout.cardBackBorder > 0}
-            class:joined-slot={placed.entry.type === 'joined-pair'}
           >
-            {#if placed.entry.type === 'joined-pair'}
-              <div class="joined-card-shell">
-                {#each placed.entry.cards as printableCard, index}
-                  <div class="joined-card-panel">
-                    <Card card={printableCard.card} />
-                    {#if index === 0}
-                      <div class="joined-card-fold" aria-hidden="true"></div>
-                    {/if}
-                  </div>
-                {/each}
-              </div>
-            {:else}
-              <Card card={placed.entry.cards[0].card} />
-            {/if}
+            <PrintableOutputEntryCard
+              entry={placed.entry}
+              side="front"
+              withBorder={$pageLayout.cardBackBorder > 0}
+            />
           </div>
         {/each}
       </div>
@@ -296,24 +290,12 @@
               grid-column: ${getBacksideColumn(placed.column, placed.entry.span)} / span ${placed.entry.span};
               grid-row: ${placed.row};
             `}
-            class="card-slot backside"
-            class:with-border={$pageLayout.cardBackBorder > 0}
-            class:joined-slot={placed.entry.type === 'joined-pair'}
           >
-            {#if placed.entry.type === 'joined-pair'}
-              <div class="joined-card-shell joined-card-shell-backside">
-                {#each getBacksideCards(placed.entry) as printableCard, index}
-                  <div class="joined-card-panel">
-                    <CardBack card={printableCard.card} />
-                    {#if index === 0}
-                      <div class="joined-card-fold" aria-hidden="true"></div>
-                    {/if}
-                  </div>
-                {/each}
-              </div>
-            {:else}
-              <CardBack card={placed.entry.cards[0].card} />
-            {/if}
+            <PrintableOutputEntryCard
+              entry={placed.entry}
+              side="back"
+              withBorder={$pageLayout.cardBackBorder > 0}
+            />
           </div>
         {/each}
       </div>
@@ -412,84 +394,6 @@
       padding-right: calc(0.5cm - var(--adjust-x));
       padding-top: calc(0.5cm - var(--adjust-y));
     }
-  }
-
-  .card-slot {
-    height: calc(var(--card-height) + (var(--back-border-width) * 2));
-    width: calc(var(--card-width) + (var(--back-border-width) * 2));
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    &.backside.with-border {
-      background-color: var(--card-color);
-    }
-  }
-
-  .joined-slot {
-    width: calc((var(--card-width) * 2 + (var(--back-border-width) * 2)));
-  }
-
-  .joined-card-shell {
-    display: inline-grid;
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
-    gap: 0;
-    width: auto;
-    height: 100%;
-  }
-
-  .joined-card-shell-backside {
-    grid-auto-columns: max-content;
-  }
-
-  .joined-card-panel {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .card-slot.backside.joined-slot {
-    justify-content: flex-end;
-  }
-
-  .card-slot.backside.with-border.joined-slot {
-    background-color: transparent;
-  }
-
-  .card-slot.backside.with-border.joined-slot .joined-card-panel {
-    box-sizing: border-box;
-    padding-top: var(--back-border-width);
-    padding-bottom: var(--back-border-width);
-    background-color: var(--card-color);
-  }
-
-  .card-slot.backside.with-border.joined-slot .joined-card-panel:first-child {
-    padding-left: var(--back-border-width);
-    padding-right: 0;
-  }
-
-  .card-slot.backside.with-border.joined-slot .joined-card-panel:last-child {
-    padding-left: 0;
-    padding-right: var(--back-border-width);
-  }
-
-  .joined-card-fold {
-    position: absolute;
-    top: 4%;
-    right: -1px;
-    width: 2px;
-    height: 92%;
-    background:
-      repeating-linear-gradient(
-        to bottom,
-        rgba(71, 85, 105, 0.4),
-        rgba(71, 85, 105, 0.4) 4px,
-        transparent 4px,
-        transparent 8px
-      );
-    pointer-events: none;
   }
 
   @keyframes output-preview-spin {

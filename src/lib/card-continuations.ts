@@ -250,26 +250,36 @@ export async function expandDeckToPrintableEntries(
 
   for (const [index, card] of cards.entries()) {
     const nextEntries = await expandCardToPrintableEntries(card, index, fitsCard);
-    const shouldJoin = card.layout?.pair_continuations === true && nextEntries.length > 1;
-
-    if (shouldJoin) {
-      nextEntries.forEach((entry, entryIndex) => {
-        const pairIndex = Math.floor(entryIndex / 2);
-        const isPaired = entryIndex + 1 < nextEntries.length || entryIndex % 2 === 1;
-
-        if (!isPaired) {
-          return;
-        }
-
-        entry.joinPairKey = `${entry.sourceIndex}:${pairIndex}`;
-        entry.joinPairPosition = entryIndex % 2 === 0 ? 'start' : 'end';
-      });
-    }
-
-    expandedEntries.push(...nextEntries);
+    expandedEntries.push(...applyContinuationPairing(nextEntries, card.layout?.pair_continuations === true));
   }
 
   return expandedEntries;
+}
+
+export function applyContinuationPairing(
+  entries: PrintableCardEntry[],
+  enabled: boolean
+): PrintableCardEntry[] {
+  const pairedEntries = entries.map((entry) => ({
+    ...entry,
+    joinPairKey: undefined,
+    joinPairPosition: undefined
+  }));
+
+  if (!enabled || pairedEntries.length <= 1) {
+    return pairedEntries;
+  }
+
+  pairedEntries.forEach((entry, index) => {
+    if (index + 1 >= pairedEntries.length && index % 2 === 0) {
+      return;
+    }
+
+    entry.joinPairKey = `${entry.sourceIndex}:${Math.floor(index / 2)}`;
+    entry.joinPairPosition = index % 2 === 0 ? 'start' : 'end';
+  });
+
+  return pairedEntries;
 }
 
 export function createPrintableOutputEntries(
@@ -308,4 +318,11 @@ export function createPrintableOutputEntries(
   }
 
   return outputEntries;
+}
+
+export function getPrintableEntryCards(
+  entry: PrintableOutputEntry,
+  side: 'front' | 'back'
+): PrintableCardEntry[] {
+  return side === 'back' && entry.type === 'joined-pair' ? [...entry.cards].reverse() : entry.cards;
 }

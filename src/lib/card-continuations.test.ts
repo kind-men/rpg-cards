@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type Card from '$model/card';
 import type { CardContent } from '$model/card';
 import {
+  applyContinuationPairing,
   createPrintableOutputEntries,
   expandCardToPrintableEntries,
   expandDeckToPrintableEntries
@@ -138,5 +139,43 @@ describe('card continuations', () => {
       type: 'single',
       span: 1
     });
+  });
+
+  it('pairs continuations strictly in twos and leaves an odd last card standalone', async () => {
+    const entries = applyContinuationPairing(
+      [
+        {
+          key: '0-0',
+          card: createCard([{ type: 'text', content: 'one', id: 'a' }], { pair_continuations: true }),
+          sourceIndex: 0,
+          continuationIndex: 0,
+          continuationCount: 3,
+          isContinuation: true
+        },
+        {
+          key: '0-1',
+          card: createCard([{ type: 'text', content: 'two', id: 'b' }], { pair_continuations: true }),
+          sourceIndex: 0,
+          continuationIndex: 1,
+          continuationCount: 3,
+          isContinuation: true
+        },
+        {
+          key: '0-2',
+          card: createCard([{ type: 'text', content: 'three', id: 'c' }], { pair_continuations: true }),
+          sourceIndex: 0,
+          continuationIndex: 2,
+          continuationCount: 3,
+          isContinuation: true
+        }
+      ],
+      true
+    );
+
+    expect(entries.map((entry) => [entry.joinPairKey, entry.joinPairPosition])).toEqual([
+      ['0:0', 'start'],
+      ['0:0', 'end'],
+      [undefined, undefined]
+    ]);
   });
 });

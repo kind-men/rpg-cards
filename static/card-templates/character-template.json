@@ -5,6 +5,8 @@
     "title": "Character Template",
     "icon": "hood",
     "icon_back": "hood",
+    "icon_back_top": "hood",
+    "icon_back_bottom": "hood",
     "contents": [
       "subtitle | Class or role",
       "rule",

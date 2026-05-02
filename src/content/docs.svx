@@ -124,6 +124,8 @@
       "title": "Hex",
       "icon": "sparkles",
       "icon_back": "magic-swirl",
+      "icon_back_top": "magic-swirl",
+      "icon_back_bottom": "magic-swirl",
       "text_back": "1st Level",
       "cardback_mode": "images",
       "cardback_images": [
@@ -176,7 +178,9 @@
     <li><code>color</code> (string): card color</li>
     <li><code>title</code> (string): card title</li>
     <li><code>icon</code> (string): front icon</li>
-    <li><code>icon_back</code> (string): icon used on the card back in icon mode. See <a href="#icons">Icons</a>.</li>
+    <li><code>icon_back</code> (string): center icon used on the card back in icon mode. See <a href="#icons">Icons</a>.</li>
+    <li><code>icon_back_top</code> (string, optional): smaller top icon used on the card back in icon mode. Use an empty string to hide it.</li>
+    <li><code>icon_back_bottom</code> (string, optional): smaller bottom icon used on the card back in icon mode. Use an empty string to hide it.</li>
     <li><code>text_back</code> (string, optional): text shown on the back, such as a spell level</li>
     <li><code>cardback_mode</code> (string, optional): back style. Possible values: <code>"icon"</code>, <code>"images"</code></li>
     <li><code>cardback_images</code> (array, optional): list of cardback images when image mode is used</li>
@@ -193,6 +197,8 @@
   "title": "Hex",
   "icon": "sparkles",
   "icon_back": "magic-swirl",
+  "icon_back_top": "magic-swirl",
+  "icon_back_bottom": "magic-swirl",
   "text_back": "1st Level",
   "cardback_mode": "icon",
   "cardback_images": [],

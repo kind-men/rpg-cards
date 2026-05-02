@@ -5,6 +5,8 @@
     "title": "Spell Template",
     "icon": "magic-swirl",
     "icon_back": "magic-swirl",
+    "icon_back_top": "magic-swirl",
+    "icon_back_bottom": "magic-swirl",
     "contents": [
       "rule",
       "property | Casting Time | 1 action",

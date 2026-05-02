@@ -28,6 +28,8 @@
   $: cardbackImages = card?.cardback_images ?? [];
   $: cardbackImageStyle = createLayeredBackground(cardbackImages);
   $: cardbackBorderStyle = card?.cardback_border_style ?? 'normal';
+  $: topBackIcon = card?.icon_back_top ?? card?.icon_back;
+  $: bottomBackIcon = card?.icon_back_bottom ?? card?.icon_back;
 </script>
 
 <div
@@ -54,7 +56,13 @@
           </div>
         </div>
         <div class="icon-wrapper">
-          <Icon name={card.icon_back} size="5rem" />
+          {#if topBackIcon}
+            <Icon name={topBackIcon} size="2.75rem" />
+          {/if}
+          <Icon name={card.icon_back} size="6rem" />
+          {#if bottomBackIcon}
+            <Icon name={bottomBackIcon} size="2.75rem" />
+          {/if}
         </div>
         <div class="content-bottom">
           <div class="content">
@@ -105,15 +113,22 @@
   }
 
   .icon-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 0.3em;
     background-color: var(--card-color);
-    padding: 1em;
+    padding: 0.9em 1.15em;
     border-radius: 1em;
+    transform: translate(-50%, -50%);
   }
 
   .line {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

@@ -3,10 +3,10 @@
   import type { Icon as IconModel } from '../lib/icons';
   import type { ColorResolvable } from '../model/color-resolvable';
 
-  export let name: string;
+  export let name: string | null | undefined;
 
   let icon: IconModel | undefined;
-  $: icon = getIcon(name);
+  $: icon = name ? getIcon(name) : undefined;
 
   export let color: ColorResolvable = 'var(--color-surface-base)';
   export let size: string = '1em';

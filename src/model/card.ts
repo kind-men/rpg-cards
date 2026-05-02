@@ -27,6 +27,8 @@ export default interface Card {
   title: string;
   icon: string;
   icon_back: string;
+  icon_back_top?: string;
+  icon_back_bottom?: string;
   text_back?: string;
   cardback_mode?: CardBackMode;
   cardback_images?: CardBackImage[];

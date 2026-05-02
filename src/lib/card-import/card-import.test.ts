@@ -116,6 +116,8 @@ describe('D&D 2014 spell importer', () => {
     expect(card.color).toBe('#4a6898');
     expect(card.icon).toBe('magic-swirl');
     expect(card.icon_back).toBe('magic-swirl');
+    expect(card.icon_back_top).toBe('');
+    expect(card.icon_back_bottom).toBe('');
     expect(card.tags).toContain('spell');
     expect(card.contents.map((content) => content.type)).toEqual([
       'rule',

@@ -8,6 +8,8 @@
   "cardback_mode": "icon",
   "icon": "magic-swirl",
   "icon_back": "magic-swirl",
+  "icon_back_top": "magic-swirl",
+  "icon_back_bottom": "magic-swirl",
   "tags": [],
   "title": "",
   "layout": {

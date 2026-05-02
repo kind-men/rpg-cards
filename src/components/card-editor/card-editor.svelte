@@ -100,6 +100,14 @@
     if (!target.cardback_border_style) {
       target.cardback_border_style = 'normal';
     }
+
+    if (target.icon_back_top === undefined) {
+      target.icon_back_top = target.icon_back;
+    }
+
+    if (target.icon_back_bottom === undefined) {
+      target.icon_back_bottom = target.icon_back;
+    }
   };
 
   const updateDeck = () => {
@@ -300,6 +308,10 @@
             custom_css: source.layout?.custom_css
           },
           cardback_mode: source.cardback_mode,
+          icon_back: source.icon_back,
+          icon_back_top: source.icon_back_top,
+          icon_back_bottom: source.icon_back_bottom,
+          text_back: source.text_back,
           cardback_background_color: source.cardback_background_color,
           cardback_border_style: source.cardback_border_style
         };
@@ -361,6 +373,8 @@
     removeEmpty({
       color: source.color,
       icon_back: source.icon_back,
+      icon_back_top: source.icon_back_top,
+      icon_back_bottom: source.icon_back_bottom,
       text_back: source.text_back,
       cardback_mode: source.cardback_mode,
       cardback_images: source.cardback_images,
@@ -705,13 +719,38 @@
                   </SidebarSection>
                 {:else}
                   <div class="sidebar-field">
-                    <Label class="col-form-label" for="icon_back">Icon (Back)</Label>
+                    <Label class="col-form-label" for="icon_back_top">Main icon</Label>
+                    <div class="sidebar-field">
+                      <IconInput
+                        bind:isMultiEditing
+                        bind:icon={card.icon_back}
+                        id="icon_back"
+                        name="icon_back"
+                        placeholder={isMultiEditing && card.icon_back === null
+                        ? '*'
+                        : 'Center icon'}
+                      />
+                    </div>
+                    <Label class="col-form-label" for="icon_back_top">Icons</Label>
                     <IconInput
                       bind:isMultiEditing
-                      bind:icon={card.icon_back}
-                      id="icon_back"
-                      name="icon_back"
-                      placeholder={isMultiEditing && card.icon_back === null ? '*' : 'Icon back'}
+                      bind:icon={card.icon_back_top}
+                      id="icon_back_top"
+                      name="icon_back_top"
+                      placeholder={isMultiEditing && card.icon_back_top === null
+                        ? '*'
+                        : 'Blank to hide top icon'}
+                    />
+                  </div>
+                  <div class="sidebar-field">
+                    <IconInput
+                      bind:isMultiEditing
+                      bind:icon={card.icon_back_bottom}
+                      id="icon_back_bottom"
+                      name="icon_back_bottom"
+                      placeholder={isMultiEditing && card.icon_back_bottom === null
+                        ? '*'
+                        : 'Blank to hide bottom icon'}
                     />
                   </div>
                   <div class="sidebar-field">

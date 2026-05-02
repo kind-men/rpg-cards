@@ -25,6 +25,15 @@ function createContentBlock(block: ImportedCardDraftBlock): CardContent {
   };
 }
 
+function useSingleIconCardback(card: Card): void {
+  if ((card.cardback_mode ?? 'icon') !== 'icon') {
+    return;
+  }
+
+  card.icon_back_top = '';
+  card.icon_back_bottom = '';
+}
+
 export function createCardFromImportedDraft(draft: ImportedCardDraft): Card {
   const card = createCardFromDefaultTemplate(draft.title);
 
@@ -44,6 +53,7 @@ export function createCardFromImportedDraft(draft: ImportedCardDraft): Card {
     card.color = draft.color ?? SPELL_CARD_DEFAULTS.color;
     card.icon = draft.icon ?? SPELL_CARD_DEFAULTS.icon;
     card.icon_back = draft.iconBack ?? SPELL_CARD_DEFAULTS.iconBack;
+    useSingleIconCardback(card);
     return card;
   }
 
@@ -51,6 +61,7 @@ export function createCardFromImportedDraft(draft: ImportedCardDraft): Card {
     card.color = draft.color ?? ITEM_CARD_DEFAULTS.color;
     card.icon = draft.icon ?? ITEM_CARD_DEFAULTS.icon;
     card.icon_back = draft.iconBack ?? ITEM_CARD_DEFAULTS.iconBack;
+    useSingleIconCardback(card);
     return card;
   }
 
@@ -65,6 +76,8 @@ export function createCardFromImportedDraft(draft: ImportedCardDraft): Card {
   if (draft.iconBack) {
     card.icon_back = draft.iconBack;
   }
+
+  useSingleIconCardback(card);
 
   return card;
 }

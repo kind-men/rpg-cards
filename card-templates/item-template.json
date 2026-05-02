@@ -5,6 +5,8 @@
     "title": "Item Template",
     "icon": "round-shield",
     "icon_back": "round-shield",
+    "icon_back_top": "round-shield",
+    "icon_back_bottom": "round-shield",
     "contents": [
       "subtitle | Wondrous item",
       "rule",

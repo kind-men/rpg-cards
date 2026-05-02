@@ -6,24 +6,24 @@
     <link rel="icon" href="./favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="manifest" crossorigin="use-credentials" href="./manifest.json" />
-    <link href="./_app/immutable/entry/start.DDTwXZ9k.js" rel="modulepreload">
-		<link href="./_app/immutable/chunks/BMSio87Y.js" rel="modulepreload">
+    <link href="./_app/immutable/entry/start.DULTCTsf.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/64OcHz0w.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/BYw82_jr.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/YExUsNAs.js" rel="modulepreload">
-		<link href="./_app/immutable/entry/app.CukX5Qpp.js" rel="modulepreload">
+		<link href="./_app/immutable/entry/app.ByXcSFB5.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/DxLN9Q9A.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/v_jBEYI6.js" rel="modulepreload">
 		<link href="./_app/immutable/nodes/0.DEeZrS8X.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/DB_bWgAF.js" rel="modulepreload">
-		<link href="./_app/immutable/nodes/3.lupgajDE.js" rel="modulepreload">
-		<link href="./_app/immutable/chunks/CMKYwH0P.js" rel="modulepreload">
-		<link href="./_app/immutable/chunks/Cpk7SuzA.js" rel="modulepreload">
+		<link href="./_app/immutable/nodes/3.BR-AW7Dv.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/CSmKTyj1.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/dx7Hxv5F.js" rel="modulepreload">
 		<link href="./_app/immutable/chunks/Dhj3GxM_.js" rel="modulepreload">
 		<!--12qhfyh--><!----><!--jk4d64--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/> <!--[0--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css"/><!--]--><!----><title>RPG Card Generator</title>
 		<link href="./_app/immutable/assets/dist.DhaulA-e.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/0.DNe1FIK-.css" rel="stylesheet">
-		<link href="./_app/immutable/assets/printable-output-entry.cB9ebBcW.css" rel="stylesheet">
-		<link href="./_app/immutable/assets/workspace-shell.DiXpZS4s.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/printable-output-entry.ViZ44sGR.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/workspace-shell.DqSg05_b.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/workspace-content-view.BXBqKfC4.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/3.B-gACyXg.css" rel="stylesheet">
   </head>
@@ -51,6 +51,8 @@
       "title": "Hex",
       "icon": "sparkles",
       "icon_back": "magic-swirl",
+      "icon_back_top": "magic-swirl",
+      "icon_back_bottom": "magic-swirl",
       "text_back": "1st Level",
       "cardback_mode": "images",
       "cardback_images": [
@@ -92,12 +94,14 @@
       ]
     }
   ]
-}</code></pre> <hr/> <h3 id="card-data">Card</h3> <p>Cards can contain the following fields:</p> <ul><li><code>count</code> (number): amount of this card to print</li> <li><code>color</code> (string): card color</li> <li><code>title</code> (string): card title</li> <li><code>icon</code> (string): front icon</li> <li><code>icon_back</code> (string): icon used on the card back in icon mode. See <a href="#icons">Icons</a>.</li> <li><code>text_back</code> (string, optional): text shown on the back, such as a spell level</li> <li><code>cardback_mode</code> (string, optional): back style. Possible values: <code>"icon"</code>, <code>"images"</code></li> <li><code>cardback_images</code> (array, optional): list of cardback images when image mode is used</li> <li><code>cardback_background_color</code> (string, optional): background color behind cardback images</li> <li><code>cardback_border_style</code> (string, optional): cardback border style. Possible values: <code>"none"</code>, <code>"normal"</code></li> <li><code>tags</code> (array): list of tags</li> <li><code>layout</code> (object): per-card layout settings</li> <li><code>contents</code> (array): list of content blocks using object entries with <code>type</code> and optional <code>id</code>. Most blocks store <code>content</code>; <code>row</code> stores <code>children</code>. See <a href="#contents">Contents JSON data</a>.</li></ul> <p>Example:</p> <pre><code>{
+}</code></pre> <hr/> <h3 id="card-data">Card</h3> <p>Cards can contain the following fields:</p> <ul><li><code>count</code> (number): amount of this card to print</li> <li><code>color</code> (string): card color</li> <li><code>title</code> (string): card title</li> <li><code>icon</code> (string): front icon</li> <li><code>icon_back</code> (string): center icon used on the card back in icon mode. See <a href="#icons">Icons</a>.</li> <li><code>icon_back_top</code> (string, optional): smaller top icon used on the card back in icon mode. Use an empty string to hide it.</li> <li><code>icon_back_bottom</code> (string, optional): smaller bottom icon used on the card back in icon mode. Use an empty string to hide it.</li> <li><code>text_back</code> (string, optional): text shown on the back, such as a spell level</li> <li><code>cardback_mode</code> (string, optional): back style. Possible values: <code>"icon"</code>, <code>"images"</code></li> <li><code>cardback_images</code> (array, optional): list of cardback images when image mode is used</li> <li><code>cardback_background_color</code> (string, optional): background color behind cardback images</li> <li><code>cardback_border_style</code> (string, optional): cardback border style. Possible values: <code>"none"</code>, <code>"normal"</code></li> <li><code>tags</code> (array): list of tags</li> <li><code>layout</code> (object): per-card layout settings</li> <li><code>contents</code> (array): list of content blocks using object entries with <code>type</code> and optional <code>id</code>. Most blocks store <code>content</code>; <code>row</code> stores <code>children</code>. See <a href="#contents">Contents JSON data</a>.</li></ul> <p>Example:</p> <pre><code>{
   "count": 1,
   "color": "#4a6898",
   "title": "Hex",
   "icon": "sparkles",
   "icon_back": "magic-swirl",
+  "icon_back_top": "magic-swirl",
+  "icon_back_bottom": "magic-swirl",
   "text_back": "1st Level",
   "cardback_mode": "icon",
   "cardback_images": [],
@@ -215,7 +219,7 @@ footer | left | right</code></pre></section> <section class="docs-section" id="i
 			
 			<script>
 				{
-					__sveltekit_1toi4an = {
+					__sveltekit_14ipuai = {
 						base: new URL(".", location).pathname.slice(0, -1),
 						assets: "/rpg-cards"
 					};
@@ -223,8 +227,8 @@ footer | left | right</code></pre></section> <section class="docs-section" id="i
 					const element = document.currentScript.parentElement;
 
 					Promise.all([
-						import("./_app/immutable/entry/start.DDTwXZ9k.js"),
-						import("./_app/immutable/entry/app.CukX5Qpp.js")
+						import("./_app/immutable/entry/start.DULTCTsf.js"),
+						import("./_app/immutable/entry/app.ByXcSFB5.js")
 					]).then(([kit, app]) => {
 						kit.start(app, element, {
 							node_ids: [0, 3],

@@ -37,7 +37,7 @@ export interface ImportedCardDraft {
   externalId: string;
   title: string;
   tags: string[];
-  template?: 'default' | 'spell' | 'item';
+  template?: 'default' | 'spell' | 'item' | 'ability';
   icon?: string;
   iconBack?: string;
   color?: string;

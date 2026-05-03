@@ -16,6 +16,12 @@ const ITEM_CARD_DEFAULTS = {
   iconBack: 'round-shield'
 } as const;
 
+const ABILITY_CARD_DEFAULTS = {
+  color: '#5f6f3f',
+  icon: 'scroll-quill',
+  iconBack: 'scroll-quill'
+} as const;
+
 function createContentBlock(block: ImportedCardDraftBlock): CardContent {
   return {
     id: uuid4(),
@@ -61,6 +67,14 @@ export function createCardFromImportedDraft(draft: ImportedCardDraft): Card {
     card.color = draft.color ?? ITEM_CARD_DEFAULTS.color;
     card.icon = draft.icon ?? ITEM_CARD_DEFAULTS.icon;
     card.icon_back = draft.iconBack ?? ITEM_CARD_DEFAULTS.iconBack;
+    useSingleIconCardback(card);
+    return card;
+  }
+
+  if (draft.template === 'ability') {
+    card.color = draft.color ?? ABILITY_CARD_DEFAULTS.color;
+    card.icon = draft.icon ?? ABILITY_CARD_DEFAULTS.icon;
+    card.icon_back = draft.iconBack ?? ABILITY_CARD_DEFAULTS.iconBack;
     useSingleIconCardback(card);
     return card;
   }

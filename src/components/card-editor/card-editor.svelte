@@ -200,8 +200,15 @@
 
   const handleMultiEditingChanging = () => {
     if (isMultiEditing) {
+      const selectedCards = $deck.filter((_, index) => $multiSelect.has(index));
+
+      if (selectedCards.length < 2) {
+        multiSelect.set(new Set($deck.map((_, index) => index).filter((index) => $multiSelect.has(index))));
+        return;
+      }
+
       skipNextMultiUpdate = true;
-      card = createMultiCard($deck.filter((_, index) => $multiSelect.has(index))) as Card;
+      card = createMultiCard(selectedCards) as Card;
       cardIndex = -1;
       return;
     }

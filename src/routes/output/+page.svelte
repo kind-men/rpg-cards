@@ -1,6 +1,7 @@
 <script lang="ts">
   import { browser } from '$app/environment';
   import { onMount, tick } from 'svelte';
+  import { parseCards } from '$lib/card-json-parser';
   import { preloadIconsForCards } from '$lib/icons';
   import { getPrintableCards } from '../../lib/print-selection';
   import Card from '../../components/card/card.svelte';
@@ -27,6 +28,7 @@
   const PAGE_PADDING = 5;
 
   let fontsReady = false;
+  let deckReady = false;
   let previewReady = false;
   let previewVisible = false;
   let measurementCard: CardModel | null = null;
@@ -210,7 +212,29 @@
     });
   };
 
+  const loadDeckForOutput = async () => {
+    const previewToken = new URL(window.location.href).searchParams.get('preview') ?? '';
+
+    try {
+      const previewDeck = previewToken
+        ? sessionStorage.getItem(`rpg-cards-print-deck:${previewToken}`)
+        : null;
+
+      if (previewDeck) {
+        deck.hydrate(parseCards(previewDeck) ?? []);
+        return;
+      }
+    } catch (error) {
+      console.warn('Unable to read print preview deck snapshot.', error);
+    }
+
+    await deck.loadStoredDeck();
+  };
+
   onMount(async () => {
+    await loadDeckForOutput();
+    deckReady = true;
+
     if ('fonts' in document) {
       await document.fonts.ready.catch(() => undefined);
     }
@@ -220,6 +244,7 @@
 
   $: if (
     browser &&
+    deckReady &&
     fontsReady &&
     $deck &&
     $pageLayout.paperSize.width &&

@@ -33,20 +33,24 @@ export function createMultiCard(cards: Card[]): Partial<Card> {
   function setValues<T>(checkValues: T[], object: T): T {
     const newObj: Partial<T> = {};
 
+    if (!object) {
+      return newObj as T;
+    }
+
     Object.entries(object).forEach(([key, value]) => {
       if (key === 'contents') {
         return;
       }
 
-      if (typeof value === 'object' && !Array.isArray(value)) {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
         newObj[key] = setValues(
-          checkValues.map((v) => v[key]),
+          checkValues.map((v) => v?.[key]),
           object[key]
         );
         return;
       }
 
-      if (checkValues.every((c) => c[key] === object[key])) {
+      if (checkValues.every((c) => c?.[key] === object[key])) {
         newObj[key] = object[key];
       } else {
         newObj[key] = null;
@@ -56,12 +60,20 @@ export function createMultiCard(cards: Card[]): Partial<Card> {
     return newObj as T;
   }
 
+  if (cards.length === 0) {
+    return {};
+  }
+
   const card = setValues<Partial<Card>>(cards, cards[0]);
 
   return card;
 }
 
 export function removeEmpty(obj: unknown): unknown {
+  if (!obj || typeof obj !== 'object') {
+    return obj;
+  }
+
   return Object.fromEntries(
     Object.entries(obj)
       .filter(([, v]) => v != null)

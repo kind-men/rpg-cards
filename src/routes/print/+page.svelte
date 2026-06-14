@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { browser } from '$app/environment';
   import { Icon, Input, InputGroup, InputGroupText } from '@sveltestrap/sveltestrap';
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import WorkspaceContentView from '$components/workspace-content-view.svelte';
   import WorkspaceShell from '$components/workspace-shell.svelte';
   import { deck, pageLayout } from '../../stores';
@@ -34,8 +34,16 @@
     }
 
     refreshTimeout = setTimeout(() => {
+      const nextPreviewNonce = previewNonce + 1;
+
+      try {
+        sessionStorage.setItem(`rpg-cards-print-deck:${nextPreviewNonce}`, JSON.stringify($deck));
+      } catch (error) {
+        console.warn('Unable to write print preview deck snapshot.', error);
+      }
+
       previewLoading = true;
-      previewNonce += 1;
+      previewNonce = nextPreviewNonce;
       refreshTimeout = undefined;
     }, 100);
   };
@@ -102,6 +110,10 @@
     if (refreshTimeout) {
       clearTimeout(refreshTimeout);
     }
+  });
+
+  onMount(() => {
+    void deck.loadStoredDeck();
   });
 </script>
 

@@ -20,8 +20,14 @@ function createDeck() {
   const defaultValue: Card[] = [];
   const { subscribe, set, update } = writable<Card[]>(defaultValue);
 
+  const hydrate = (cards: Card[]) => {
+    set(cards);
+    preloadDeckIcons(cards);
+  };
+
   return {
     subscribe,
+    hydrate,
     loadStoredDeck: async () => {
       if (!browser || hasLoadedStoredDeck) {
         return;
@@ -36,20 +42,18 @@ function createDeck() {
       const storedDeck = localStorage.getItem('deck') ?? '[]';
 
       if (storedDeck.trim() === '[]') {
-        shouldPersistDeck = true;
         deckLoading.set(false);
         return;
       }
 
       try {
         const parsedDeck = parseCards(storedDeck) ?? [];
-        shouldPersistDeck = parsedDeck.length > 0;
 
         if (!hasUserMutation) {
-          set(parsedDeck);
+          hydrate(parsedDeck);
         }
 
-        preloadDeckIcons(parsedDeck);
+        shouldPersistDeck = parsedDeck.length > 0;
       } catch (err) {
         console.warn('Unable to load stored deck.', err);
         shouldPersistDeck = false;

@@ -121,6 +121,11 @@
     await goto(`${base}/print`);
   };
 
+  const handleOpenBattlemapMode = async () => {
+    generalMenuOpen = false;
+    await goto(`${base}/map`);
+  };
+
   const closeGeneralMenu = () => {
     generalMenuOpen = false;
   };
@@ -163,7 +168,7 @@
     </a>
   </div>
 
-  <div class="sidebar-toolbar">
+  <div class="sidebar-mode-row">
     <div
       class="general-menu-popover"
       role="presentation"
@@ -210,6 +215,10 @@
             </button>
             <button class="general-menu-item" type="button" on:click={handleOpenPrintView}>
               Print
+            </button>
+            <div class="general-menu-divider"></div>
+            <button class="general-menu-item" type="button" on:click={handleOpenBattlemapMode}>
+              Battlemaps
             </button>
           </div>
 
@@ -310,10 +319,12 @@
     display: none !important;
   }
 
-  .sidebar-toolbar {
+  .sidebar-mode-row {
     position: relative;
     display: flex;
+    align-items: center;
     justify-content: flex-start;
+    gap: 0.5rem;
   }
 
   .general-menu-popover {

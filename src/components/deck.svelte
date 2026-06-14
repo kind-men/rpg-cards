@@ -7,9 +7,9 @@
   import type { CardFormat } from '../model/page-layout';
   import { createNewCard } from '../lib/card-builder';
   import { cloneCardContentsWithNewIds } from '../lib/card-content';
-  import { CARD_SIZE_PRESETS, currentCard, deck, multiSelect, pageLayout } from '../stores';
+  import { CARD_SIZE_PRESETS, currentCard, deck, deckLoading, multiSelect, pageLayout } from '../stores';
   import ConfirmationDialog from './confirmation-dialog.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
 
   const dispatch = createEventDispatcher<{ import: void }>();
 
@@ -23,12 +23,18 @@
   ];
 
   let cards: Card[];
+  let deckHydrated = false;
   $: {
     cards = $deck;
-    if (cards && cards.length === 0) {
+    if (deckHydrated && !$deckLoading && cards && cards.length === 0) {
       currentCard.set(-1);
     }
   }
+
+  onMount(async () => {
+    await deck.loadStoredDeck();
+    deckHydrated = true;
+  });
 
   const handleClick = (index: number) => {
     if ($multiSelect.size > 1 && $multiSelect.has(index)) {
@@ -177,7 +183,12 @@
     </div>
 
     <div class="deck-list" role="list">
-      {#if cards && cards.length > 0}
+      {#if !deckHydrated || $deckLoading}
+        <div class="deck-loading" aria-live="polite">
+          <div class="deck-loading-spinner" aria-hidden="true"></div>
+          <span>Loading cards</span>
+        </div>
+      {:else if cards && cards.length > 0}
         <div class="deck-list-header">
           <label class="deck-select-all">
             <input
@@ -562,6 +573,34 @@
     color: var(--deck-text-faint);
     font-size: 0.78rem;
     text-align: center;
+  }
+
+  .deck-loading {
+    min-height: 7rem;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 0.65rem;
+    padding: 1rem 0.25rem;
+    color: var(--deck-text-faint);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .deck-loading-spinner {
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 2px solid color-mix(in srgb, var(--deck-divider) 80%, transparent);
+    border-top-color: var(--deck-text-muted);
+    border-radius: 999px;
+    animation: deck-loading-spin 900ms linear infinite;
+  }
+
+  @keyframes deck-loading-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>
 

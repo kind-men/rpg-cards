@@ -3,6 +3,7 @@
   import { base } from '$app/paths';
   import { goto } from '$app/navigation';
   import { onDestroy, onMount } from 'svelte';
+  import { Icon } from '@sveltestrap/sveltestrap';
   import { setPrintSelection } from '$lib/print-selection';
   import CardEditor from '$components/card-editor/card-editor.svelte';
   import CurrentCard from '$components/card/current-card.svelte';
@@ -15,6 +16,7 @@
   const minPanelWidth = 260;
   const maxPanelWidth = 520;
   const minCanvasWidth = 320;
+  const modeRailWidth = 56;
 
   let viewportWidth = 0;
   let leftPanelWidth = 340;
@@ -31,10 +33,10 @@
   const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
   const getMaxLeftPanelWidth = () =>
-    clamp(viewportWidth - rightPanelWidth - minCanvasWidth, minPanelWidth, maxPanelWidth);
+    clamp(viewportWidth - modeRailWidth - rightPanelWidth - minCanvasWidth, minPanelWidth, maxPanelWidth);
 
   const getMaxRightPanelWidth = () =>
-    clamp(viewportWidth - leftPanelWidth - minCanvasWidth, minPanelWidth, maxPanelWidth);
+    clamp(viewportWidth - modeRailWidth - leftPanelWidth - minCanvasWidth, minPanelWidth, maxPanelWidth);
 
   const startResize = (event: CustomEvent<{ side: 'left' | 'right' }>) => {
     activeResize = event.detail.side;
@@ -50,7 +52,7 @@
     }
 
     if (activeResize === 'left') {
-      leftPanelWidth = clamp(event.clientX, minPanelWidth, getMaxLeftPanelWidth());
+      leftPanelWidth = clamp(event.clientX - modeRailWidth, minPanelWidth, getMaxLeftPanelWidth());
       return;
     }
 
@@ -126,7 +128,7 @@
 <div
   class:workspace-static-view={!isEditorView()}
   class="workspace"
-  style={`--left-panel-width: ${leftPanelWidth}px; --right-panel-width: ${effectiveRightPanelWidth}px; --content-max-width: ${contentMaxWidth}; --workspace-watermark: url('${menuLogoUrl}');`}
+  style={`--left-panel-width: ${leftPanelWidth}px; --right-panel-width: ${effectiveRightPanelWidth}px; --mode-rail-width: ${modeRailWidth}px; --content-max-width: ${contentMaxWidth}; --workspace-watermark: url('${menuLogoUrl}');`}
 >
   {#if isEditorView()}
     <div class="canvas-layer">
@@ -145,7 +147,16 @@
     </main>
   {/if}
 
-  <SidebarContainer side="left" width={leftPanelWidth} on:resizestart={startResize}>
+  <nav class="workspace-mode-rail" aria-label="Workspace modes">
+    <a class="workspace-mode-button workspace-mode-button-active" href={`${base}/`} aria-label="Cards">
+      <Icon name="card-text" />
+    </a>
+    <a class="workspace-mode-button" href={`${base}/map`} aria-label="Battlemaps">
+      <Icon name="map" />
+    </a>
+  </nav>
+
+  <SidebarContainer side="left" width={leftPanelWidth} offset={modeRailWidth} on:resizestart={startResize}>
     <Sidebar />
   </SidebarContainer>
 
@@ -181,7 +192,7 @@
 
   .canvas-layer {
     position: fixed;
-    inset: 0 var(--right-panel-width) 0 var(--left-panel-width);
+    inset: 0 var(--right-panel-width) 0 calc(var(--left-panel-width) + var(--mode-rail-width));
     z-index: 1;
   }
 
@@ -189,7 +200,7 @@
     --workspace-shell-surface: var(--color-surface-panel);
     --workspace-shell-glow: var(--color-white-65);
     position: fixed;
-    inset: 0 0 0 var(--left-panel-width);
+    inset: 0 0 0 calc(var(--left-panel-width) + var(--mode-rail-width));
     z-index: 1;
     overflow-y: auto;
     background:
@@ -214,10 +225,50 @@
     overflow: hidden;
   }
 
+  .workspace-mode-rail {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 12;
+    width: var(--mode-rail-width);
+    padding: 0.75rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    border-right: 1px solid var(--color-border-strong);
+    background: var(--color-surface-base);
+  }
+
+  .workspace-mode-button {
+    width: 2.35rem;
+    height: 2.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    color: var(--color-ink-575);
+    text-decoration: none;
+    transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+  }
+
+  .workspace-mode-button:hover,
+  .workspace-mode-button-active {
+    border-color: var(--color-border-medium);
+    background: var(--color-surface-panel-active);
+    color: var(--color-ink-900);
+  }
+
+  .workspace-mode-button :global(svg) {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
   @media (max-width: 1100px) {
     .workspace {
       min-height: auto;
       padding: 1rem;
+      padding-left: calc(var(--mode-rail-width) + 1rem);
       display: grid;
       gap: 1rem;
     }
@@ -238,6 +289,10 @@
 
     .content-shell {
       padding: 1rem;
+    }
+
+    .workspace-mode-rail {
+      position: fixed;
     }
 
     :global(body) {

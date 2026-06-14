@@ -3,6 +3,7 @@
 
   export let side: 'left' | 'right';
   export let width: number;
+  export let offset = 0;
   export let scrollable = false;
   const dispatch = createEventDispatcher<{ resizestart: { side: 'left' | 'right' } }>();
 
@@ -17,7 +18,7 @@
   class:sidebar-container-right={side === 'right'}
   class:sidebar-container-scrollable={scrollable}
   class="sidebar-container"
-  style={`--sidebar-width: ${width}px;`}
+  style={`--sidebar-width: ${width}px; --sidebar-offset: ${offset}px;`}
 >
   {#if side === 'right'}
     <button
@@ -61,7 +62,7 @@
   }
 
   .sidebar-container-left {
-    left: 0;
+    left: var(--sidebar-offset);
     border-right: 1px solid var(--sidebar-container-divider);
   }
 

@@ -49,13 +49,24 @@ async function unzipIconFiles(path: string, output: string) {
 
 async function indexFiles(path: string, outputJson: string) {
   const files = await walk(path);
+  const iconNames = new Set<string>();
   const map = files
     .filter((file) => Path.extname(file) === '.svg')
     .map((file) => {
+      const baseName = Path.basename(file, '.svg');
+      let name = baseName;
+      let count = 2;
+
+      while (iconNames.has(name)) {
+        name = `${name}${count}`;
+        count++;
+      }
+
+      iconNames.add(name);
+
       return {
-        path: Path.relative(path, file),
-        name: Path.basename(file, '.svg'),
-        svg: fs.readFileSync(file, 'utf-8')
+        path: Path.relative(path, file).split(Path.sep).join('/'),
+        name
       };
     });
 

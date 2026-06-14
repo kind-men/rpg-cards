@@ -1,6 +1,7 @@
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 import { parseCards } from '$lib/card-json-parser';
+import { preloadIconsForCards } from '$lib/icons';
 import type Card from '../model/card';
 
 let shouldPersistDeck = false;
@@ -8,6 +9,12 @@ let hasUserMutation = false;
 let hasLoadedStoredDeck = false;
 
 export const deckLoading = writable(false);
+
+const preloadDeckIcons = (cards: Card[]) => {
+  if (browser) {
+    void preloadIconsForCards(cards);
+  }
+};
 
 function createDeck() {
   const defaultValue: Card[] = [];
@@ -41,6 +48,8 @@ function createDeck() {
         if (!hasUserMutation) {
           set(parsedDeck);
         }
+
+        preloadDeckIcons(parsedDeck);
       } catch (err) {
         console.warn('Unable to load stored deck.', err);
         shouldPersistDeck = false;
@@ -56,6 +65,7 @@ function createDeck() {
         index = deck.length;
         return [...deck, ...card];
       });
+      preloadDeckIcons(card);
       return index;
     },
     removeCards: (...indexes: number[]) => {
@@ -70,11 +80,13 @@ function createDeck() {
         deck.splice(index, 1, card);
         return deck;
       });
+      preloadDeckIcons([card]);
     },
     set: (deck: Card[]) => {
       hasUserMutation = true;
       shouldPersistDeck = true;
       set(deck);
+      preloadDeckIcons(deck);
     }
   };
 }

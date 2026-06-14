@@ -25,6 +25,12 @@ const config = {
     },
     paths: {
       base: basePath
+    },
+    serviceWorker: {
+      files: (file) => {
+        const normalizedFile = file.replace(/\\/g, '/');
+        return !normalizedFile.startsWith('icons/') || normalizedFile === 'icons/icons.json';
+      }
     }
   }
 };

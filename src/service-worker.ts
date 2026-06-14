@@ -4,7 +4,10 @@ import { build, files } from '$service-worker';
 
 const worker = self as unknown as ServiceWorkerGlobalScope;
 
-const toCache = build.concat(files);
+const isRuntimeIconAsset = (asset: string) =>
+  asset.startsWith('/icons/') && asset !== '/icons/icons.json';
+
+const toCache = build.concat(files.filter((file) => !isRuntimeIconAsset(file)));
 const createCacheVersion = (assets: string[]) => {
   let hash = 0;
 

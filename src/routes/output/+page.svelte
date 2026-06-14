@@ -1,6 +1,7 @@
 <script lang="ts">
   import { browser } from '$app/environment';
   import { onMount, tick } from 'svelte';
+  import { preloadIconsForCards } from '$lib/icons';
   import { getPrintableCards } from '../../lib/print-selection';
   import Card from '../../components/card/card.svelte';
   import PrintableOutputEntryCard from '../../components/card/printable-output-entry.svelte';
@@ -176,6 +177,11 @@
     const outputEntries = createPrintableOutputEntries(printableCards, pageColumns);
     printablePages = placeOutputEntries(outputEntries, pageColumns, pageRows);
     measurementCard = null;
+    await preloadIconsForCards(printableCards.map((entry) => entry.card));
+
+    if (token !== buildToken) {
+      return;
+    }
 
     await tick();
 

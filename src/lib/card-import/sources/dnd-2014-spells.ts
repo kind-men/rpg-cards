@@ -174,7 +174,8 @@ export function adaptDnd2014SpellToDraft(spell: Dnd2014SpellDetailResponse): Imp
         spell.casting_time ?? '',
         spell.range ?? '',
         formatDnd2014SpellComponents(spell),
-        spell.duration ?? ''
+        spell.duration ?? '',
+        spell.concentration ? 'true' : 'false'
       ].join(' | ')
     },
     {

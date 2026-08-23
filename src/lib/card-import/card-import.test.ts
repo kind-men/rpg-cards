@@ -65,6 +65,7 @@ describe('D&D 2014 spell importer', () => {
       components: ['V', 'S', 'M'],
       material: 'powdered rhubarb leaf and an adder’s stomach',
       duration: 'Instantaneous',
+      concentration: true,
       desc: [
         'A shimmering green arrow streaks toward a target within range and bursts in a spray of acid.'
       ],
@@ -83,7 +84,7 @@ describe('D&D 2014 spell importer', () => {
     expect(draft.blocks[1]).toMatchObject({
       type: 'dndspellblock',
       content:
-        '1 action | 90 feet | V, S, M (powdered rhubarb leaf and an adder’s stomach) | Instantaneous'
+        '1 action | 90 feet | V, S, M (powdered rhubarb leaf and an adder’s stomach) | Instantaneous | true'
     });
     expect(draft.blocks.at(-1)).toMatchObject({
       type: 'footer',

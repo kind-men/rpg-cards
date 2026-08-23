@@ -7,7 +7,8 @@
 
   export let content: CardContent;
 
-  $: [castingTime, range, components, duration] = getContentText(content).split(SPLIT_REGEX);
+  $: [castingTime, range, components, duration, concentration] = getContentText(content).split(SPLIT_REGEX);
+  $: requiresConcentration = concentration === 'true';
 </script>
 
 <div class="wrapper">
@@ -25,7 +26,12 @@
   </div>
   <div class="block">
     <h2>Duration</h2>
-    <p>{@html renderText(duration)}</p>
+    <p class:duration-with-concentration={requiresConcentration}>
+      {#if requiresConcentration}
+        <span class="concentration-icon" aria-label="Requires concentration"><span>C</span></span>
+      {/if}
+      <span>{@html renderText(duration)}</span>
+    </p>
   </div>
 </div>
 
@@ -39,7 +45,7 @@
 
   .block {
     background-color: white;
-    padding: 0.15em 0 0;
+    padding: 0.25em 0 0.15em;
     font-size: var(--card-text-size);
 
     p,
@@ -54,6 +60,35 @@
       font-weight: normal;
       color: var(--card-color);
       font-family: 'Overpass', sans-serif;
+    }
+
+    .duration-with-concentration {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.28em;
+      line-height: 1;
+    }
+
+    .concentration-icon {
+      width: 1em;
+      height: 1em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      background: #262626;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      font-size: 0.9em;
+      font-weight: 700;
+      line-height: 1;
+      transform: rotate(45deg);
+    }
+
+    .concentration-icon > span {
+      font-size: 0.55em;
+      transform: rotate(-45deg);
     }
   }
 </style>

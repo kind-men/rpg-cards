@@ -196,7 +196,8 @@ export const CARD_CONTENT_TYPES = createCardContentTypes(
       { name: 'Casting time', description: 'Casting time' },
       { name: 'Range', description: 'Range' },
       { name: 'Components', description: 'Components' },
-      { name: 'Duration', description: 'Duration' }
+      { name: 'Duration', description: 'Duration' },
+      { name: 'Concentration', description: 'Whether the spell requires concentration', optional: true }
     ],
     renderComponent: Dndspellblock,
     editorComponent: DndspellblockContentBlockEditor

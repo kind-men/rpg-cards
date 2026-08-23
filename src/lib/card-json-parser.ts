@@ -328,7 +328,7 @@ function convertDndSpellBlock(contents: CardContent[]): CardContent[] {
   blocks.forEach((block, i) => {
     newContents.splice(block.index + i * 4, 0, {
       type: 'dndspellblock',
-      content: [block.castingTime, block.range, block.components, block.duration].join(' | '),
+      content: [block.castingTime, block.range, block.components, block.duration, 'false'].join(' | '),
       id: uuid4()
     });
   });

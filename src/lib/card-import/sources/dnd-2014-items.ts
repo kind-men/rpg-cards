@@ -226,6 +226,32 @@ function formatContents(
     .join(', ');
 }
 
+function descriptionToTextBlocks(desc?: string[]): ImportedCardDraft['blocks'] {
+  const blocks: ImportedCardDraft['blocks'] = [];
+  let tableLines: string[] = [];
+
+  const addTable = () => {
+    if (tableLines.length > 0) {
+      blocks.push({ type: 'text', content: tableLines.join('\n') });
+      tableLines = [];
+    }
+  };
+
+  for (const paragraph of desc ?? []) {
+    if (paragraph.trimStart().startsWith('|')) {
+      tableLines.push(paragraph);
+      continue;
+    }
+
+    addTable();
+    blocks.push({ type: 'text', content: paragraph });
+  }
+
+  addTable();
+
+  return blocks.length > 0 ? blocks : [{ type: 'text', content: 'Describe the item here.' }];
+}
+
 function buildEquipmentFooterRight(item: DndEquipmentResponse): string {
   return (
     item.equipment_category?.name ??
@@ -289,19 +315,7 @@ export function adaptDnd2014EquipmentToDraft(item: DndEquipmentResponse): Import
     });
   }
 
-  blocks.push(
-    ...((item.desc ?? []).length > 0
-      ? (item.desc ?? []).map((paragraph) => ({
-          type: 'text' as const,
-          content: paragraph
-        }))
-      : [
-          {
-            type: 'text' as const,
-            content: 'Describe the item here.'
-          }
-        ])
-  );
+  blocks.push(...descriptionToTextBlocks(item.desc));
 
   blocks.push({
     type: 'footer',
@@ -376,19 +390,7 @@ export function adaptDnd2014MagicItemToDraft(item: DndMagicItemResponse): Import
     });
   }
 
-  blocks.push(
-    ...((item.desc ?? []).length > 0
-      ? (item.desc ?? []).map((paragraph) => ({
-          type: 'text' as const,
-          content: paragraph
-        }))
-      : [
-          {
-            type: 'text' as const,
-            content: 'Describe the item here.'
-          }
-        ])
-  );
+  blocks.push(...descriptionToTextBlocks(item.desc));
 
   blocks.push({
     type: 'footer',

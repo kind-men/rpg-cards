@@ -95,6 +95,33 @@ describe('D&D 2014 spell importer', () => {
     });
   });
 
+  it('keeps Prestidigitation bullet points together in one text block', () => {
+    const draft = adaptDnd2014SpellToDraft({
+      index: 'prestidigitation',
+      name: 'Prestidigitation',
+      desc: [
+        'This spell is a minor magical trick that novice spellcasters use for practice.',
+        '- You create a harmless sensory effect.',
+        '- You light or snuff out a small flame.',
+        '- You clean or soil an object.',
+        'The effect lasts for up to 1 hour.'
+      ]
+    });
+
+    expect(draft.blocks.filter((block) => block.type === 'text')).toEqual([
+      {
+        type: 'text',
+        content: 'This spell is a minor magical trick that novice spellcasters use for practice.'
+      },
+      {
+        type: 'text',
+        content:
+          '- You create a harmless sensory effect.\n- You light or snuff out a small flame.\n- You clean or soil an object.'
+      },
+      { type: 'text', content: 'The effect lasts for up to 1 hour.' }
+    ]);
+  });
+
   it('creates editable cards from imported drafts with spell defaults', () => {
     const draft = adaptDnd2014SpellToDraft({
       index: 'light',

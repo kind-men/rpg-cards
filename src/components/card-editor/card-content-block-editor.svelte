@@ -44,7 +44,9 @@
   $: paddingLabel = `${(paddingStep * CONTENT_PADDING_REM_STEP).toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1')}rem`;
 
   const getSplitContentFromValue = (value: string) =>
-    value?.split(SPLIT_REGEX) ?? typeDescriptor?.params?.map(() => '') ?? [];
+    content.type === 'text'
+      ? [value ?? '']
+      : value?.split(SPLIT_REGEX) ?? typeDescriptor?.params?.map(() => '') ?? [];
 
   const updatePadding = (value: number) => {
     const nextPaddingStep = normalizeContentPaddingStep(value);
@@ -77,6 +79,18 @@
 
   const updateContent = () => {
     if (isContainerContent(content)) {
+      return;
+    }
+
+    if (content.type === 'text') {
+      const nextContent = splitContent[0] ?? '';
+
+      if (getContentText(content) !== nextContent) {
+        content = setContentText(content, nextContent);
+        lastSyncedContentId = content.id;
+        lastSyncedSerializedContent = nextContent;
+      }
+
       return;
     }
 

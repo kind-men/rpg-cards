@@ -74,6 +74,30 @@ describe('D&D 2014 item importer', () => {
     expect(draft.blocks.some((block) => block.type === 'subtitle')).toBe(false);
   });
 
+  it('keeps a magic item table together in one text block', () => {
+    const draft = adaptDnd2014MagicItemToDraft({
+      index: 'bag-of-tricks-rust',
+      name: 'Bag of Tricks (Rust)',
+      desc: [
+        'This ordinary bag is made of rust-colored cloth.',
+        '| d8 | Creature |',
+        '|:--:|:--|',
+        '| 1 | Weasel |',
+        '| 2 | Giant Rat |',
+        'The creature is friendly to you and your companions.'
+      ]
+    });
+
+    expect(draft.blocks.filter((block) => block.type === 'text')).toEqual([
+      { type: 'text', content: 'This ordinary bag is made of rust-colored cloth.' },
+      {
+        type: 'text',
+        content: '| d8 | Creature |\n|:--:|:--|\n| 1 | Weasel |\n| 2 | Giant Rat |'
+      },
+      { type: 'text', content: 'The creature is friendly to you and your companions.' }
+    ]);
+  });
+
   it('creates item cards with image cardbacks from imported drafts', () => {
     const draft = adaptDnd2014MagicItemToDraft({
       index: 'potion-of-healing',

@@ -122,6 +122,31 @@ export function buildDnd2014SpellFooterRight(spell: Dnd2014SpellDetailResponse):
   return [school, level].filter(Boolean).join(' ');
 }
 
+function descriptionToTextBlocks(desc?: string[]): ImportedCardDraft['blocks'] {
+  const blocks: ImportedCardDraft['blocks'] = [];
+  let listItems: string[] = [];
+
+  const addList = () => {
+    if (listItems.length > 0) {
+      blocks.push({ type: 'text', content: listItems.join('\n') });
+      listItems = [];
+    }
+  };
+
+  for (const paragraph of desc ?? []) {
+    if (/^\s*(?:[-+*]|\d+[.)])\s+/.test(paragraph)) {
+      listItems.push(paragraph);
+      continue;
+    }
+
+    addList();
+    blocks.push({ type: 'text', content: paragraph });
+  }
+
+  addList();
+  return blocks;
+}
+
 export function adaptDnd2014SpellToDraft(spell: Dnd2014SpellDetailResponse): ImportedCardDraft {
   if (!spell?.index || !spell?.name) {
     throw createImportError('parse', 'Spell response is missing required fields.');
@@ -155,10 +180,7 @@ export function adaptDnd2014SpellToDraft(spell: Dnd2014SpellDetailResponse): Imp
     {
       type: 'rule'
     },
-    ...(spell.desc ?? []).map((paragraph) => ({
-      type: 'text' as const,
-      content: paragraph
-    }))
+    ...descriptionToTextBlocks(spell.desc)
   ];
 
   if (Array.isArray(spell.higher_level) && spell.higher_level.length > 0) {
@@ -167,12 +189,7 @@ export function adaptDnd2014SpellToDraft(spell: Dnd2014SpellDetailResponse): Imp
       content: 'At higher levels'
     });
 
-    blocks.push(
-      ...spell.higher_level.map((paragraph) => ({
-        type: 'text' as const,
-        content: paragraph
-      }))
-    );
+    blocks.push(...descriptionToTextBlocks(spell.higher_level));
   }
 
   blocks.push({

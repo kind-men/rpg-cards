@@ -14,6 +14,17 @@
   $: columns = getContentChildren(content);
   $: columnCount = columns.length;
   $: canRemoveColumn = columnCount > 2;
+  let columnEditors: Array<{ focusContent: (contentId: string) => Promise<boolean> } | undefined> = [];
+
+  export const focusContent = async (contentId: string): Promise<boolean> => {
+    for (const editor of columnEditors) {
+      if (await editor?.focusContent(contentId)) {
+        return true;
+      }
+    }
+
+    return false;
+  };
 
   const handleAddColumn = () => {
     content = {
@@ -79,6 +90,7 @@
         <span class="row-editor-column-meta">{column.length} items</span>
       </div>
       <CardContentBlocksEditor
+        bind:this={columnEditors[columnIndex]}
         bind:contents={content.children[columnIndex]}
         allowFooter={false}
         depth={depth + 1}

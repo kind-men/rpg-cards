@@ -1,6 +1,6 @@
 <script lang="ts">
   import { flip } from 'svelte/animate';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, tick } from 'svelte';
   import { dragHandleZone } from 'svelte-dnd-action';
   import { Button, Icon, Input, InputGroup } from '@sveltestrap/sveltestrap';
   import { createNewCardContent } from '$lib/card-builder';
@@ -29,6 +29,38 @@
   let hasExpandedItems = false;
   let lastSetCollapsedVersion = 0;
   let nestedExpandedById: Record<string, boolean> = {};
+  let listElement: HTMLDivElement;
+  let blockEditors: Array<{ focusNestedContent: (contentId: string) => Promise<boolean> } | undefined> = [];
+
+  export const focusContent = async (contentId: string): Promise<boolean> => {
+    if (!contents.some((content) => content.id === contentId)) {
+      for (const editor of blockEditors) {
+        if (await editor?.focusNestedContent(contentId)) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    collapsedById = {
+      ...collapsedById,
+      [contentId]: false
+    };
+    await tick();
+
+    const editor = Array.from(listElement?.querySelectorAll<HTMLElement>('[data-content-id]') ?? []).find(
+      (element) => element.dataset.contentId === contentId
+    );
+    const field =
+      editor?.querySelector<HTMLElement>(
+        'input:not([disabled]), textarea:not([disabled]), [contenteditable="true"]'
+      ) ?? editor?.querySelector<HTMLElement>('.editor-content-card-title');
+
+    editor?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    field?.focus();
+    return Boolean(field);
+  };
 
   $: availableTypes = CARD_CONTENT_TYPES.filter((type) => allowFooter || type.name !== 'footer');
   $: if (!availableTypes.some((type) => type.name === addType)) {
@@ -123,7 +155,7 @@
   $: dispatch('collapsechange', { hasExpandedItems });
 </script>
 
-<div class="content-editor-list" class:content-editor-list-nested={depth > 0}>
+<div bind:this={listElement} class="content-editor-list" class:content-editor-list-nested={depth > 0}>
   <div
     class="content-editor-items"
     use:dragHandleZone={{ items: contents, flipDurationMs, dropTargetStyle: {} }}
@@ -140,6 +172,7 @@
         >
           <div class="input-stack">
       <CardContentBlockEditor
+              bind:this={blockEditors[index]}
               bind:content
               collapsed={content.id ? (collapsedById[content.id] ?? true) : true}
               on:delete={() => handleDelete(index)}

@@ -6,7 +6,7 @@
   import { onDestroy, onMount } from 'svelte';
   import WorkspaceContentView from '$components/workspace-content-view.svelte';
   import WorkspaceShell from '$components/workspace-shell.svelte';
-  import { deck, pageLayout } from '../../stores';
+  import { deck, deckLoading, pageLayout } from '../../stores';
   import Hint from '../../components/hint.svelte';
   import type { PaperFormat } from '../../model/page-layout';
   import { PAPER_SIZE_PRESETS } from '../../stores/page-layout';
@@ -15,6 +15,8 @@
   let previewNonce = 0;
   let previewLoading = true;
   let refreshTimeout: ReturnType<typeof setTimeout> | undefined;
+  let initialDeckSize: number | undefined;
+  let isLeavingForNewCards = false;
   const paperFormatOptions: { value: PaperFormat; label: string }[] = [
     { value: 'a4', label: 'A4' },
     { value: 'letter', label: 'Letter' },
@@ -113,8 +115,22 @@
   });
 
   onMount(() => {
-    void deck.loadStoredDeck();
+    void (async () => {
+      await deck.loadStoredDeck();
+      initialDeckSize = $deck.length;
+    })();
   });
+
+  $: if (
+    browser &&
+    !isLeavingForNewCards &&
+    !($deckLoading ?? false) &&
+    initialDeckSize !== undefined &&
+    $deck.length > initialDeckSize
+  ) {
+    isLeavingForNewCards = true;
+    void goto(`${base}/`);
+  }
 </script>
 
 <svelte:window on:keydown={handleWindowKeydown} on:message={handlePreviewMessage} />

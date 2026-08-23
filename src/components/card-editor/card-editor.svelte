@@ -18,7 +18,7 @@
     CardBackImageSizePreset,
     CardBackMode
   } from '$model/card';
-  import { currentCard, deck, multiSelect } from '../../stores';
+  import { currentCard, deck, multiSelect, requestedContentEditId } from '../../stores';
   import CardContentBlocksEditor from './card-content-blocks-editor.svelte';
   import CardSetupWizard from './card-setup-wizard.svelte';
   import ColorInput from '../form/color.svelte';
@@ -45,6 +45,8 @@
   let lastLoadedCurrentCard = $currentCard;
   let lastLoadedDeckCard = $currentCard > -1 ? $deck[$currentCard] : undefined;
   let skipNextMultiUpdate = false;
+  let contentBlocksEditor: { focusContent: (contentId: string) => Promise<boolean> } | undefined;
+  let lastRequestedContentEditId: string | null = null;
   $: isMultiEditing = $multiSelect.size > 1;
   $: cardbackMode = card?.cardback_mode ?? 'icon';
   $: cardbackImages = card?.cardback_images ?? [];
@@ -160,6 +162,17 @@
     hasExpandedContentItems = false;
   };
 
+  const focusRequestedContent = async (contentId: string) => {
+    editorPane = 'content';
+    contentEditorMode = 'individual';
+    await tick();
+    await contentBlocksEditor?.focusContent(contentId);
+
+    if ($requestedContentEditId === contentId) {
+      requestedContentEditId.set(null);
+    }
+  };
+
   const updateCardContents = () => {
     try {
       if (!card || contentEditorMode !== 'textfield' || isWizardVisible) {
@@ -184,6 +197,12 @@
   };
 
   $: (void textFieldContent, updateCardContents());
+  $: if (!$requestedContentEditId) {
+    lastRequestedContentEditId = null;
+  } else if ($requestedContentEditId !== lastRequestedContentEditId) {
+    lastRequestedContentEditId = $requestedContentEditId;
+    void focusRequestedContent($requestedContentEditId);
+  }
   $: {
     const nextSelectedDeckCard = $currentCard > -1 ? $deck[$currentCard] : undefined;
     const shouldReloadSelectedCard =
@@ -534,6 +553,7 @@
                   >
                     {#if contentEditorMode === 'individual'}
                       <CardContentBlocksEditor
+                        bind:this={contentBlocksEditor}
                         bind:contents={card.contents}
                         {setCollapsedVersion}
                         {setCollapsed}

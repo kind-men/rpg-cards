@@ -31,6 +31,7 @@
   let splitContent: string[] = [];
   let lastSyncedContentId: string | undefined;
   let lastSyncedSerializedContent = '';
+  let rowEditor: any;
 
   $: typeDescriptor = getContentTypeDescriptor(content.type);
   $: contentEditorComponent = typeDescriptor?.editorComponent;
@@ -117,9 +118,12 @@
   $: if (!isContainerContent(content) && splitContent) {
     updateContent();
   }
+
+  export const focusNestedContent = (contentId: string): Promise<boolean> =>
+    content.type === 'row' ? (rowEditor?.focusContent(contentId) ?? Promise.resolve(false)) : Promise.resolve(false);
 </script>
 
-<div class="editor-content-card">
+<div class="editor-content-card" data-content-id={content.id}>
   <div class="editor-content-card-header" class:editor-content-card-header-collapsed={collapsed}>
     <div class="editor-content-card-heading">
       <button
@@ -172,6 +176,7 @@
       {#if contentEditorComponent && contentEditorBinding === 'content'}
         <svelte:component
           this={contentEditorComponent}
+          bind:this={rowEditor}
           bind:content
           {...contentEditorProps}
           on:collapsechange={(event) => dispatch('collapsechange', event.detail)}

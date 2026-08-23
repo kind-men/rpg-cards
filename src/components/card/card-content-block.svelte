@@ -3,7 +3,7 @@
   import { getContentTypeDescriptor, resolveContentBlockRenderProps } from '$lib/card-content-types';
   import type Card from '$model/card';
   import type { CardContent } from '$model/card';
-  import { hoveredContentId } from '../../stores';
+  import { hoveredContentId, requestedContentEditId } from '../../stores';
 
   export let content: CardContent;
   export let card: Card;
@@ -11,12 +11,30 @@
   $: renderProps = resolveContentBlockRenderProps(content, card);
   $: isHighlighted = Boolean(content.id) && $hoveredContentId === content.id;
   $: paddingRem = getContentVerticalSpacingRemValue(content);
+
+  const requestEditorFocus = () => {
+    if (content.id) {
+      requestedContentEditId.set(content.id);
+    }
+  };
+
+  const handleKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      requestEditorFocus();
+    }
+  };
 </script>
 
 <div
   class:card-content-highlighted={isHighlighted}
   class="card-content-block"
   style={`--card-content-padding-y: ${paddingRem}rem;`}
+  role="button"
+  tabindex="0"
+  aria-label={`Edit ${typeDescriptor?.label ?? content.type} block`}
+  on:click={requestEditorFocus}
+  on:keydown={handleKeydown}
 >
   <svelte:component this={typeDescriptor.renderComponent} {...renderProps} />
 </div>
@@ -28,6 +46,7 @@
     padding-top: var(--card-content-padding-y, 0);
     padding-bottom: var(--card-content-padding-y, 0);
     border-radius: 0.2rem;
+    cursor: pointer;
     transition: background-color 120ms ease, box-shadow 120ms ease;
   }
 

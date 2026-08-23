@@ -10,6 +10,7 @@
   $: [title, rightTitle] = getContentText(content).split(SPLIT_REGEX);
   $: hasLeftTitle = Boolean(title?.trim());
   $: hasRightTitle = Boolean(rightTitle?.trim());
+
 </script>
 
 <h3

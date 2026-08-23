@@ -122,7 +122,6 @@
                   side="front"
                   previewMode={true}
                   previewScale={$settings.previewZoom / 100}
-                  withBorder={$pageLayout.cardBackBorder > 0}
                   style={`
                     --card-width: ${$pageLayout.cardSize.width}mm;
                     --card-height: ${$pageLayout.cardSize.height}mm;
@@ -145,7 +144,6 @@
                   side="back"
                   previewMode={true}
                   previewScale={$settings.previewZoom / 100}
-                  withBorder={$pageLayout.cardBackBorder > 0}
                   style={`
                     --card-width: ${$pageLayout.cardSize.width}mm;
                     --card-height: ${$pageLayout.cardSize.height}mm;

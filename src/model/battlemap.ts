@@ -20,17 +20,21 @@ export interface BattlemapRect {
 }
 
 export type BattlemapGridOverlay = 'none' | 'light' | 'dark';
+export type BattlemapPageOrientation = 'portrait' | 'landscape';
 
 export interface BattlemapCalibration {
   start?: BattlemapPoint;
   end?: BattlemapPoint;
+  square?: Omit<BattlemapRect, 'id' | 'name'>;
   gridOrigin?: BattlemapPoint;
+  pixelsPerSquare?: number;
   squareCount: number;
 }
 
 export interface BattlemapPrintSettings {
   paperFormat: PaperFormat;
   paperSize: BattlemapSize;
+  orientation: BattlemapPageOrientation;
   margins: {
     top: number;
     right: number;
@@ -42,6 +46,7 @@ export interface BattlemapPrintSettings {
     y?: number;
   };
   gridOverlay: BattlemapGridOverlay;
+  gridOffset: BattlemapPoint;
   showCropMarks: boolean;
   snapToGrid: boolean;
 }

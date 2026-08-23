@@ -3,17 +3,25 @@
   import { onMount, tick } from 'svelte';
   import {
     getMapPrintSize,
+    getOrientedPaperSize,
     getPixelsPerSquare,
     getRectCropOffset,
-    getRectPrintSize
+    getRectPrintSize,
+    normalizeBattlemapProject,
+    pixelsToMillimeters
   } from '$lib/battlemap';
   import { battlemapProject } from '../../../stores/battlemap';
+
+  type BattlemapPrintWindow = Window & {
+    __rpgCardsMapPrintProjects?: Record<string, string>;
+  };
 
   let outputReady = false;
 
   $: project = $battlemapProject;
   $: pixelsPerSquare = getPixelsPerSquare(project);
   $: mapPrintSize = getMapPrintSize(project.imageSize, pixelsPerSquare);
+  $: paperSize = getOrientedPaperSize(project.print);
   $: hasPrintableOutput = project.imageSrc && pixelsPerSquare > 0 && project.pages.length > 0;
 
   const notifyReady = async () => {
@@ -38,7 +46,31 @@
     });
   };
 
+  const hydratePreviewProject = () => {
+    if (!browser) {
+      return;
+    }
+
+    const previewToken = new URL(window.location.href).searchParams.get('preview') ?? '';
+    const parentPrintWindow =
+      window.parent !== window ? (window.parent as BattlemapPrintWindow) : undefined;
+    const storedProject =
+      parentPrintWindow?.__rpgCardsMapPrintProjects?.[previewToken] ??
+      sessionStorage.getItem(`rpg-cards-map-print-project:${previewToken}`);
+
+    if (!storedProject) {
+      return;
+    }
+
+    try {
+      battlemapProject.set(normalizeBattlemapProject(JSON.parse(storedProject)));
+    } catch (error) {
+      console.warn('Unable to read battlemap print preview snapshot.', error);
+    }
+  };
+
   onMount(() => {
+    hydratePreviewProject();
     void notifyReady();
   });
 
@@ -52,8 +84,8 @@
     class:map-output-visible={outputReady}
     class="map-output"
     style={`
-      --paper-width: ${project.print.paperSize.width}mm;
-      --paper-height: ${project.print.paperSize.height}mm;
+      --paper-width: ${paperSize.width}mm;
+      --paper-height: ${paperSize.height}mm;
       --margin-top: ${project.print.margins.top}mm;
       --margin-right: ${project.print.margins.right}mm;
       --margin-bottom: ${project.print.margins.bottom}mm;
@@ -76,6 +108,8 @@
           style={`
             width: ${rectSize.width}mm;
             height: ${rectSize.height}mm;
+            --page-grid-offset-x: ${pixelsToMillimeters(project.print.gridOffset.x - page.x, pixelsPerSquare)}mm;
+            --page-grid-offset-y: ${pixelsToMillimeters(project.print.gridOffset.y - page.y, pixelsPerSquare)}mm;
           `}
         >
           <img
@@ -166,6 +200,7 @@
     background-image:
       linear-gradient(to right, var(--grid-color) 0.2mm, transparent 0.2mm),
       linear-gradient(to bottom, var(--grid-color) 0.2mm, transparent 0.2mm);
+    background-position: var(--page-grid-offset-x) var(--page-grid-offset-y);
     background-size: 25.4mm 25.4mm;
   }
 

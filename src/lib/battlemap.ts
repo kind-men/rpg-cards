@@ -8,10 +8,12 @@ import type {
 } from '../model/battlemap';
 
 export const MM_PER_INCH = 25.4;
+export const DEFAULT_PIXELS_PER_INCH = 70;
 
 export const defaultBattlemapPrintSettings: BattlemapPrintSettings = {
   paperFormat: 'a4',
   paperSize: { ...PAPER_SIZE_PRESETS.a4 },
+  orientation: 'portrait',
   margins: {
     top: 10,
     right: 10,
@@ -23,6 +25,10 @@ export const defaultBattlemapPrintSettings: BattlemapPrintSettings = {
     y: undefined
   },
   gridOverlay: 'none',
+  gridOffset: {
+    x: 0,
+    y: 0
+  },
   showCropMarks: true,
   snapToGrid: true
 };
@@ -35,6 +41,7 @@ export const createEmptyBattlemapProject = (): BattlemapProject => ({
     height: 0
   },
   calibration: {
+    pixelsPerSquare: DEFAULT_PIXELS_PER_INCH,
     squareCount: 1
   },
   print: structuredClone(defaultBattlemapPrintSettings),
@@ -49,12 +56,32 @@ export const getDistance = (a?: BattlemapPoint, b?: BattlemapPoint): number => {
   return Math.hypot(b.x - a.x, b.y - a.y);
 };
 
+export const getCalibrationSquarePixels = (
+  square?: Pick<BattlemapRect, 'width' | 'height'>
+): number => {
+  if (!square || square.width <= 0 || square.height <= 0) {
+    return 0;
+  }
+
+  return (square.width + square.height) / 2;
+};
+
 export const getPixelsPerSquare = (project: Pick<BattlemapProject, 'calibration'>): number => {
+  if (project.calibration.pixelsPerSquare && project.calibration.pixelsPerSquare > 0) {
+    return project.calibration.pixelsPerSquare;
+  }
+
+  const squarePixels = getCalibrationSquarePixels(project.calibration.square);
+
+  if (squarePixels > 0) {
+    return squarePixels;
+  }
+
   const distance = getDistance(project.calibration.start, project.calibration.end);
   const squareCount = 1;
 
   if (distance <= 0 || squareCount <= 0) {
-    return 0;
+    return DEFAULT_PIXELS_PER_INCH;
   }
 
   return distance / squareCount;
@@ -76,10 +103,28 @@ export const getMapPrintSize = (imageSize: BattlemapSize, pixelsPerSquare: numbe
   height: pixelsToMillimeters(imageSize.height, pixelsPerSquare)
 });
 
-export const getPrintablePaperSize = (print: BattlemapPrintSettings): BattlemapSize => ({
-  width: Math.max(0, print.paperSize.width - print.margins.left - print.margins.right),
-  height: Math.max(0, print.paperSize.height - print.margins.top - print.margins.bottom)
-});
+export const getOrientedPaperSize = (print: BattlemapPrintSettings): BattlemapSize => {
+  if (print.orientation === 'landscape') {
+    return {
+      width: Math.max(print.paperSize.width, print.paperSize.height),
+      height: Math.min(print.paperSize.width, print.paperSize.height)
+    };
+  }
+
+  return {
+    width: Math.min(print.paperSize.width, print.paperSize.height),
+    height: Math.max(print.paperSize.width, print.paperSize.height)
+  };
+};
+
+export const getPrintablePaperSize = (print: BattlemapPrintSettings): BattlemapSize => {
+  const paperSize = getOrientedPaperSize(print);
+
+  return {
+    width: Math.max(0, paperSize.width - print.margins.left - print.margins.right),
+    height: Math.max(0, paperSize.height - print.margins.top - print.margins.bottom)
+  };
+};
 
 export const getPrintablePaperSizePixels = (
   print: BattlemapPrintSettings,
@@ -131,6 +176,34 @@ export const clampRectToImage = (
   };
 };
 
+export const resizePagesForPixelsPerSquare = (
+  pages: BattlemapRect[],
+  imageSize: BattlemapSize,
+  previousPixelsPerSquare: number,
+  nextPixelsPerSquare: number
+): BattlemapRect[] => {
+  if (
+    previousPixelsPerSquare <= 0 ||
+    nextPixelsPerSquare <= 0 ||
+    previousPixelsPerSquare === nextPixelsPerSquare
+  ) {
+    return pages;
+  }
+
+  const scale = nextPixelsPerSquare / previousPixelsPerSquare;
+
+  return pages.map((page) =>
+    clampRectToImage(
+      {
+        ...page,
+        width: page.width * scale,
+        height: page.height * scale
+      },
+      imageSize
+    )
+  );
+};
+
 export const createAutoBattlemapPages = (project: BattlemapProject): BattlemapRect[] => {
   const pixelsPerSquare = getPixelsPerSquare(project);
   const pageSize = getPrintablePaperSizePixels(project.print, pixelsPerSquare);
@@ -171,6 +244,18 @@ export const normalizeBattlemapProject = (
           height: project?.print?.paperSize?.height ?? fallback.print.paperSize.height
         }
       : { ...PAPER_SIZE_PRESETS[paperFormat] };
+  const orientation =
+    project?.print?.orientation ?? (paperSize.width > paperSize.height ? 'landscape' : fallback.print.orientation);
+  const squarePixels = getCalibrationSquarePixels(project?.calibration?.square);
+  const measuredPixelsPerSquare = getDistance(project?.calibration?.start, project?.calibration?.end);
+  const pixelsPerSquare =
+    project?.calibration?.pixelsPerSquare && project.calibration.pixelsPerSquare > 0
+      ? project.calibration.pixelsPerSquare
+      : squarePixels > 0
+        ? squarePixels
+        : measuredPixelsPerSquare > 0
+          ? measuredPixelsPerSquare
+          : fallback.calibration.pixelsPerSquare;
 
   return {
     ...fallback,
@@ -182,6 +267,7 @@ export const normalizeBattlemapProject = (
     calibration: {
       ...fallback.calibration,
       ...project?.calibration,
+      pixelsPerSquare,
       squareCount: 1
     },
     print: {
@@ -189,6 +275,7 @@ export const normalizeBattlemapProject = (
       ...project?.print,
       paperFormat,
       paperSize,
+      orientation,
       margins: {
         ...fallback.print.margins,
         ...project?.print?.margins
@@ -196,6 +283,10 @@ export const normalizeBattlemapProject = (
       adjust: {
         ...fallback.print.adjust,
         ...project?.print?.adjust
+      },
+      gridOffset: {
+        ...fallback.print.gridOffset,
+        ...project?.print?.gridOffset
       }
     },
     pages: project?.pages ?? []

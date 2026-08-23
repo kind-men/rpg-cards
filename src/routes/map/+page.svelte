@@ -7,16 +7,22 @@
   import {
     clampRectToImage,
     createAutoBattlemapPages,
+    DEFAULT_PIXELS_PER_INCH,
+    getCalibrationSquarePixels,
+    getOrientedPaperSize,
     getPixelsPerSquare,
     getPrintablePaperSizePixels,
     getRectPrintSize,
+    millimetersToPixels,
     normalizeBattlemapProject,
+    pixelsToMillimeters,
+    resizePagesForPixelsPerSquare,
     snapToGrid
   } from '$lib/battlemap';
-  import type { BattlemapPoint, BattlemapRect } from '$model/battlemap';
+  import type { BattlemapGridOverlay, BattlemapPageOrientation, BattlemapPoint, BattlemapRect } from '$model/battlemap';
+  import type { PaperFormat } from '$model/page-layout';
+  import { PAPER_SIZE_PRESETS } from '../../stores/page-layout';
   import { battlemapProject } from '../../stores/battlemap';
-
-  type CalibrationPoint = 'start' | 'end';
 
   let imageFileSelector: HTMLInputElement;
   let projectFileSelector: HTMLInputElement;
@@ -24,12 +30,20 @@
   let mapStageElement: HTMLDivElement;
   let mapScrollShellElement: HTMLDivElement;
   let downloadUrl = '';
-  let pendingCalibrationPoint: CalibrationPoint | undefined;
+  let pendingCalibrationSquare = false;
+  let calibrationDrag:
+    | {
+        start: BattlemapPoint;
+        current: BattlemapPoint;
+      }
+    | undefined;
+  let calibrationDraft: { x: number; y: number; width: number; height: number } | undefined;
   let selectedPageId = '';
   let zoom = 35;
   let panOffset: BattlemapPoint = { x: 24, y: 24 };
   let projectWarning = '';
   let generalMenuOpen = false;
+  let showPageMargins = false;
   let didPan = false;
   let drag:
     | {
@@ -45,12 +59,36 @@
         startOffset: BattlemapPoint;
       }
     | undefined;
+  const paperFormatOptions: { value: PaperFormat; label: string }[] = [
+    { value: 'a4', label: 'A4' },
+    { value: 'letter', label: 'Letter' },
+    { value: 'legal', label: 'Legal' },
+    { value: 'a3', label: 'A3' },
+    { value: 'a5', label: 'A5' },
+    { value: 'custom', label: 'Custom' }
+  ];
+  const gridOverlayOptions: { value: BattlemapGridOverlay; label: string }[] = [
+    { value: 'none', label: 'None' },
+    { value: 'light', label: 'Light' },
+    { value: 'dark', label: 'Dark' }
+  ];
 
   $: project = $battlemapProject;
   $: pixelsPerSquare = getPixelsPerSquare(project);
   $: isCalibrated = pixelsPerSquare > 0;
   $: selectedPage = project.pages.find((page) => page.id === selectedPageId);
   $: printablePageSize = getPrintablePaperSizePixels(project.print, pixelsPerSquare);
+  $: orientedPaperSize = getOrientedPaperSize(project.print);
+  $: selectedPagePrintSize = selectedPage ? getRectPrintSize(selectedPage, pixelsPerSquare) : undefined;
+  $: selectedPagePrintTotal = selectedPagePrintSize
+    ? {
+        width: selectedPagePrintSize.width + project.print.margins.left + project.print.margins.right,
+        height: selectedPagePrintSize.height + project.print.margins.top + project.print.margins.bottom
+      }
+    : undefined;
+  $: selectedPageWidthInvalid = !!selectedPagePrintTotal && selectedPagePrintTotal.width > orientedPaperSize.width;
+  $: selectedPageHeightInvalid = !!selectedPagePrintTotal && selectedPagePrintTotal.height > orientedPaperSize.height;
+  $: selectedPageInvalid = selectedPageWidthInvalid || selectedPageHeightInvalid;
 
   const getStageImagePoint = (event: PointerEvent | MouseEvent): BattlemapPoint | null => {
     if (!mapStageElement || !project.imageSize.width || !project.imageSize.height) {
@@ -98,13 +136,16 @@
       imageSrc,
       imageSize,
       calibration: {
+        pixelsPerSquare: DEFAULT_PIXELS_PER_INCH,
         squareCount: 1
       },
       pages: []
     }));
 
     selectedPageId = '';
-    pendingCalibrationPoint = undefined;
+    pendingCalibrationSquare = false;
+    calibrationDrag = undefined;
+    calibrationDraft = undefined;
     panOffset = { x: 24, y: 24 };
     imageFileSelector.value = '';
   };
@@ -140,13 +181,15 @@
     setTimeout(() => URL.revokeObjectURL(downloadUrl), 500);
   };
 
-  const handleMapClick = (event: MouseEvent) => {
-    if (didPan) {
-      didPan = false;
-      return;
-    }
+  const getRectFromPoints = (start: BattlemapPoint, end: BattlemapPoint) => ({
+    x: Math.min(start.x, end.x),
+    y: Math.min(start.y, end.y),
+    width: Math.abs(end.x - start.x),
+    height: Math.abs(end.y - start.y)
+  });
 
-    if (!pendingCalibrationPoint) {
+  const startCalibrationSquareDrag = (event: PointerEvent) => {
+    if (!pendingCalibrationSquare || event.button !== 0) {
       return;
     }
 
@@ -155,41 +198,67 @@
       return;
     }
 
-    const pointKey = pendingCalibrationPoint;
-    battlemapProject.update((current) => ({
-      ...current,
-      calibration: {
-        ...current.calibration,
-        [pointKey]: point,
-        gridOrigin: current.calibration.gridOrigin ?? point
-      }
-    }));
+    event.preventDefault();
+    event.stopPropagation();
+    calibrationDrag = {
+      start: point,
+      current: point
+    };
+    calibrationDraft = getRectFromPoints(point, point);
+    didPan = false;
+  };
 
-    pendingCalibrationPoint = undefined;
+  const commitCalibrationSquare = () => {
+    if (!calibrationDraft || calibrationDraft.width < 4 || calibrationDraft.height < 4) {
+      calibrationDrag = undefined;
+      calibrationDraft = undefined;
+      pendingCalibrationSquare = false;
+      return;
+    }
+
+    const square = { ...calibrationDraft };
+    const nextPixelsPerSquare = getCalibrationSquarePixels(square);
+
+    battlemapProject.update((current) => {
+      const previousPixelsPerSquare = getPixelsPerSquare(current);
+
+      return {
+        ...current,
+        calibration: {
+          ...current.calibration,
+          start: undefined,
+          end: undefined,
+          square,
+          gridOrigin: {
+            x: square.x,
+            y: square.y
+          },
+          pixelsPerSquare: nextPixelsPerSquare,
+          squareCount: 1
+        },
+        pages: resizePagesForPixelsPerSquare(
+          current.pages,
+          current.imageSize,
+          previousPixelsPerSquare,
+          nextPixelsPerSquare
+        )
+      };
+    });
+
+    calibrationDrag = undefined;
+    calibrationDraft = undefined;
+    pendingCalibrationSquare = false;
   };
 
   const handleMapKeydown = (event: KeyboardEvent) => {
-    if (!pendingCalibrationPoint || (event.key !== 'Enter' && event.key !== ' ')) {
+    if (!pendingCalibrationSquare || event.key !== 'Escape') {
       return;
     }
 
     event.preventDefault();
-    const fallbackPoint = {
-      x: project.imageSize.width / 2,
-      y: project.imageSize.height / 2
-    };
-    const pointKey = pendingCalibrationPoint;
-
-    battlemapProject.update((current) => ({
-      ...current,
-      calibration: {
-        ...current.calibration,
-        [pointKey]: fallbackPoint,
-        gridOrigin: current.calibration.gridOrigin ?? fallbackPoint
-      }
-    }));
-
-    pendingCalibrationPoint = undefined;
+    pendingCalibrationSquare = false;
+    calibrationDrag = undefined;
+    calibrationDraft = undefined;
   };
 
   const addPage = () => {
@@ -236,11 +305,18 @@
       return;
     }
 
+    removePage(selectedPageId);
+  };
+
+  const removePage = (pageId: string) => {
     battlemapProject.update((current) => ({
       ...current,
-      pages: current.pages.filter((page) => page.id !== selectedPageId)
+      pages: current.pages.filter((page) => page.id !== pageId)
     }));
-    selectedPageId = '';
+
+    if (selectedPageId === pageId) {
+      selectedPageId = '';
+    }
   };
 
   const updateSelectedPage = (patch: Partial<BattlemapRect>) => {
@@ -256,6 +332,27 @@
           : page
       )
     }));
+  };
+
+  const updateSelectedPageMillimeters = (
+    field: 'x' | 'y' | 'width' | 'height',
+    event: Event
+  ) => {
+    const value = Number((event.currentTarget as HTMLInputElement).value);
+    updateSelectedPage({
+      [field]: millimetersToPixels(Math.max(0, value || 0), pixelsPerSquare)
+    });
+  };
+
+  const getPagePrintSize = (page: BattlemapRect) => getRectPrintSize(page, pixelsPerSquare);
+
+  const isPagePrintSizeInvalid = (page: BattlemapRect) => {
+    const printSize = getPagePrintSize(page);
+
+    return (
+      printSize.width + project.print.margins.left + project.print.margins.right > orientedPaperSize.width ||
+      printSize.height + project.print.margins.top + project.print.margins.bottom > orientedPaperSize.height
+    );
   };
 
   const startPageDrag = (event: PointerEvent, page: BattlemapRect, type: 'move' | 'resize') => {
@@ -274,6 +371,18 @@
   };
 
   const handleWindowPointerMove = (event: PointerEvent) => {
+    if (calibrationDrag) {
+      const point = getStageImagePoint(event);
+      if (point) {
+        calibrationDrag = {
+          ...calibrationDrag,
+          current: point
+        };
+        calibrationDraft = getRectFromPoints(calibrationDrag.start, point);
+      }
+      return;
+    }
+
     if (pan && mapScrollShellElement) {
       const dx = event.clientX - pan.startClient.x;
       const dy = event.clientY - pan.startClient.y;
@@ -336,12 +445,16 @@
   };
 
   const stopDrag = () => {
+    if (calibrationDrag) {
+      commitCalibrationSquare();
+    }
+
     drag = undefined;
     pan = undefined;
   };
 
   const startMapPan = (event: PointerEvent) => {
-    if (pendingCalibrationPoint || event.button !== 0) {
+    if (pendingCalibrationSquare || event.button !== 0) {
       return;
     }
 
@@ -407,16 +520,115 @@
     }));
   };
 
+  const setPixelsPerSquare = (event: Event) => {
+    const pixelsPerSquare = Number((event.currentTarget as HTMLInputElement).value);
+    battlemapProject.update((current) => {
+      const previousPixelsPerSquare = getPixelsPerSquare(current);
+      const nextPixelsPerSquare = Math.max(1, pixelsPerSquare || DEFAULT_PIXELS_PER_INCH);
+
+      return {
+        ...current,
+        calibration: {
+          ...current.calibration,
+          pixelsPerSquare: nextPixelsPerSquare,
+          squareCount: 1
+        },
+        pages: resizePagesForPixelsPerSquare(
+          current.pages,
+          current.imageSize,
+          previousPixelsPerSquare,
+          nextPixelsPerSquare
+        )
+      };
+    });
+  };
+
+  const setPageOrientation = (event: Event) => {
+    const orientation = (event.currentTarget as HTMLSelectElement).value as BattlemapPageOrientation;
+    battlemapProject.update((current) => ({
+      ...current,
+      print: {
+        ...current.print,
+        orientation
+      }
+    }));
+  };
+
+  const setPaperFormat = (event: Event) => {
+    const paperFormat = (event.currentTarget as HTMLSelectElement).value as PaperFormat;
+    battlemapProject.update((current) => ({
+      ...current,
+      print: {
+        ...current.print,
+        paperFormat,
+        paperSize:
+          paperFormat === 'custom' ? { ...current.print.paperSize } : { ...PAPER_SIZE_PRESETS[paperFormat] }
+      }
+    }));
+  };
+
+  const setMargin = (side: 'top' | 'right' | 'bottom' | 'left', event: Event) => {
+    const value = Number((event.currentTarget as HTMLInputElement).value);
+    battlemapProject.update((current) => ({
+      ...current,
+      print: {
+        ...current.print,
+        margins: {
+          ...current.print.margins,
+          [side]: Math.max(0, value || 0)
+        }
+      }
+    }));
+  };
+
+  const setGridOverlay = (event: Event) => {
+    const gridOverlay = (event.currentTarget as HTMLSelectElement).value as BattlemapGridOverlay;
+    battlemapProject.update((current) => ({
+      ...current,
+      print: {
+        ...current.print,
+        gridOverlay
+      }
+    }));
+  };
+
+  const setGridOffset = (axis: 'x' | 'y', event: Event) => {
+    const value = Number((event.currentTarget as HTMLInputElement).value);
+    battlemapProject.update((current) => ({
+      ...current,
+      print: {
+        ...current.print,
+        gridOffset: {
+          ...current.print.gridOffset,
+          [axis]: value || 0
+        }
+      }
+    }));
+  };
+
   const handlePrint = async () => {
     generalMenuOpen = false;
     await goto(`${base}/map/print`);
+  };
+
+  const handleWindowKeydown = (event: KeyboardEvent) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.code === 'KeyP') {
+      event.preventDefault();
+      void handlePrint();
+    }
   };
 
   const resetProject = () => {
     generalMenuOpen = false;
     battlemapProject.reset();
     selectedPageId = '';
-    pendingCalibrationPoint = undefined;
+    pendingCalibrationSquare = false;
+    calibrationDrag = undefined;
+    calibrationDraft = undefined;
     panOffset = { x: 24, y: 24 };
     projectWarning = '';
   };
@@ -439,14 +651,25 @@
     generalMenuOpen = false;
     handleExportProject();
   };
+
+  const toggleCalibrationSquare = () => {
+    pendingCalibrationSquare = !pendingCalibrationSquare;
+    calibrationDrag = undefined;
+    calibrationDraft = undefined;
+  };
 </script>
 
-<svelte:window on:click={closeGeneralMenu} on:pointermove={handleWindowPointerMove} on:pointerup={stopDrag} />
+<svelte:window
+  on:click={closeGeneralMenu}
+  on:keydown={handleWindowKeydown}
+  on:pointermove={handleWindowPointerMove}
+  on:pointerup={stopDrag}
+/>
 
-<div class="map-workspace">
+<div class="map-workspace" class:map-workspace-has-inspector={!!selectedPage}>
   <nav class="map-mode-rail" aria-label="Workspace modes">
     <a class="map-mode-button" href={`${base}/`} aria-label="Cards">
-      <Icon name="card-text" />
+      <Icon name="phone" />
     </a>
     <a class="map-mode-button map-mode-button-active" href={`${base}/map`} aria-label="Battlemaps">
       <Icon name="map" />
@@ -516,137 +739,211 @@
     </section>
 
     <section class="map-panel">
-      <h2>Calibration</h2>
+      <h2>Grid</h2>
       <div class="map-form">
         <div class="map-action-grid">
           <button
             type="button"
-            class:map-button-active={pendingCalibrationPoint === 'start'}
+            class:map-button-active={pendingCalibrationSquare}
             class="map-button"
             disabled={!project.imageSrc}
-            on:click={() => (pendingCalibrationPoint = 'start')}
+            on:click={toggleCalibrationSquare}
           >
-            <Icon name="crosshair" />
-            <span>Point A</span>
-          </button>
-          <button
-            type="button"
-            class:map-button-active={pendingCalibrationPoint === 'end'}
-            class="map-button"
-            disabled={!project.imageSrc}
-            on:click={() => (pendingCalibrationPoint = 'end')}
-          >
-            <Icon name="crosshair2" />
-            <span>Point B</span>
+            <Icon name="bounding-box" />
+            <span>Draw square</span>
           </button>
         </div>
-        <div class="map-status">
-          {#if isCalibrated}
-            <strong>{pixelsPerSquare.toFixed(2)} px</strong> per 1 inch square
-          {:else if project.imageSrc}
-            Mark two adjacent grid intersections on the map.
-          {:else}
-            Load a map image to begin.
-          {/if}
+        <div class="map-field">
+          <Label for="map-pixels-per-inch">Pixels per 1 inch square</Label>
+          <InputGroup id="map-pixels-per-inch">
+            <Input
+              type="number"
+              min="1"
+              step="0.1"
+              value={pixelsPerSquare.toFixed(2)}
+              on:input={setPixelsPerSquare}
+            />
+            <InputGroupText>px</InputGroupText>
+          </InputGroup>
         </div>
+        <div class="map-field">
+          <Label for="map-grid-overlay">Grid overlay</Label>
+          <Input id="map-grid-overlay" type="select" value={project.print.gridOverlay} on:change={setGridOverlay}>
+            {#each gridOverlayOptions as option}
+              <option value={option.value}>{option.label}</option>
+            {/each}
+          </Input>
+        </div>
+        {#if project.print.gridOverlay !== 'none'}
+          <div class="map-field">
+            <Label for="map-grid-offset">Grid offset</Label>
+            <div id="map-grid-offset" class="map-field-grid">
+              <InputGroup>
+                <InputGroupText>X</InputGroupText>
+                <Input type="number" value={project.print.gridOffset.x} on:input={(event) => setGridOffset('x', event)} />
+                <InputGroupText>px</InputGroupText>
+              </InputGroup>
+              <InputGroup>
+                <InputGroupText>Y</InputGroupText>
+                <Input type="number" value={project.print.gridOffset.y} on:input={(event) => setGridOffset('y', event)} />
+                <InputGroupText>px</InputGroupText>
+              </InputGroup>
+            </div>
+          </div>
+        {/if}
       </div>
     </section>
 
     <section class="map-panel">
       <div class="map-panel-header">
         <h2>Pages</h2>
-        <span class="map-count">{project.pages.length}</span>
       </div>
       <div class="map-form">
-        <label class="map-toggle">
-          <span>Snap to grid</span>
-          <Input type="checkbox" checked={project.print.snapToGrid} on:change={setSnapToGrid} />
-        </label>
-        <div class="map-action-grid">
-          <button type="button" class="map-button" disabled={!project.imageSrc} on:click={addPage}>
-            <Icon name="plus-lg" />
-            <span>Add page</span>
-          </button>
-          <button type="button" class="map-button" disabled={!isCalibrated} on:click={generatePages}>
+        <div class="map-field">
+          <div class="map-field-label-row">
+            <Label for="map-page-paper-size">Paper size</Label>
+            <button
+              type="button"
+              class:map-icon-toggle-active={showPageMargins}
+              class="map-icon-toggle"
+              aria-label={showPageMargins ? 'Hide margins' : 'Show margins'}
+              aria-expanded={showPageMargins}
+              aria-controls="map-page-margins"
+              on:click={() => (showPageMargins = !showPageMargins)}
+            >
+              <Icon name="fullscreen" />
+            </button>
+          </div>
+          <Input
+            id="map-page-paper-size"
+            type="select"
+            value={project.print.paperFormat}
+            on:change={setPaperFormat}
+          >
+            {#each paperFormatOptions as option}
+              <option value={option.value}>{option.label}</option>
+            {/each}
+          </Input>
+        </div>
+        {#if showPageMargins}
+          <div class="map-field">
+            <Label for="map-page-margins">Margins</Label>
+            <div id="map-page-margins" class="map-field-grid">
+              <InputGroup>
+                <InputGroupText>T</InputGroupText>
+                <Input type="number" value={project.print.margins.top} on:input={(event) => setMargin('top', event)} />
+                <InputGroupText>mm</InputGroupText>
+              </InputGroup>
+              <InputGroup>
+                <InputGroupText>R</InputGroupText>
+                <Input type="number" value={project.print.margins.right} on:input={(event) => setMargin('right', event)} />
+                <InputGroupText>mm</InputGroupText>
+              </InputGroup>
+              <InputGroup>
+                <InputGroupText>B</InputGroupText>
+                <Input type="number" value={project.print.margins.bottom} on:input={(event) => setMargin('bottom', event)} />
+                <InputGroupText>mm</InputGroupText>
+              </InputGroup>
+              <InputGroup>
+                <InputGroupText>L</InputGroupText>
+                <Input type="number" value={project.print.margins.left} on:input={(event) => setMargin('left', event)} />
+                <InputGroupText>mm</InputGroupText>
+              </InputGroup>
+            </div>
+          </div>
+        {/if}
+        <div class="map-auto-pages-row">
+          <Input
+            aria-label="Page orientation"
+            class="map-orientation-select"
+            type="select"
+            value={project.print.orientation}
+            on:change={setPageOrientation}
+          >
+            <option value="portrait">Portrait</option>
+            <option value="landscape">Landscape</option>
+          </Input>
+          <button
+            type="button"
+            class="map-button map-button-wide"
+            disabled={!project.imageSrc}
+            on:click={generatePages}
+          >
             <Icon name="grid-3x3" />
             <span>Auto pages</span>
           </button>
         </div>
-        <button type="button" class="map-button map-button-danger" disabled={!selectedPageId} on:click={removeSelectedPage}>
-          <Icon name="trash" />
-          <span>Delete selected</span>
-        </button>
-
-        {#if selectedPage}
-          <div class="map-page-fields">
-            <div class="map-field">
-              <Label for="selected-page-name">Name</Label>
-              <Input
-                id="selected-page-name"
-                value={selectedPage.name}
-                on:input={(event) => updateSelectedPage({ name: event.currentTarget.value })}
-              />
-            </div>
-            <div class="map-field-grid">
-              <InputGroup>
-                <InputGroupText>X</InputGroupText>
-                <Input
-                  type="number"
-                  value={Math.round(selectedPage.x)}
-                  on:input={(event) => updateSelectedPage({ x: Number(event.currentTarget.value) || 0 })}
-                />
-              </InputGroup>
-              <InputGroup>
-                <InputGroupText>Y</InputGroupText>
-                <Input
-                  type="number"
-                  value={Math.round(selectedPage.y)}
-                  on:input={(event) => updateSelectedPage({ y: Number(event.currentTarget.value) || 0 })}
-                />
-              </InputGroup>
-              <InputGroup>
-                <InputGroupText>W</InputGroupText>
-                <Input
-                  type="number"
-                  value={Math.round(selectedPage.width)}
-                  on:input={(event) => updateSelectedPage({ width: Number(event.currentTarget.value) || 1 })}
-                />
-              </InputGroup>
-              <InputGroup>
-                <InputGroupText>H</InputGroupText>
-                <Input
-                  type="number"
-                  value={Math.round(selectedPage.height)}
-                  on:input={(event) => updateSelectedPage({ height: Number(event.currentTarget.value) || 1 })}
-                />
-              </InputGroup>
-            </div>
-            {#if isCalibrated}
-              <div class="map-status">
-                Prints {getRectPrintSize(selectedPage, pixelsPerSquare).width.toFixed(1)} x
-                {getRectPrintSize(selectedPage, pixelsPerSquare).height.toFixed(1)} mm
-              </div>
-            {/if}
-          </div>
-        {/if}
+        <label class="map-toggle">
+          <span>Snap to grid</span>
+          <Input type="checkbox" checked={project.print.snapToGrid} on:change={setSnapToGrid} />
+        </label>
       </div>
     </section>
 
-    <section class="map-panel map-panel-grow">
-      <h2>Page list</h2>
-      <div class="map-page-list">
-        {#each project.pages as page}
+    <section class="map-panel map-panel-grow map-pages-wrapper">
+      <div class="map-pages-list-header">
+        <div class="map-pages-list-title">
+          <span>Pages</span>
+          {#if project.pages.length > 0}
+            <span class="map-pages-count">{project.pages.length}</span>
+          {/if}
+        </div>
+        <div class="map-pages-list-actions">
           <button
+            class="map-pages-header-action"
             type="button"
+            aria-label="Add page"
+            disabled={!project.imageSrc}
+            on:click={addPage}
+          >
+            <Icon name="plus-lg" />
+          </button>
+        </div>
+      </div>
+
+      <div class="map-page-list" role="list">
+        {#each project.pages as page}
+          <div
             class:map-page-row-active={page.id === selectedPageId}
             class="map-page-row"
+            role="button"
+            tabindex="0"
             on:click={() => (selectedPageId = page.id)}
+            on:keydown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                selectedPageId = page.id;
+              }
+            }}
           >
-            <span>{page.name}</span>
-            <small>{Math.round(page.width)} x {Math.round(page.height)} px</small>
-          </button>
+            <span class="map-page-row-main">
+              <span class="map-page-row-icon">
+                <Icon name="file-earmark" />
+              </span>
+              <span class="map-page-row-text">
+                <span class="map-page-row-title">{page.name}</span>
+                <small>
+                  {Math.round(pixelsToMillimeters(page.width, pixelsPerSquare))} mm x
+                  {Math.round(pixelsToMillimeters(page.height, pixelsPerSquare))} mm
+                </small>
+              </span>
+            </span>
+            <span class="map-page-row-actions">
+              <button
+                type="button"
+                class="map-page-row-action"
+                aria-label={`Delete ${page.name}`}
+                on:click={(event) => {
+                  event.stopPropagation();
+                  removePage(page.id);
+                }}
+              >
+                <Icon name="trash" />
+              </button>
+            </span>
+          </div>
         {:else}
-          <div class="map-empty">No print pages yet.</div>
+          <div class="map-empty map-pages-empty">No print pages yet.</div>
         {/each}
       </div>
     </section>
@@ -670,23 +967,26 @@
           </InputGroupText>
         </InputGroup>
       </div>
-      {#if pendingCalibrationPoint}
-        <div class="map-canvas-hint">Click the map to place point {pendingCalibrationPoint === 'start' ? 'A' : 'B'}.</div>
+      {#if pendingCalibrationSquare}
+        <div class="map-canvas-hint">Drag around one grid square on the map.</div>
       {/if}
     </div>
 
     <div
       bind:this={mapScrollShellElement}
-      class:map-scroll-shell-calibrating={!!pendingCalibrationPoint}
+      class:map-scroll-shell-calibrating={pendingCalibrationSquare}
       class:map-scroll-shell-panning={!!pan}
       class="map-scroll-shell"
+      role="region"
+      aria-label="Battlemap canvas"
       on:wheel|nonpassive={handleMapWheel}
+      on:pointerdown={startMapPan}
     >
       {#if project.imageSrc}
         <div
           bind:this={mapStageElement}
           class="map-stage"
-          class:map-stage-calibrating={!!pendingCalibrationPoint}
+          class:map-stage-calibrating={pendingCalibrationSquare}
           role="button"
           tabindex="0"
           style={`
@@ -694,35 +994,51 @@
             height: ${project.imageSize.height}px;
             transform: translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoom / 100});
           `}
-          on:click={handleMapClick}
           on:keydown={handleMapKeydown}
-          on:pointerdown={startMapPan}
+          on:pointerdown={startCalibrationSquareDrag}
         >
           <img class="map-image" src={project.imageSrc} alt={project.name} draggable="false" />
-
-          {#if project.calibration.start}
+          {#if project.print.gridOverlay !== 'none'}
             <div
-              class="map-calibration-marker"
-              style={`left: ${(project.calibration.start.x / project.imageSize.width) * 100}%; top: ${(project.calibration.start.y / project.imageSize.height) * 100}%;`}
-            >
-              <span class="map-calibration-pin"><span>A</span></span>
-              <span class="map-calibration-dot"></span>
-            </div>
+              class:map-grid-overlay-light={project.print.gridOverlay === 'light'}
+              class:map-grid-overlay-dark={project.print.gridOverlay === 'dark'}
+              class="map-grid-overlay"
+              style={`
+                --map-grid-size: ${pixelsPerSquare}px;
+                --map-grid-offset-x: ${project.print.gridOffset.x}px;
+                --map-grid-offset-y: ${project.print.gridOffset.y}px;
+              `}
+            ></div>
           {/if}
-          {#if project.calibration.end}
+
+          {#if project.calibration.square}
             <div
-              class="map-calibration-marker"
-              style={`left: ${(project.calibration.end.x / project.imageSize.width) * 100}%; top: ${(project.calibration.end.y / project.imageSize.height) * 100}%;`}
-            >
-              <span class="map-calibration-pin"><span>B</span></span>
-              <span class="map-calibration-dot"></span>
-            </div>
+              class="map-calibration-square"
+              style={`
+                left: ${(project.calibration.square.x / project.imageSize.width) * 100}%;
+                top: ${(project.calibration.square.y / project.imageSize.height) * 100}%;
+                width: ${(project.calibration.square.width / project.imageSize.width) * 100}%;
+                height: ${(project.calibration.square.height / project.imageSize.height) * 100}%;
+              `}
+            ></div>
+          {/if}
+          {#if calibrationDraft && calibrationDraft.width > 0 && calibrationDraft.height > 0}
+            <div
+              class="map-calibration-square map-calibration-square-draft"
+              style={`
+                left: ${(calibrationDraft.x / project.imageSize.width) * 100}%;
+                top: ${(calibrationDraft.y / project.imageSize.height) * 100}%;
+                width: ${(calibrationDraft.width / project.imageSize.width) * 100}%;
+                height: ${(calibrationDraft.height / project.imageSize.height) * 100}%;
+              `}
+            ></div>
           {/if}
 
           {#each project.pages as page}
             <button
               type="button"
               class:map-page-box-active={page.id === selectedPageId}
+              class:map-page-box-invalid={isPagePrintSizeInvalid(page)}
               class="map-page-box"
               style={`
                 left: ${(page.x / project.imageSize.width) * 100}%;
@@ -753,6 +1069,133 @@
       {/if}
     </div>
   </main>
+
+  {#if selectedPage}
+    <aside class="map-inspector">
+      <div class="map-inspector-header">
+        <div>
+          <h2>Page</h2>
+          <p>{selectedPage.name || 'Untitled page'}</p>
+        </div>
+        <button
+          class="map-inspector-icon-button map-inspector-icon-button-danger"
+          type="button"
+          aria-label="Delete selected page"
+          on:click={removeSelectedPage}
+        >
+          <Icon name="trash" />
+        </button>
+      </div>
+
+      <section class="map-inspector-section">
+        <div class="map-inspector-section-header">
+          <h3>Details</h3>
+        </div>
+        <div class="map-page-fields">
+          <div class="map-field">
+            <Label for="selected-page-name">Name</Label>
+            <Input
+              id="selected-page-name"
+              value={selectedPage.name}
+              on:input={(event) => updateSelectedPage({ name: event.currentTarget.value })}
+            />
+          </div>
+        </div>
+      </section>
+
+      <section class="map-inspector-section">
+        <div class="map-inspector-section-header">
+          <h3>Bounds</h3>
+        </div>
+        <div class="map-field-grid">
+          <InputGroup>
+            <InputGroupText>X</InputGroupText>
+            <Input
+              type="number"
+              step="0.1"
+              value={pixelsToMillimeters(selectedPage.x, pixelsPerSquare).toFixed(1)}
+              on:input={(event) => updateSelectedPageMillimeters('x', event)}
+            />
+            <InputGroupText>mm</InputGroupText>
+          </InputGroup>
+          <InputGroup>
+            <InputGroupText>Y</InputGroupText>
+            <Input
+              type="number"
+              step="0.1"
+              value={pixelsToMillimeters(selectedPage.y, pixelsPerSquare).toFixed(1)}
+              on:input={(event) => updateSelectedPageMillimeters('y', event)}
+            />
+            <InputGroupText>mm</InputGroupText>
+          </InputGroup>
+          <InputGroup>
+            <InputGroupText>W</InputGroupText>
+            <Input
+              type="number"
+              step="0.1"
+              value={pixelsToMillimeters(selectedPage.width, pixelsPerSquare).toFixed(1)}
+              on:input={(event) => updateSelectedPageMillimeters('width', event)}
+            />
+            <InputGroupText>mm</InputGroupText>
+          </InputGroup>
+          <InputGroup>
+            <InputGroupText>H</InputGroupText>
+            <Input
+              type="number"
+              step="0.1"
+              value={pixelsToMillimeters(selectedPage.height, pixelsPerSquare).toFixed(1)}
+              on:input={(event) => updateSelectedPageMillimeters('height', event)}
+            />
+            <InputGroupText>mm</InputGroupText>
+          </InputGroup>
+        </div>
+      </section>
+
+      {#if selectedPagePrintSize && selectedPagePrintTotal}
+        <section class="map-inspector-section">
+          <div class="map-inspector-section-header">
+            <h3>Print size</h3>
+          </div>
+          <div class="map-print-size-summary">
+            <strong class:map-print-size-invalid={selectedPageWidthInvalid}>{selectedPagePrintSize.width.toFixed(1)} mm</strong>
+            <span>by</span>
+            <strong class:map-print-size-invalid={selectedPageHeightInvalid}>{selectedPagePrintSize.height.toFixed(1)} mm</strong>
+          </div>
+          <div class="map-print-margin-summary">
+            <span>Margins</span>
+            <strong>
+              L {project.print.margins.left.toFixed(1)} / R {project.print.margins.right.toFixed(1)} mm
+            </strong>
+            <strong>
+              T {project.print.margins.top.toFixed(1)} / B {project.print.margins.bottom.toFixed(1)} mm
+            </strong>
+          </div>
+          <div class="map-print-total-summary">
+            <span>Total on paper</span>
+            <strong class:map-print-size-invalid={selectedPageWidthInvalid}>
+              {selectedPagePrintTotal.width.toFixed(1)} / {orientedPaperSize.width.toFixed(1)} mm wide
+            </strong>
+            <strong class:map-print-size-invalid={selectedPageHeightInvalid}>
+              {selectedPagePrintTotal.height.toFixed(1)} / {orientedPaperSize.height.toFixed(1)} mm high
+            </strong>
+          </div>
+          {#if selectedPageInvalid}
+            <div class="map-inspector-error" role="alert">
+              <Icon name="exclamation-triangle" />
+              <span>
+                Page size plus margins exceeds the selected {project.print.paperFormat.toUpperCase()} paper
+                {selectedPageWidthInvalid && selectedPageHeightInvalid
+                  ? ' width and height.'
+                  : selectedPageWidthInvalid
+                    ? ' width.'
+                    : ' height.'}
+              </span>
+            </div>
+          {/if}
+        </section>
+      {/if}
+    </aside>
+  {/if}
 </div>
 
 <style lang="scss">
@@ -766,6 +1209,10 @@
     display: grid;
     grid-template-columns: 56px 340px minmax(0, 1fr);
     background: var(--color-surface-editor);
+  }
+
+  .map-workspace-has-inspector {
+    grid-template-columns: 56px 340px minmax(0, 1fr) 340px;
   }
 
   .map-mode-rail {
@@ -814,6 +1261,127 @@
     overflow-y: auto;
     border-right: 1px solid var(--color-border-strong);
     background: var(--color-surface-base);
+  }
+
+  .map-inspector {
+    min-height: 100vh;
+    max-height: 100vh;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow-y: auto;
+    border-left: 1px solid var(--color-border-strong);
+    background: var(--color-surface-base);
+  }
+
+  .map-inspector-header {
+    min-height: 4.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+
+  .map-inspector-header h2,
+  .map-inspector-section-header h3 {
+    margin: 0;
+    color: var(--color-ink-900);
+    font-size: var(--section-title-size);
+    font-weight: var(--section-title-weight);
+  }
+
+  .map-inspector-header p {
+    max-width: 15rem;
+    margin: 0.25rem 0 0;
+    overflow: hidden;
+    color: var(--color-ink-575);
+    font-size: 0.78rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .map-inspector-icon-button {
+    width: 1.7rem;
+    height: 1.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0.35rem;
+    background: transparent;
+    color: var(--color-ink-550);
+    transition: background-color 120ms ease, color 120ms ease;
+  }
+
+  .map-inspector-icon-button:hover {
+    background: var(--color-overlay-muted);
+    color: var(--color-ink-900);
+  }
+
+  .map-inspector-icon-button-danger:hover {
+    color: var(--color-danger-strong);
+  }
+
+  .map-inspector-section {
+    display: grid;
+    gap: 0.7rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+
+  .map-inspector-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .map-print-size-summary {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    color: var(--color-ink-575);
+    font-size: 0.78rem;
+  }
+
+  .map-print-size-summary strong,
+  .map-print-margin-summary strong,
+  .map-print-total-summary strong {
+    color: var(--color-ink-900);
+    font-weight: 700;
+  }
+
+  .map-print-margin-summary,
+  .map-print-total-summary {
+    display: grid;
+    gap: 0.2rem;
+    color: var(--color-ink-575);
+    font-size: 0.76rem;
+  }
+
+  .map-print-size-invalid,
+  .map-print-size-summary .map-print-size-invalid,
+  .map-print-total-summary .map-print-size-invalid {
+    color: var(--color-danger-strong);
+  }
+
+  .map-inspector-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    padding: 0.65rem 0.7rem;
+    border: 1px solid color-mix(in srgb, var(--color-danger-strong) 45%, transparent);
+    border-radius: 0.35rem;
+    background: color-mix(in srgb, var(--color-danger-strong) 10%, var(--color-surface-base));
+    color: var(--color-danger-strong);
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1.35;
   }
 
   .map-menu-row,
@@ -956,11 +1524,22 @@
     gap: 0.25rem;
   }
 
+  .map-field-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
   .map-field :global(.col-form-label),
   .map-sidebar :global(.form-control),
   .map-sidebar :global(.input-group-text),
   .map-sidebar :global(input),
-  .map-sidebar :global(select) {
+  .map-sidebar :global(select),
+  .map-inspector :global(.form-control),
+  .map-inspector :global(.input-group-text),
+  .map-inspector :global(input),
+  .map-inspector :global(select) {
     font-size: var(--editor-form-font-size);
   }
 
@@ -972,6 +1551,21 @@
 
   .map-action-grid .map-button:only-child {
     grid-column: 1 / -1;
+  }
+
+  .map-auto-pages-row {
+    display: grid;
+    grid-template-columns: minmax(7.5rem, 0.8fr) minmax(0, 1.2fr);
+    gap: 0.4rem;
+    align-items: stretch;
+  }
+
+  .map-auto-pages-row :global(.map-orientation-select.form-select) {
+    min-height: 2rem;
+    padding-top: var(--editor-form-control-padding-y);
+    padding-bottom: var(--editor-form-control-padding-y);
+    border-radius: 0.35rem;
+    font-size: var(--editor-form-font-size);
   }
 
   .map-button,
@@ -987,6 +1581,7 @@
     color: var(--color-ink-700);
     font-size: 0.78rem;
     font-weight: 700;
+    padding: 0.5rem 1rem;
   }
 
   .map-button:hover,
@@ -1001,9 +1596,29 @@
     cursor: not-allowed;
   }
 
-  .map-button-danger {
+  .map-button-wide {
     width: 100%;
-    color: var(--color-danger);
+  }
+
+  .map-icon-toggle {
+    width: 1.7rem;
+    height: 1.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0.35rem;
+    background: transparent;
+    color: var(--color-ink-550);
+    transition: background-color 120ms ease, color 120ms ease;
+  }
+
+  .map-icon-toggle:hover,
+  .map-icon-toggle-active {
+    background: var(--color-overlay-muted);
+    color: var(--color-ink-900);
   }
 
   .map-toggle {
@@ -1019,7 +1634,6 @@
     padding: 0;
   }
 
-  .map-status,
   .map-warning,
   .map-empty {
     color: var(--color-ink-600);
@@ -1031,11 +1645,6 @@
     color: var(--color-warning);
   }
 
-  .map-count {
-    color: var(--color-ink-500);
-    font-size: 0.78rem;
-  }
-
   .map-field-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1044,31 +1653,164 @@
 
   .map-page-list {
     min-height: 0;
-    display: grid;
-    gap: 0.2rem;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 0.1rem;
     overflow-y: auto;
+    padding-right: 0.2rem;
   }
 
-  .map-page-row {
-    padding: 0.35rem 0.45rem;
-    display: grid;
-    gap: 0.1rem;
+  .map-pages-wrapper {
+    --map-pages-text-primary: var(--color-ink-900);
+    --map-pages-text-subtle: var(--color-ink-550);
+    --map-pages-text-faint: var(--color-ink-500);
+    --map-pages-hover-overlay: var(--color-overlay-muted);
+    --map-pages-row-hover: var(--color-overlay-faint);
+    --map-pages-selected-surface: var(--color-surface-selected);
+    --map-pages-active-border: var(--color-border-active);
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    gap: 0.15rem;
+  }
+
+  .map-pages-list-header {
+    min-height: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0 0.15rem;
+    color: var(--map-pages-text-faint);
+    font-size: 0.8rem;
+  }
+
+  .map-pages-list-title {
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .map-pages-count {
+    color: var(--map-pages-text-primary);
+  }
+
+  .map-pages-list-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15rem;
+  }
+
+  .map-pages-header-action,
+  .map-page-row-action {
+    width: 1.7rem;
+    height: 1.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
     border: 0;
     border-radius: 0.35rem;
     background: transparent;
-    color: var(--color-ink-700);
+    color: var(--map-pages-text-subtle);
+    transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;
+  }
+
+  .map-pages-header-action:hover,
+  .map-page-row-action:hover {
+    background: var(--map-pages-hover-overlay);
+    color: var(--map-pages-text-primary);
+  }
+
+  .map-pages-header-action:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .map-page-row {
+    width: 100%;
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.2rem 0.25rem;
+    border: 0;
+    border-radius: 0.35rem;
+    background: transparent;
+    color: var(--map-pages-text-primary);
     text-align: left;
   }
 
-  .map-page-row:hover,
-  .map-page-row-active {
-    background: var(--color-surface-selected);
-    color: var(--color-ink-900);
+  .map-page-row:hover {
+    background: var(--map-pages-row-hover);
   }
 
-  .map-page-row small {
-    color: var(--color-ink-500);
+  .map-page-row-active {
+    background: var(--map-pages-selected-surface);
+  }
+
+  .map-page-row-main {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex: 1 1 auto;
+  }
+
+  .map-page-row-icon {
+    width: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--map-pages-text-faint);
+  }
+
+  .map-page-row-text {
+    min-width: 0;
+    display: grid;
+    gap: 0.05rem;
+  }
+
+  .map-page-row-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.78rem;
+  }
+
+  .map-page-row-text small {
+    color: var(--map-pages-text-faint);
     font-size: 0.68rem;
+  }
+
+  .map-page-row-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.1rem;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .map-page-row:hover .map-page-row-actions,
+  .map-page-row:focus-visible .map-page-row-actions,
+  .map-page-row-active .map-page-row-actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .map-page-row-active {
+    box-shadow: inset 3px 0 0 var(--map-pages-active-border);
+  }
+
+  .map-pages-empty {
+    padding: 0.75rem 0.25rem;
+    color: var(--map-pages-text-faint);
+    font-size: 0.78rem;
+    text-align: center;
   }
 
   .map-canvas {
@@ -1159,55 +1901,63 @@
     object-fit: fill;
   }
 
-  .map-calibration-marker {
+  .map-grid-overlay {
     position: absolute;
+    inset: 0;
     z-index: 2;
-    width: 0;
-    height: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
+    background-image:
+      repeating-linear-gradient(
+        to right,
+        var(--map-grid-color) 0,
+        var(--map-grid-color) 2px,
+        transparent 2px,
+        transparent var(--map-grid-size)
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        var(--map-grid-color) 0,
+        var(--map-grid-color) 2px,
+        transparent 2px,
+        transparent var(--map-grid-size)
+      );
+    background-position: var(--map-grid-offset-x) var(--map-grid-offset-y);
+    background-repeat: repeat;
+    mix-blend-mode: var(--map-grid-blend-mode);
   }
 
-  .map-calibration-pin {
+  .map-grid-overlay-light {
+    --map-grid-color: rgba(255, 255, 255, 0.86);
+    --map-grid-blend-mode: screen;
+  }
+
+  .map-grid-overlay-dark {
+    --map-grid-color: rgba(0, 0, 0, 0.58);
+    --map-grid-blend-mode: multiply;
+  }
+
+  .map-calibration-square {
     position: absolute;
-    left: 0;
-    top: -1.25rem;
-    width: 1.25rem;
-    height: 1.25rem;
-    display: grid;
-    place-items: center;
-    border: 2px solid white;
-    border-radius: 999px 999px 999px 0;
-    background: #1b2a44;
-    color: white;
-    font-size: 0.72rem;
-    font-weight: 800;
-    transform: rotate(-45deg);
-    transform-origin: 0 100%;
-    box-shadow: 0 4px 12px var(--color-shadow-400);
+    z-index: 4;
+    pointer-events: none;
+    border: 2px solid #1b2a44;
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.92),
+      0 0 0 1px rgba(27, 42, 68, 0.28),
+      0 8px 22px var(--color-shadow-300);
   }
 
-  .map-calibration-pin span {
-    position: relative;
-    z-index: 1;
-    transform: rotate(45deg);
-  }
-
-  .map-calibration-dot {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 0.34rem;
-    height: 0.34rem;
-    border: 1.5px solid white;
-    border-radius: 999px;
-    background: #1b2a44;
-    box-shadow: 0 2px 7px var(--color-shadow-500);
-    transform: translate(-50%, -50%);
+  .map-calibration-square-draft {
+    border-style: dashed;
+    background: rgba(81, 162, 255, 0.18);
   }
 
   .map-page-box {
     position: absolute;
-    z-index: 1;
+    z-index: 3;
     padding: 0.25rem;
     border: 2px solid rgba(27, 42, 68, 0.82);
     background: rgba(81, 162, 255, 0.12);
@@ -1220,6 +1970,17 @@
     border-color: #9a6b00;
     background: rgba(255, 242, 184, 0.24);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.85);
+  }
+
+  .map-page-box-invalid {
+    border-color: var(--color-danger-strong);
+    background: rgba(205, 50, 50, 0.12);
+  }
+
+  .map-page-box-invalid.map-page-box-active {
+    border-color: var(--color-danger-strong);
+    background: rgba(205, 50, 50, 0.24);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.78);
   }
 
   .map-page-box span {
@@ -1268,10 +2029,20 @@
       grid-template-columns: 56px minmax(0, 1fr);
     }
 
-    .map-sidebar {
+    .map-workspace-has-inspector {
+      grid-template-columns: 56px minmax(0, 1fr);
+    }
+
+    .map-sidebar,
+    .map-inspector {
       min-height: auto;
       max-height: none;
       grid-column: 2;
+    }
+
+    .map-inspector {
+      border-top: 1px solid var(--color-border-strong);
+      border-left: 0;
     }
 
     .map-canvas {

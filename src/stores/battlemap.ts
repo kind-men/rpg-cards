@@ -56,9 +56,11 @@ battlemapProject.subscribe((project) => {
         ...defaultBattlemapPrintSettings,
         ...project.print,
         paperSize: project.print.paperSize,
+        orientation: project.print.orientation,
         margins: project.print.margins,
         adjust: project.print.adjust,
         gridOverlay: project.print.gridOverlay,
+        gridOffset: project.print.gridOffset,
         showCropMarks: project.print.showCropMarks,
         snapToGrid: project.print.snapToGrid
       })

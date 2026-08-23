@@ -12,6 +12,7 @@
   import { currentCard } from '../stores';
 
   export let view: 'editor' | 'docs' | 'info' | 'print' = 'editor';
+  export let workspaceMode: 'cards' | 'battlemaps' = 'cards';
   export let contentMaxWidth = '800px';
   const minPanelWidth = 260;
   const maxPanelWidth = 520;
@@ -27,7 +28,11 @@
   const menuLogoUrl = `${base}/menu-logo.svg`;
 
   const isEditorView = () => view === 'editor';
+  $: isCardsMode = workspaceMode === 'cards';
+  $: isBattlemapsMode = workspaceMode === 'battlemaps';
+  $: hasCustomLeftSidebar = Boolean($$slots.leftSidebar);
   $: isRightSidebarVisible = isEditorView() && $currentCard !== -1;
+  $: effectiveLeftPanelWidth = isCardsMode || hasCustomLeftSidebar ? leftPanelWidth : 0;
   $: effectiveRightPanelWidth = isRightSidebarVisible ? rightPanelWidth : 0;
 
   const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
@@ -60,7 +65,7 @@
   };
 
   const closeView = async () => {
-    await goto(`${base}/`);
+    await goto(isBattlemapsMode ? `${base}/map` : `${base}/`);
   };
 
   const handleWindowKeydown = async (event: KeyboardEvent) => {
@@ -74,8 +79,11 @@
       }
 
       event.preventDefault();
-      setPrintSelection(null);
-      await goto(`${base}/print`);
+      if (isCardsMode) {
+        event.preventDefault();
+        setPrintSelection(null);
+        await goto(`${base}/print`);
+      }
     }
   };
 
@@ -128,7 +136,7 @@
 <div
   class:workspace-static-view={!isEditorView()}
   class="workspace"
-  style={`--left-panel-width: ${leftPanelWidth}px; --right-panel-width: ${effectiveRightPanelWidth}px; --mode-rail-width: ${modeRailWidth}px; --content-max-width: ${contentMaxWidth}; --workspace-watermark: url('${menuLogoUrl}');`}
+  style={`--left-panel-width: ${effectiveLeftPanelWidth}px; --right-panel-width: ${effectiveRightPanelWidth}px; --mode-rail-width: ${modeRailWidth}px; --content-max-width: ${contentMaxWidth}; --workspace-watermark: url('${menuLogoUrl}');`}
 >
   {#if isEditorView()}
     <div class="canvas-layer">
@@ -148,17 +156,23 @@
   {/if}
 
   <nav class="workspace-mode-rail" aria-label="Workspace modes">
-    <a class="workspace-mode-button workspace-mode-button-active" href={`${base}/`} aria-label="Cards">
-      <Icon name="card-text" />
+    <a class:workspace-mode-button-active={isCardsMode} class="workspace-mode-button" href={`${base}/`} aria-label="Cards">
+      <Icon name="phone" />
     </a>
-    <a class="workspace-mode-button" href={`${base}/map`} aria-label="Battlemaps">
+    <a class:workspace-mode-button-active={isBattlemapsMode} class="workspace-mode-button" href={`${base}/map`} aria-label="Battlemaps">
       <Icon name="map" />
     </a>
   </nav>
 
-  <SidebarContainer side="left" width={leftPanelWidth} offset={modeRailWidth} on:resizestart={startResize}>
-    <Sidebar />
-  </SidebarContainer>
+  {#if isCardsMode}
+    <SidebarContainer side="left" width={leftPanelWidth} offset={modeRailWidth} on:resizestart={startResize}>
+      <Sidebar />
+    </SidebarContainer>
+  {:else if hasCustomLeftSidebar}
+    <SidebarContainer side="left" width={leftPanelWidth} offset={modeRailWidth} scrollable on:resizestart={startResize}>
+      <slot name="leftSidebar" />
+    </SidebarContainer>
+  {/if}
 
   {#if isRightSidebarVisible}
     <SidebarContainer side="right" width={rightPanelWidth} on:resizestart={startResize}>

@@ -19,5 +19,27 @@
         margin-bottom: 0 !important;
       }
     }
+
+    :global(table) {
+      width: calc(100% - 1em);
+      max-width: 100%;
+      margin: 0 0.5em 0.25rem;
+      border-collapse: collapse;
+      font-size: 0.9em;
+      line-height: 1.1;
+    }
+
+    :global(th),
+    :global(td) {
+      padding: 0.12em 0.35em;
+      border: 1px solid color-mix(in srgb, var(--card-color) 45%, #ffffff);
+      vertical-align: top;
+    }
+
+    :global(th) {
+      background: color-mix(in srgb, var(--card-color) 14%, #ffffff);
+      color: var(--card-color);
+      font-weight: 700;
+    }
   }
 </style>

@@ -7,13 +7,17 @@
   import WorkspaceContentView from '$components/workspace-content-view.svelte';
   import WorkspaceShell from '$components/workspace-shell.svelte';
   import { deck, deckLoading, pageLayout } from '../../stores';
+  import { getPrintableCards } from '$lib/print-selection';
   import Hint from '../../components/hint.svelte';
+  import type CardModel from '../../model/card';
   import type { PaperFormat } from '../../model/page-layout';
   import { PAPER_SIZE_PRESETS } from '../../stores/page-layout';
 
   let previewFrame: HTMLIFrameElement | undefined;
   let previewNonce = 0;
   let previewLoading = true;
+  let previewInitialized = false;
+  let previewCards: CardModel[] = [];
   let refreshTimeout: ReturnType<typeof setTimeout> | undefined;
   let initialDeckSize: number | undefined;
   let isLeavingForNewCards = false;
@@ -26,8 +30,14 @@
     { value: 'custom', label: 'Custom' }
   ];
 
+  const updatePreview = () => {
+    previewLoading = true;
+    previewCards = getPrintableCards($deck);
+    previewNonce += 1;
+  };
+
   const queuePreviewRefresh = () => {
-    if (!browser) {
+    if (!browser || !previewInitialized) {
       return;
     }
 
@@ -36,16 +46,7 @@
     }
 
     refreshTimeout = setTimeout(() => {
-      const nextPreviewNonce = previewNonce + 1;
-
-      try {
-        sessionStorage.setItem(`rpg-cards-print-deck:${nextPreviewNonce}`, JSON.stringify($deck));
-      } catch (error) {
-        console.warn('Unable to write print preview deck snapshot.', error);
-      }
-
-      previewLoading = true;
-      previewNonce = nextPreviewNonce;
+      updatePreview();
       refreshTimeout = undefined;
     }, 100);
   };
@@ -101,6 +102,22 @@
     }
 
     if (
+      event.data?.type === 'rpg-cards-output-request-deck' &&
+      String(event.data?.previewToken ?? '') === String(previewNonce) &&
+      event.source === previewFrame?.contentWindow
+    ) {
+      previewFrame.contentWindow?.postMessage(
+        {
+          type: 'rpg-cards-output-deck',
+          previewToken: previewNonce,
+          cards: previewCards
+        },
+        window.location.origin
+      );
+      return;
+    }
+
+    if (
       event.data?.type === 'rpg-cards-output-ready' &&
       String(event.data?.previewToken ?? '') === String(previewNonce)
     ) {
@@ -118,6 +135,8 @@
     void (async () => {
       await deck.loadStoredDeck();
       initialDeckSize = $deck.length;
+      updatePreview();
+      previewInitialized = true;
     })();
   });
 
@@ -257,14 +276,16 @@
             <p class="print-preview-loading-text">Building print preview…</p>
           </div>
         {/if}
-        <iframe
-          bind:this={previewFrame}
-          class="print-preview-frame"
-          class:print-preview-frame-ready={!previewLoading}
-          title="Print preview"
-          src={`${base}/output?preview=${previewNonce}`}
-          on:load={handlePreviewLoad}
-        ></iframe>
+        {#if previewInitialized}
+          <iframe
+            bind:this={previewFrame}
+            class="print-preview-frame"
+            class:print-preview-frame-ready={!previewLoading}
+            title="Print preview"
+            src={`${base}/output?preview=${previewNonce}`}
+            on:load={handlePreviewLoad}
+          ></iframe>
+        {/if}
       </div>
     </section>
   </WorkspaceContentView>

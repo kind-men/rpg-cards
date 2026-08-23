@@ -1,7 +1,6 @@
 <script lang="ts">
   import { browser } from '$app/environment';
   import { onMount, tick } from 'svelte';
-  import { parseCards } from '$lib/card-json-parser';
   import { preloadIconsForCards } from '$lib/icons';
   import { getPrintableCards } from '../../lib/print-selection';
   import { getBleedAwarePrintGrid } from '$lib/print-layout';
@@ -39,6 +38,7 @@
   let pageRows = 1;
   let buildToken = 0;
   let requestedPreviewKey = '';
+  let isSnapshotPreview = false;
 
   const getCardBackBleed = () => {
     const bleed = Number($pageLayout.cardBackBorder);
@@ -160,7 +160,7 @@
     previewReady = false;
     previewVisible = false;
 
-    const selectedCards = getPrintableCards($deck);
+    const selectedCards = isSnapshotPreview ? $deck : getPrintableCards($deck);
     const printGrid = getBleedAwarePrintGrid({
       paperSize: $pageLayout.paperSize,
       cardSize: $pageLayout.cardSize,
@@ -220,17 +220,31 @@
   const loadDeckForOutput = async () => {
     const previewToken = new URL(window.location.href).searchParams.get('preview') ?? '';
 
-    try {
-      const previewDeck = previewToken
-        ? sessionStorage.getItem(`rpg-cards-print-deck:${previewToken}`)
-        : null;
+    if (previewToken && window.parent !== window) {
+      const previewDeck = await new Promise<CardModel[]>((resolve) => {
+        const receiveDeck = (event: MessageEvent) => {
+          if (
+            event.origin === window.location.origin &&
+            event.source === window.parent &&
+            event.data?.type === 'rpg-cards-output-deck' &&
+            String(event.data?.previewToken ?? '') === previewToken &&
+            Array.isArray(event.data?.cards)
+          ) {
+            window.removeEventListener('message', receiveDeck);
+            resolve(event.data.cards as CardModel[]);
+          }
+        };
 
-      if (previewDeck) {
-        deck.hydrate(parseCards(previewDeck) ?? []);
-        return;
-      }
-    } catch (error) {
-      console.warn('Unable to read print preview deck snapshot.', error);
+        window.addEventListener('message', receiveDeck);
+        window.parent.postMessage(
+          { type: 'rpg-cards-output-request-deck', previewToken },
+          window.location.origin
+        );
+      });
+
+      isSnapshotPreview = true;
+      deck.hydrate(previewDeck);
+      return;
     }
 
     await deck.loadStoredDeck();

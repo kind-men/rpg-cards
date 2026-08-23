@@ -11,12 +11,19 @@
   export let style = '';
 
   $: orderedCards = getPrintableEntryCards(entry, side);
+  $: transparentBleed =
+    side === 'back' &&
+    orderedCards.length > 0 &&
+    orderedCards.every(
+      ({ card }) => card.cardback_mode === 'images' && card.cardback_border_style === 'none'
+    );
 </script>
 
 <div
   class="output-entry-slot"
   class:backside={side === 'back'}
   class:with-border={withBorder}
+  class:transparent-bleed={transparentBleed}
   class:joined-slot={entry.type === 'joined-pair'}
   class:preview-mode={previewMode}
   style={`--preview-scale: ${previewScale}; ${style}`}
@@ -94,6 +101,10 @@
         background-color: var(--card-color);
         content: '';
         pointer-events: none;
+      }
+
+      &.transparent-bleed::before {
+        background-color: transparent;
       }
     }
 

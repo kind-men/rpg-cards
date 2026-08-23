@@ -4,6 +4,7 @@
   import { parseCards } from '$lib/card-json-parser';
   import { preloadIconsForCards } from '$lib/icons';
   import { getPrintableCards } from '../../lib/print-selection';
+  import { getBleedAwarePrintGrid } from '$lib/print-layout';
   import Card from '../../components/card/card.svelte';
   import PrintableOutputEntryCard from '../../components/card/printable-output-entry.svelte';
   import {
@@ -39,11 +40,10 @@
   let buildToken = 0;
   let requestedPreviewKey = '';
 
-  const calculateGridCount = (availableSpace: number, cellSize: number) =>
-    Math.max(1, Math.floor((availableSpace + GAP_BETWEEN) / (cellSize + GAP_BETWEEN)));
-
-  const getCardCellWidth = () => $pageLayout.cardSize.width + ($pageLayout.cardBackBorder || 0) * 2;
-  const getCardCellHeight = () => $pageLayout.cardSize.height + ($pageLayout.cardBackBorder || 0) * 2;
+  const getCardBackBleed = () => {
+    const bleed = Number($pageLayout.cardBackBorder);
+    return Number.isFinite(bleed) ? Math.max(0, bleed) : 0;
+  };
 
   const getBacksideColumn = (column: number, span: number) => pageColumns - column - span + 2;
 
@@ -127,7 +127,9 @@
   };
 
   const doesMeasuredCardFit = (): boolean => {
-    const contentElement = measurementStageElement?.querySelector('.card-content') as HTMLElement | null;
+    const contentElement = measurementStageElement?.querySelector(
+      '.card-content'
+    ) as HTMLElement | null;
 
     if (!contentElement) {
       return false;
@@ -159,13 +161,16 @@
     previewVisible = false;
 
     const selectedCards = getPrintableCards($deck);
-    const cardCellWidth = getCardCellWidth();
-    const cardCellHeight = getCardCellHeight();
-    const availableWidth = $pageLayout.paperSize.width - PAGE_PADDING * 2;
-    const availableHeight = $pageLayout.paperSize.height - PAGE_PADDING * 2;
+    const printGrid = getBleedAwarePrintGrid({
+      paperSize: $pageLayout.paperSize,
+      cardSize: $pageLayout.cardSize,
+      gap: GAP_BETWEEN,
+      pagePadding: PAGE_PADDING,
+      bleed: getCardBackBleed()
+    });
 
-    pageColumns = calculateGridCount(availableWidth, cardCellWidth);
-    pageRows = calculateGridCount(availableHeight, cardCellHeight);
+    pageColumns = printGrid.columns;
+    pageRows = printGrid.rows;
 
     const printableCards = await expandDeckToPrintableEntries(
       selectedCards,
@@ -285,7 +290,9 @@
     style="
       --page-width: {$pageLayout.paperSize.width}mm;
       --page-height: {$pageLayout.paperSize.height}mm;
-      --back-border-width: {$pageLayout.cardBackBorder || 0}mm;
+      --back-border-width: {getCardBackBleed()}mm;
+      --bleed-excess: {Math.max(0, getCardBackBleed() * 2 - GAP_BETWEEN)}mm;
+      --print-gap: {GAP_BETWEEN}mm;
       --card-width: {$pageLayout.cardSize.width}mm;
       --card-height: {$pageLayout.cardSize.height}mm;
       --page-columns: {pageColumns};
@@ -305,14 +312,15 @@
             <PrintableOutputEntryCard
               entry={placed.entry}
               side="front"
-              withBorder={$pageLayout.cardBackBorder > 0}
+              withBorder={getCardBackBleed() > 0}
             />
           </div>
         {/each}
       </div>
       <div
         class="paper backside"
-        style="--adjust-x: {$pageLayout.adjust.x || 0}mm; --adjust-y: {$pageLayout.adjust.y || 0}mm;"
+        style="--adjust-x: {$pageLayout.adjust.x || 0}mm; --adjust-y: {$pageLayout.adjust.y ||
+          0}mm;"
       >
         {#each page.entries as placed}
           <div
@@ -325,7 +333,7 @@
             <PrintableOutputEntryCard
               entry={placed.entry}
               side="back"
-              withBorder={$pageLayout.cardBackBorder > 0}
+              withBorder={getCardBackBleed() > 0}
             />
           </div>
         {/each}
@@ -366,8 +374,7 @@
     gap: 0.85rem;
     padding: 2rem;
     background:
-      radial-gradient(circle at top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 38%),
-      #edf1f6;
+      radial-gradient(circle at top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 38%), #edf1f6;
     text-align: center;
   }
 
@@ -401,13 +408,10 @@
     display: grid;
     grid-template-columns: repeat(
       var(--page-columns),
-      calc(var(--card-width) + var(--back-border-width) * 2)
+      calc(var(--card-width) + var(--bleed-excess))
     );
-    grid-template-rows: repeat(
-      var(--page-rows),
-      calc(var(--card-height) + var(--back-border-width) * 2)
-    );
-    gap: 2mm;
+    grid-template-rows: repeat(var(--page-rows), calc(var(--card-height) + var(--bleed-excess)));
+    gap: var(--print-gap);
     padding: $paper-padding;
     width: var(--page-width);
     height: var(--page-height);

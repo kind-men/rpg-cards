@@ -1,10 +1,7 @@
 <script lang="ts">
   import CardBack from './card-back.svelte';
   import CardComponent from './card.svelte';
-  import {
-    getPrintableEntryCards,
-    type PrintableOutputEntry
-  } from '$lib/card-continuations';
+  import { getPrintableEntryCards, type PrintableOutputEntry } from '$lib/card-continuations';
 
   export let entry: PrintableOutputEntry;
   export let side: 'front' | 'back' = 'front';
@@ -60,7 +57,10 @@
   {:else if orderedCards[0]}
     {#if previewMode}
       <div class="preview-card-stage">
-        <div class="preview-card-scale" style={`transform: scale(${previewScale}); transform-origin: top left;`}>
+        <div
+          class="preview-card-scale"
+          style={`transform: scale(${previewScale}); transform-origin: top left;`}
+        >
           {#if side === 'front'}
             <CardComponent card={orderedCards[0].card} />
           {:else}
@@ -78,19 +78,34 @@
 
 <style lang="scss">
   .output-entry-slot {
-    height: calc(var(--card-height) + (var(--back-border-width) * 2));
-    width: calc(var(--card-width) + (var(--back-border-width) * 2));
+    position: relative;
+    isolation: isolate;
+    height: var(--card-height);
+    width: var(--card-width);
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
 
     &.backside.with-border {
-      background-color: var(--card-color);
+      &::before {
+        position: absolute;
+        z-index: 0;
+        inset: calc(var(--back-border-width) * -1);
+        background-color: var(--card-color);
+        content: '';
+        pointer-events: none;
+      }
+    }
+
+    :global(.rpg-card-wrapper),
+    .joined-card-shell {
+      position: relative;
+      z-index: 1;
     }
   }
 
   .joined-slot {
-    width: calc((var(--card-width) * 2) + (var(--back-border-width) * 2));
+    width: calc(var(--card-width) * 2);
   }
 
   .joined-card-shell {
@@ -113,41 +128,19 @@
     justify-content: flex-end;
   }
 
-  .backside.with-border.joined-slot {
-    background-color: transparent;
-  }
-
-  .backside.with-border.joined-slot .joined-card-panel {
-    box-sizing: border-box;
-    padding-top: var(--back-border-width);
-    padding-bottom: var(--back-border-width);
-    background-color: var(--card-color);
-  }
-
-  .backside.with-border.joined-slot .joined-card-panel:first-child {
-    padding-left: var(--back-border-width);
-    padding-right: 0;
-  }
-
-  .backside.with-border.joined-slot .joined-card-panel:last-child {
-    padding-left: 0;
-    padding-right: var(--back-border-width);
-  }
-
   .joined-card-fold {
     position: absolute;
     top: 4%;
     right: -1px;
     width: 2px;
     height: 92%;
-    background:
-      repeating-linear-gradient(
-        to bottom,
-        rgba(71, 85, 105, 0.4),
-        rgba(71, 85, 105, 0.4) 4px,
-        transparent 4px,
-        transparent 8px
-      );
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(71, 85, 105, 0.4),
+      rgba(71, 85, 105, 0.4) 4px,
+      transparent 4px,
+      transparent 8px
+    );
     pointer-events: none;
   }
 
